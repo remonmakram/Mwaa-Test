@@ -1,0 +1,25 @@
+---
+
+pipeline:
+  name: lt_34_digital_order_tracking_dag
+  description: 34 digital order tracking pipeline
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - digital order tracking
+  task_groups:
+    - name: DIGITAL_ORDER_TRACKING_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_ld_date: dags/sql/pre_sql/pre_v_cdc_ld_date.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+        v_cdc_oms_overlap: 0.02083333333
+      tasks:
+        - description: digital order tracking subpackage
+          type: oracle
+          script_location: dags/sql/34_DIGITAL_ORDER_TRACKING/34_DIGITAL_ORDER_TRACKING_PKG.sql
+          args:
+            v_cdc_load_table_name: DIGITAL_ORDER_DATA
+            
+        

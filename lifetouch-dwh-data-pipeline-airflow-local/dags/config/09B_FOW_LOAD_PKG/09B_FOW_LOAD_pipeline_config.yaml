@@ -1,0 +1,239 @@
+---
+
+pipeline:
+  name: lt_09b_fow_load_dag
+  description: lifetouch 09B_FOW_LOAD_PKG package
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - 09B_FOW_LOAD_PKG
+  task_groups:
+    - name: 09B_FOW_LOAD_PKG_INGESTION
+      description: extract and load part
+      ingestion_script: ingestion_script.py
+      data_sources:
+          - type: oracle
+            name: fow
+            default_args:
+              dest_schema: RAX_APP_USER
+              merge_required: False
+              v_cdc_oms_overlap: 0.02083333333
+              v_cdc_overlap: 0.02083333333
+            entities:
+              - dest_table: "C$_0FOW_CT_BATCH_STG"
+                v_cdc_load_table_name: CT_BATCH
+                tmp_create: '09B_FOW_LOAD_PKG/01-create_temp_fow_ct_batch_stg.sql'
+                extract_query: '09B_FOW_LOAD_PKG/01-extract_fow_ct_batch_stg.sql'
+                src_table: CT_BATCH
+
+              - dest_table: "C$_0FOW_CT_SUBJECT_STG"
+                v_cdc_load_table_name: CT_SUBJECT
+                tmp_create: '09B_FOW_LOAD_PKG/02-create_temp_fow_ct_subject_stg.sql'
+                extract_query: '09B_FOW_LOAD_PKG/02-extract_fow_ct_subject_stg.sql'
+                src_table: CT_SUBJECT
+
+              - dest_table: "C$_0FOW_CT_SBJ_BATCH_STG"
+                v_cdc_load_table_name: CT_SUBJECT_BATCH
+                tmp_create: '09B_FOW_LOAD_PKG/03-create_temp_fow_ct_sbj_batch_stg.sql'
+                extract_query: '09B_FOW_LOAD_PKG/03-extract_fow_ct_sbj_batch_stg.sql'
+                src_table: CT_SUBJECT_BATCH
+
+              - dest_table: "C$_0FOW_APO_MERCH_TAGS"
+                v_cdc_load_table_name: FOW_MERCH_TAGS_TABLE
+                tmp_create: '09B_FOW_LOAD_PKG/05-create_temp_fow_apo_merch_tags.sql'
+                extract_query: '09B_FOW_LOAD_PKG/05-extract_fow_apo_merch_tags.sql'
+                src_table: APO_MERCH_TAGS
+
+              - dest_table: "C$_0FOW_APO_ASSOCIATION_STG"
+                v_cdc_load_table_name: APO_ASSOCIATION
+                tmp_create: '09B_FOW_LOAD_PKG/06-create_temp_fow_apo_association_stg.sql'
+                extract_query: '09B_FOW_LOAD_PKG/06-extract_fow_apo_association_stg.sql'
+                src_table: APO_ASSOCIATION  
+
+              - dest_table: "C$_0FOW_YB_AUDIT_STG"
+                v_cdc_load_table_name: YB_AUDIT
+                tmp_create: '09B_FOW_LOAD_PKG/07-create_temp_fow_yb_audit_stg.sql'
+                extract_query: '09B_FOW_LOAD_PKG/07-extract_fow_yb_audit_stg.sql'
+                src_table: YB_AUDIT
+
+              - dest_table: "C$_0FOW_YB_FRNG_CNG_STG"
+                v_cdc_load_table_name: YB_OFFERING_CONFIG
+                tmp_create: '09B_FOW_LOAD_PKG/08-create_temp_fow_yb_frng_cng_stg.sql'
+                extract_query: '09B_FOW_LOAD_PKG/08-extract_fow_yb_frng_cng_stg.sql'
+                src_table: YB_OFFERING_CONFIG
+
+              - dest_table: "fow_names_file_stg"
+                v_cdc_load_table_name: FOW_NAMES_FILE
+                tmp_create: '09B_FOW_LOAD_PKG/09-create_temp_fow_names_file_stg.sql'
+                extract_query: '09B_FOW_LOAD_PKG/09-extract_fow_names_file_stg.sql'
+                src_table: names_file
+
+              - dest_table: "fow_yb_feature_stg"
+                v_cdc_load_table_name: FOW_YB_FEATURE
+                tmp_create: '09B_FOW_LOAD_PKG/10-create_temp_fow_yb_feature_stg.sql'
+                extract_query: '09B_FOW_LOAD_PKG/10-extract_fow_yb_feature_stg.sql'
+                src_table: YB_FEATURE  
+
+              - dest_table: "fow_yb_choice_stg"
+                v_cdc_load_table_name: FOW_YB_CHOICE
+                tmp_create: '09B_FOW_LOAD_PKG/11-create_temp_fow_yb_choice_stg.sql'
+                extract_query: '09B_FOW_LOAD_PKG/11-extract_fow_yb_choice_stg.sql'
+                src_table: YB_CHOICE
+
+              - dest_table: "fow_yb_feature_choice_stg"
+                v_cdc_load_table_name: FOW_YB_FEATURE_CHOICE
+                tmp_create: '09B_FOW_LOAD_PKG/12-create_temp_fow_yb_feature_choice_stg.sql'
+                extract_query: '09B_FOW_LOAD_PKG/12-extract_fow_yb_feature_choice_stg.sql'
+                src_table: YB_FEATURE_CHOICE
+
+              - dest_table: "fow_yb_flow_stg"
+                v_cdc_load_table_name: FOW_YB_FLOW
+                tmp_create: '09B_FOW_LOAD_PKG/13-create_temp_fow_yb_flow_stg.sql'
+                extract_query: '09B_FOW_LOAD_PKG/13-extract_fow_yb_flow_stg.sql'
+                src_table: fow_yb_flow_stg
+
+              - dest_table: "fow_yb_flow_feature_stg"
+                v_cdc_load_table_name: FOW_YB_FLOW_FEATURE
+                tmp_create: '09B_FOW_LOAD_PKG/14-create_temp_fow_yb_flow_feature_stg.sql'
+                extract_query: '09B_FOW_LOAD_PKG/14-extract_fow_yb_flow_feature_stg.sql'
+                src_table: YB_FLOW_FEATURE
+
+              - dest_table: "fow_yb_flow_booking_year_stg"
+                v_cdc_load_table_name: FOW_YB_FLOW_BOOKING_YEAR
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: '09B_FOW_LOAD_PKG/15-create_temp_fow_yb_flow_booking_year_stg.sql'
+                extract_query: '09B_FOW_LOAD_PKG/15-extract_fow_yb_flow_booking_year_stg.sql'
+                src_table: YB_FLOW_BOOKING_YEAR   
+
+              - dest_table: "C$_0FOW_YB_PRICING_STG"
+                v_cdc_load_table_name: FOW_YB_PRICING_STG
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: '09B_FOW_LOAD_PKG/16-create_temp_fow_yb_pricing_stg.sql'
+                extract_query: '09B_FOW_LOAD_PKG/16-extract_fow_yb_pricing_stg.sql'
+                src_table: YB_PRICING                   
+
+
+
+
+
+    - name: 09B_FOW_LOAD_PKG_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_oms_overlap: 0.02083333333
+        v_cdc_overlap: 0.02083333333
+      tasks: 
+        - name: 01-LOAD_FOW_CT_BATCH_PKG
+          description: LOAD_FOW_CT_BATCH_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/09B_FOW_LOAD_PKG/01-LOAD_FOW_CT_BATCH_PKG.sql
+          args:
+            v_cdc_load_table_name: CT_BATCH
+
+        - name: 02-LOAD_FOW_CT_SUBJECT_PKG
+          description: 02-LOAD_FOW_CT_SUBJECT_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/09B_FOW_LOAD_PKG/02-LOAD_FOW_CT_SUBJECT_PKG.sql
+          args:
+            v_cdc_load_table_name: CT_SUBJECT
+
+        - name: 03-LOAD_FOW_CT_SUBJECT_BATCH_PKG
+          description: LOAD_FOW_CT_SUBJECT_BATCH_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/09B_FOW_LOAD_PKG/03-LOAD_FOW_CT_SUBJECT_BATCH_PKG.sql
+          args:
+            v_cdc_load_table_name: CT_SUBJECT_BATCH
+
+        - name: 04-LOAD_CT_SUMMARY_PKG
+          description: LOAD_CT_SUMMARY_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/09B_FOW_LOAD_PKG/04-LOAD_CT_SUMMARY_PKG.sql
+          args:
+            v_cdc_load_table_name: CT_SUMMARY      
+
+        - name: 05-LOAD_FOW_MERCH_TAGS_PKG
+          description: LOAD_FOW_MERCH_TAGS_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/09B_FOW_LOAD_PKG/05-LOAD_FOW_MERCH_TAGS_PKG.sql
+          args:
+            v_cdc_load_table_name: FOW_MERCH_TAGS_TABLE    
+
+        - name: 06-LOAD_APO_ASSOCIATION_PKG
+          description: LOAD_APO_ASSOCIATION_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/09B_FOW_LOAD_PKG/06-LOAD_APO_ASSOCIATION_PKG.sql
+          args:
+            v_cdc_load_table_name: APO_ASSOCIATION
+
+        - name: 07-LOAD_FOW_YB_AUDIT_PKG
+          description: LOAD_FOW_YB_AUDIT_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/09B_FOW_LOAD_PKG/07-LOAD_FOW_YB_AUDIT_PKG.sql
+          args:
+            v_cdc_load_table_name: YB_AUDIT 
+
+        - name: 08-LOAD_FOW_YB_OFFERING_CONFIG_PKG
+          description: LOAD_FOW_YB_OFFERING_CONFIG_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/09B_FOW_LOAD_PKG/08-LOAD_FOW_YB_OFFERING_CONFIG_PKG.sql
+          args:
+            v_cdc_load_table_name: YB_OFFERING_CONFIG       
+
+        - name: 09-LOAD_FOW_NAMES_FILE_PKG
+          description: LOAD_FOW_NAMES_FILE_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/09B_FOW_LOAD_PKG/09-LOAD_FOW_NAMES_FILE_PKG.sql
+          args:
+            v_cdc_load_table_name: FOW_NAMES_FILE
+
+        - name: 10-LOAD_FOW_YB_FEATURE_PKG
+          description: LOAD_FOW_YB_FEATURE_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/09B_FOW_LOAD_PKG/10-LOAD_FOW_YB_FEATURE_PKG.sql
+          args:
+            v_cdc_load_table_name: FOW_YB_FEATURE 
+
+        - name: 11-LOAD_FOW_YB_CHOICE_PKG
+          description: LOAD_FOW_YB_CHOICE_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/09B_FOW_LOAD_PKG/11-LOAD_FOW_YB_CHOICE_PKG.sql
+          args:
+            v_cdc_load_table_name: FOW_YB_CHOICE     
+
+        - name: 12-LOAD_FOW_YB_FEATURE_CHOICE_PKG
+          description: LOAD_FOW_YB_FEATURE_CHOICE_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/09B_FOW_LOAD_PKG/12-LOAD_FOW_YB_FEATURE_CHOICE_PKG.sql
+          args:
+            v_cdc_load_table_name: FOW_YB_FEATURE_CHOICE     
+
+        - name: 13-LOAD_FOW_YB_FLOW_PKG
+          description: LOAD_FOW_YB_FLOW_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/09B_FOW_LOAD_PKG/13-LOAD_FOW_YB_FLOW_PKG.sql
+          args:
+            v_cdc_load_table_name: FOW_YB_FLOW     
+
+        - name: 14-LOAD_FOW_YB_FLOW_FEATURE_PKG
+          description: LOAD_FOW_YB_FLOW_FEATURE_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/09B_FOW_LOAD_PKG/14-LOAD_FOW_YB_FLOW_FEATURE_PKG.sql
+          args:
+            v_cdc_load_table_name: FOW_YB_FLOW_FEATURE 
+
+        - name: 15-LOAD_FOW_YB_FLOW_BOOKING_YEAR_PKG
+          description: LOAD_FOW_YB_FLOW_BOOKING_YEAR_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/09B_FOW_LOAD_PKG/15-LOAD_FOW_YB_FLOW_BOOKING_YEAR_PKG.sql
+          args:
+            v_cdc_load_table_name: FOW_YB_FLOW_BOOKING_YEAR  
+
+        - name: 16-LOAD_FOW_YB_PRICING_PKG
+          description: LOAD_FOW_YB_PRICING_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/09B_FOW_LOAD_PKG/16-LOAD_FOW_YB_PRICING_PKG.sql
+          args:
+            v_cdc_load_table_name: FOW_YB_PRICING_STG           
+
+            

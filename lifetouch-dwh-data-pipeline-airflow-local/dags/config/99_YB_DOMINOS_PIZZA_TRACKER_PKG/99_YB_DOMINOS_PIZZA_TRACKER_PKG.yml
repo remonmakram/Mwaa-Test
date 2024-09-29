@@ -1,0 +1,25 @@
+---
+
+pipeline:
+  name: lt_99_YB_DOMINOS_PIZZA_TRACKER_PKG
+  description: 99_YB_DOMINOS_PIZZA_TRACKER_PKG 
+  schedule: '@daily'
+  tags:
+    - lifetouch
+    - 99_YB_DOMINOS_PIZZA_TRACKER_PKG
+  
+  task_groups:
+    - name: 99_YB_DOMINOS_PIZZA_TRACKER_PKG_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      tasks: 
+        - description: run_pkg
+          type: oracle_sql
+          script_location: dags/sql/99_YB_DOMINOS_PIZZA_TRACKER_PKG/99_YB_DOMINOS_PIZZA_TRACKER_PKG.sql
+          args:
+            v_cdc_load_table_name: YB_DOMINO_STG
+            v_cdc_overlap: 0.02083333333 
+
+        
+        

@@ -1,0 +1,3 @@
+SELECT last_cdc_completion_date
+FROM ods.dw_cdc_load_status
+WHERE dw_table_name=  :v_cdc_load_table_name

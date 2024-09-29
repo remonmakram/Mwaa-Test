@@ -1,0 +1,12 @@
+Data Center - :v_US_data_center
+
+PLPS Data Error in the last 24 hours:
+
+STD_ID                 ORDER_DATE                            ORDER_ID                 ORDER_TYPE                 STUDIO_SOFTWARE_VERSION                 CCPRICING_TOT_537                 DETAIL_TOT                 SALE_DIFF                 ISSUE_WITH
+
+--#v_diff_in_ccpricing_detail_post_updates
+
+The source for this package is in:
+ODS_Project -> LPS_Folder -> MONITOR_PLPS_DATA_ISSUES_PKG
+
+Please feel free to enhance, improve, or refine as you see fit.

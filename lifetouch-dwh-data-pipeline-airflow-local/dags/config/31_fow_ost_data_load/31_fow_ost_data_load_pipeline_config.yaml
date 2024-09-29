@@ -1,0 +1,103 @@
+---
+
+pipeline:
+  name: 31_fow_ost_data_load_dag
+  description: 31_fow_ost_data_load package
+  schedule: "0 5 * * *"
+  tags:
+    - lifetouch
+    - 31_fow_ost_data_load
+  task_groups:
+    - name: 31_fow_ost_data_load_Ingestion
+      description: extract and load part
+      ingestion_script: ingestion_script.py
+      data_sources:
+          - type: oracle
+            name: fow
+            default_args:
+              dest_schema: RAX_APP_USER
+              merge_required: False
+            entities:
+              - dest_table: "C$_0FOW_FRNG_MDL_CM_STG"
+                v_cdc_load_table_name: OST_TABLES
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: '31_fow_ost_data_load/ingestion/create_temp_fow_frng_mdl_cm_stg.sql'
+                extract_query: '31_fow_ost_data_load/ingestion/extract_fow_frng_mdl_cm_stg.sql'
+                src_table: FOW_FRNG_MDL_CM_STG
+
+              - dest_table: "C$_0FOW_FRNG_MDL_STG"
+                v_cdc_load_table_name: OST_TABLES
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: '31_fow_ost_data_load/ingestion/create_temp_fow_frng_mdl_stg.sql'
+                extract_query: '31_fow_ost_data_load/ingestion/extract_fow_frng_mdl_stg.sql'
+                src_table: FOW_FRNG_MDL_STG
+
+              - dest_table: "C$_0FOW_FRNG_MDL_TGS_STG"
+                v_cdc_load_table_name: OST_TABLES
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: '31_fow_ost_data_load/ingestion/create_temp_fow_frng_mdl_tgs_stg.sql'
+                extract_query: '31_fow_ost_data_load/ingestion/extract_fow_frng_mdl_tgs_stg.sql'
+                src_table: FOW_FRNG_MDL_TGS_STG
+
+              - dest_table: "C$_0FOW_ITM_CM_VL_STG"
+                v_cdc_load_table_name: OST_TABLES
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: '31_fow_ost_data_load/ingestion/create_temp_fow_itm_cm_vl_stg.sql'
+                extract_query: '31_fow_ost_data_load/ingestion/extract_fow_itm_cm_vl_stg.sql'
+                src_table: FOW_ITM_CM_VL_STG
+
+              - dest_table: "C$_0FW_FRNG_MDL_PKG_CM"
+                v_cdc_load_table_name: OST_TABLES
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: '31_fow_ost_data_load/ingestion/create_temp_fw_frng_mdl_pkg_cm.sql'
+                extract_query: '31_fow_ost_data_load/ingestion/extract_fw_frng_mdl_pkg_cm.sql'
+                src_table: FW_FRNG_MDL_PKG_CM
+
+              - dest_table: "C$_0FW_FRNG_MDL_SM_CM_STG"
+                v_cdc_load_table_name: OST_TABLES
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: '31_fow_ost_data_load/ingestion/create_temp_fw_frng_mdl_sm_cm_stg.sql'
+                extract_query: '31_fow_ost_data_load/ingestion/extract_fw_frng_mdl_sm_cm_stg.sql'
+                src_table: FW_FRNG_MDL_SM_CM_STG
+
+
+    - name: 31_fow_ost_data_load_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+        v_cdc_ld_date: dags/sql/pre_sql/pre_v_cdc_ld_date.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+        v_cdc_load_table_name: OST_TABLES
+      tasks:
+        - description: load 31_fow_ost_data_load LOAD_FOW_OST_OFR_MOD_STG_INT batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/31_fow_ost_data_load/LOAD_FOW_OST_OFR_MOD_STG_INT.sql
+
+        - description: load 31_fow_ost_data_load LOAD_FOW_OFR_MDL_COM_STG_INT batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/31_fow_ost_data_load/LOAD_FOW_OFR_MDL_COM_STG_INT.sql
+
+        - description: load 31_fow_ost_data_load LOAD_FOW_OFR_PKG_COM_STG_INT batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/31_fow_ost_data_load/LOAD_FOW_OFR_PKG_COM_STG_INT.sql
+
+
+        - description: load 31_fow_ost_data_load LOAD_FOW_OFR_MDL_SUM_COM_STG_INT batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/31_fow_ost_data_load/LOAD_FOW_OFR_MDL_SUM_COM_STG_INT.sql
+
+
+        - description: load 31_fow_ost_data_load LOAD_FOW_ITEM_COM_VALUE_STG_INT batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/31_fow_ost_data_load/LOAD_FOW_ITEM_COM_VALUE_STG_INT.sql
+
+
+        - description: load 31_fow_ost_data_load LOAD_FOW_OFRING_MDL_TAGS_INT batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/31_fow_ost_data_load/LOAD_FOW_OFRING_MDL_TAGS_INT.sql
+
+
+        - description: load 31_fow_ost_data_load update cdc batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/31_fow_ost_data_load/update_cdc.sql

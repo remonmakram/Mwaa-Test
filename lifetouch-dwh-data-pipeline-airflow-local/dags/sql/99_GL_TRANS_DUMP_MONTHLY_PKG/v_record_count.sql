@@ -1,0 +1,1 @@
+select count(*) from GL_TRANS_DTL_DUMP_ALL ct

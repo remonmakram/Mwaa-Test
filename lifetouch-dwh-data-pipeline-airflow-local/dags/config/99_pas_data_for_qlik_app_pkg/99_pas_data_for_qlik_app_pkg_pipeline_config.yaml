@@ -1,0 +1,21 @@
+---
+
+pipeline:
+  name: 99_pas_data_for_qlik_app_pkg_dag
+  description: 99_pas_data_for_qlik_app_pkg package
+  schedule: "@daily" 
+  tags:
+    - lifetouch
+    - 99_pas_data_for_qlik_app_pkg
+  task_groups:
+  
+    - name: 99_pas_data_for_qlik_app_pkg_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks: 
+        - description: 99_pas_data_for_qlik_app_pkg batch package
+          type: oracle_sql
+          script_location: dags/sql/99_pas_data_for_qlik_app_pkg/PAS_DATA_FOR_QLIK_APP_PRC.sql
+          
+        

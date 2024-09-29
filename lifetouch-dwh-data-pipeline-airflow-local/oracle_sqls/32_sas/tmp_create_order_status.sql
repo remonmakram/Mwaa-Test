@@ -1,0 +1,25 @@
+DECLARE create_query CLOB;  
+   BEGIN  
+      BEGIN  
+         EXECUTE IMMEDIATE 'drop table RAX_APP_USER.C$_0SAS_ORD_STATUS_STG purge';  
+      EXCEPTION  
+         WHEN OTHERS THEN NULL;  
+      END;  
+      create_query := 'create table RAX_APP_USER.C$_0SAS_ORD_STATUS_STG
+         (
+            C1_ORDER_STATUS_ID	NUMBER(10) NULL,
+            C2_AUDIT_CREATE_DATE	TIMESTAMP(6) NULL,
+            C3_AUDIT_CREATED_BY	VARCHAR2(255) NULL,
+            C4_AUDIT_MODIFIED_BY	VARCHAR2(255) NULL,
+            C5_AUDIT_MODIFY_DATE	TIMESTAMP(6) NULL,
+            C6_CODE	VARCHAR2(255) NULL,
+            C7_CREATE_DT	TIMESTAMP(6) NULL,
+            C8_MODIFYING_USER	VARCHAR2(255) NULL,
+            C9_STATUS_SEQUENCE	NUMBER(10) NULL,
+            C10_CUSTOMER_ORDER_ID	NUMBER(10) NULL,
+            C11_DELETED_IND	VARCHAR2(1) NULL
+         )
+	   ';
+      EXECUTE IMMEDIATE create_query;  
+   END;
+

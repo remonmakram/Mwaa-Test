@@ -1,0 +1,61 @@
+---
+
+pipeline:
+  name: lt_43_bta_dag
+  description: 43_bta package
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - bta
+  task_groups:
+    - name: BTA_Ingestion
+      description: extract and load part
+      ingestion_script: ingestion_script.py
+      data_sources:
+        - type: oracle
+          name: bta
+          default_args:
+            src_prefix: BTA
+            dest_prefix: BTA
+            src_schema: BTA_OWN
+            dest_schema: RAX_APP_USER
+            stage_schema: ODS_STAGE
+            watermark_interval: 30
+            watermark_column: modified_date
+            excluded_columns: "'ODS_CREATE_DATE', 'ODS_MODIFY_DATE'"
+            insert_date_columns: "ODS_CREATE_DATE, ODS_MODIFY_DATE"
+            update_date_columns: "ODS_MODIFY_DATE"
+            unique_keys: "ID"
+            merge_required: False
+          entities:
+            - src_table: JOB_BAG
+              dest_table: "C$_0BTA_JOB_BAG_STG"
+              watermark_column: "LAST_UPDATED"
+              tmp_create: '43_bta/tmp_create_jobbag.sql'
+              extract_query: '43_bta/extract_query_jobbag.sql'
+              full_load: "False"
+              v_cdc_load_table_name: BTA_BAG_TRACK_TABLES
+              v_cdc_oms_overlap: 0.02083333333
+            - src_table: TMPR_EVID_DETS
+              dest_table: "C$_0BTA_TMPR_EVID_DETS_STG"
+              watermark_column: "LAST_UPDATED"
+              tmp_create: '43_bta/tmp_create_tmpreviddets.sql'
+              extract_query: '43_bta/extract_query_tmpreviddets.sql'
+              full_load: "False"
+              v_cdc_load_table_name: BTA_BAG_TRACK_TABLES
+              v_cdc_oms_overlap: 0.02083333333
+
+    - name: BTA_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+        v_cdc_ld_date: dags/sql/pre_sql/pre_v_cdc_ld_date.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks:
+        - description: load bta package
+          type: oracle_sql
+          script_location: dags/sql/43_BTA_LOAD_PKG/43_BTA_LOAD_PKG.sql
+          args:
+            v_cdc_load_table_name: BTA_BAG_TRACK_TABLES
+            v_cdc_oms_overlap: 0.02083333333

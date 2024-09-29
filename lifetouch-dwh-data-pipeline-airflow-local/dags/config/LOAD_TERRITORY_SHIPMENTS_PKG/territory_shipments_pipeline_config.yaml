@@ -1,0 +1,35 @@
+---
+
+pipeline:
+  name: lt_territory_shipments_dag
+  description: lifetouch territory shipments load package
+  # schedule: "0 * * * *"
+  schedule: "0 */4 * * *" # frequency of execution is 6 hrs that means 4 hr interval
+  tags:
+    - lifetouch
+    - territory_shipments
+  task_groups:
+    # - name: territory_shipments_Ingestion
+             
+
+
+    - name: Territory_Shipments_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+        v_cdc_oms_overlap: 0.02083333333
+      tasks:
+        - description: load territory shipments sfly eligible subpackage
+          type: oracle
+          script_location: dags/sql/LOAD_TERRITORY_SHIPMENTS_PKG/LOAD_TERRITORY_SHIPMENTS_PKG.sql
+          args:
+            v_cdc_load_table_name: TERRITORY_SHIPMENTS
+
+        - description: update track no territory shipments sfly eligible subpackage
+          type: oracle
+          script_location: dags/sql/LOAD_TERRITORY_SHIPMENTS_PKG/UPDATE_TRACK_NO_TERRITORY_SHIPMENTS_PKG.sql
+          args:
+            v_cdc_load_table_name: UPDATE_TRACK_NO_TERRITORY_SHIPMENTS
+        

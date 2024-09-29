@@ -1,0 +1,327 @@
+---
+
+pipeline:
+  name: lt_06A_OMS_LOAD_PKG_dag
+  description: 06A_OMS_LOAD_PKG package
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - 06A_OMS_LOAD_PKG
+  task_groups:
+    - name: 06A_OMS_LOAD_PKG_Ingestion
+      description: extract and load part
+      ingestion_script: ingestion_script.py
+      data_sources:
+          - type: oracle
+            name: oms3
+            default_args:
+              dest_schema: RAX_APP_USER
+              merge_required: False
+            entities:
+              - dest_table: "C$_0SHIP_NODE_STG"
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: '06A_OMS_LOAD_PKG/create_temp_1-LOAD_SHIP_NODE_PKG.sql'
+                extract_query: '06A_OMS_LOAD_PKG/extract_1-LOAD_SHIP_NODE_PKG.sql'
+                v_cdc_load_table_name: SHIP_NODE
+                src_table: YFS_SHIP_NODE
+
+              - dest_table: "C$_0OMS3_ITEM_STG"
+                v_cdc_overlap: 0.02083333333
+                tmp_create: '06A_OMS_LOAD_PKG/create_temp_2-LOAD_ITEM_PKG.sql'
+                extract_query: '06A_OMS_LOAD_PKG/extract_2-LOAD_ITEM_PKG.sql'
+                v_cdc_load_table_name: OMS3_ITEM
+                src_table: YFS_ITEM
+
+              - dest_table: "C$_0STG_KIT_ITEM"
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: '06A_OMS_LOAD_PKG/create_temp_3-LOAD_KIT_ITEM_PKG.sql'
+                extract_query: '06A_OMS_LOAD_PKG/extract_3-LOAD_KIT_ITEM_PKG.sql'
+                v_cdc_load_table_name: KIT_ITEM
+                src_table: YFS_KIT_ITEM
+              
+              - dest_table: "C$_0OMS3_KIT_ITEM_STG"
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: '06A_OMS_LOAD_PKG/create_temp_3.2-LOAD_KIT_ITEM_PKG.sql'
+                extract_query: '06A_OMS_LOAD_PKG/extract_3.2-LOAD_KIT_ITEM_PKG.sql'
+                v_cdc_load_table_name: KIT_ITEM
+                src_table: YFS_KIT_ITEM2
+
+              - dest_table: "C$_0STG_PERSON_INFO"
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: '06A_OMS_LOAD_PKG/create_temp_4-LOAD_PERSON_INFO_PKG.sql'
+                extract_query: '06A_OMS_LOAD_PKG/extract_4-LOAD_PERSON_INFO_PKG.sql'
+                v_cdc_load_table_name: PERSON_INFO
+                src_table: YFS_PERSON_INFO
+
+              - dest_table: "C$_0STG_SHIPMENT"
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: '06A_OMS_LOAD_PKG/create_temp_5-LOAD_SHIPMENT_PKG.sql'
+                extract_query: '06A_OMS_LOAD_PKG/extract_5-LOAD_SHIPMENT_PKG.sql'
+                v_cdc_load_table_name: SHIPMENT
+                src_table: YFS_SHIPMENT
+
+              - dest_table: "C$_0OMS3_LT_APO_STG"
+                v_cdc_overlap: 0.02083333333
+                tmp_create: '06A_OMS_LOAD_PKG/create_temp_6-LOAD_ORDER_HEADER_PKG.sql'
+                extract_query: '06A_OMS_LOAD_PKG/extract_6-LOAD_ORDER_HEADER_PKG.sql'
+                v_cdc_load_table_name: OMS3_LT_APO_STG
+                src_table: LT_APO
+
+              - dest_table: "C$_0STG_ORDER_HEADER"
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: '06A_OMS_LOAD_PKG/create_temp_6.2-LOAD_ORDER_HEADER_PKG.sql'
+                extract_query: '06A_OMS_LOAD_PKG/extract_6.2-LOAD_ORDER_HEADER_PKG.sql'
+                v_cdc_load_table_name: ORDER_HEADER
+                src_table: YFS_ORDER_HEADER
+
+              - dest_table: "C$_0STG_ORDER_LINE"
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: '06A_OMS_LOAD_PKG/create_temp_8-LOAD_ORDER_LINE_PKG.sql'
+                extract_query: '06A_OMS_LOAD_PKG/extract_8-LOAD_ORDER_LINE_PKG.sql'
+                v_cdc_load_table_name: ORDER_LINE
+                src_table: YFS_ORDER_LINE
+
+              - dest_table: "C$_0STG_PROMOTION"
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: '06A_OMS_LOAD_PKG/create_temp_10-LOAD_PROMOTION_PKG.sql'
+                extract_query: '06A_OMS_LOAD_PKG/extract_10-LOAD_PROMOTION_PKG.sql'
+                v_cdc_load_table_name: PROMOTION
+                src_table: YFS_PROMOTION
+
+              - dest_table: "C$_0STG_HEADER_CHARGE"
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: '06A_OMS_LOAD_PKG/create_temp_14-LOAD_HEADER_CHARGE_PKG.sql'
+                extract_query: '06A_OMS_LOAD_PKG/extract_14-LOAD_HEADER_CHARGE_PKG.sql'
+                v_cdc_load_table_name: HEADER_CHARGE
+                src_table: YFS_HEADER_CHARGES
+
+              - dest_table: "C$_0STG_LINE_CHARGE"
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: '06A_OMS_LOAD_PKG/create_temp_15-LOAD_LINE_CHARGE_PKG.sql'
+                extract_query: '06A_OMS_LOAD_PKG/extract_15-LOAD_LINE_CHARGE_PKG.sql'
+                v_cdc_load_table_name: LINE_CHARGE
+                src_table: YFS_LINE_CHARGES
+
+              - dest_table: "oms3_shipment_container_tmp"
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: '06A_OMS_LOAD_PKG/create_temp_24-LOAD_SHIPMENT_CONTAINER_PKG.sql'
+                extract_query: '06A_OMS_LOAD_PKG/extract_24-LOAD_SHIPMENT_CONTAINER_PKG.sql'
+                v_cdc_load_table_name: OMS3_SHIPMENT_CONTAINER
+                src_table: YFS_SHIPMENT_CONTAINER
+
+            
+
+    - name: 06A_OMS_LOAD_PKG_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks: 
+        - description: load LOAD_SHIP_NODE_PKG subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/06A_OMS_LOAD_PKG/1-LOAD_SHIP_NODE_PKG.sql
+          args:
+            v_cdc_load_table_name: SHIP_NODE
+            v_cdc_oms_overlap: 0.02083333333
+
+        - description: load LOAD_ITEM_PKG subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/06A_OMS_LOAD_PKG/2-LOAD_ITEM_PKG.sql
+          args:
+            v_cdc_load_table_name: OMS3_ITEM
+            v_cdc_overlap: 0.02083333333
+
+        - description: load LOAD_KIT_ITEM_PKG subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/06A_OMS_LOAD_PKG/3-LOAD_KIT_ITEM_PKG.sql
+          args:
+            v_cdc_load_table_name: KIT_ITEM
+            v_cdc_oms_overlap: 0.02083333333
+        
+        - description: load LOAD_KIT_ITEM_PKG 2 subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/06A_OMS_LOAD_PKG/3.2-LOAD_KIT_ITEM_PKG.sql
+          args:
+            v_cdc_load_table_name: KIT_ITEM
+            v_cdc_oms_overlap: 0.02083333333
+
+        - description: load LOAD_PERSON_INFO_PKG subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/06A_OMS_LOAD_PKG/4-LOAD_PERSON_INFO_PKG.sql
+          args:
+            v_cdc_load_table_name: PERSON_INFO
+            v_cdc_oms_overlap: 0.02083333333
+
+        - description: load LOAD_SHIPMENT_PKG subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/06A_OMS_LOAD_PKG/5-LOAD_SHIPMENT_PKG.sql
+          args:
+            v_cdc_load_table_name: SHIPMENT
+            v_cdc_oms_overlap: 0.02083333333
+
+        - description: load LOAD_ORDER_HEADER_PKG subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/06A_OMS_LOAD_PKG/6-LOAD_ORDER_HEADER_PKG.sql
+          args:
+            v_cdc_load_table_name: OMS3_LT_APO_STG
+            v_cdc_overlap: 0.02083333333
+
+        - description: load LOAD_ORDER_HEADER_PKG 2 subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/06A_OMS_LOAD_PKG/6.2-LOAD_ORDER_HEADER_PKG.sql
+          args:
+            v_cdc_load_table_name: ORDER_HEADER
+            v_cdc_overlap: 0.02083333333
+            
+        - description: load REPAIR_OMS_A_E$_ORDERLINE_PROC subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/06A_OMS_LOAD_PKG/7-REPAIR_OMS_A_E_ORDERLINE_PROC.sql
+          args:
+            v_cdc_load_table_name: ORDER_LINE
+            v_cdc_oms_overlap: 0.02083333333
+
+        - description: load LOAD_ORDER_LINE_PKG subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/06A_OMS_LOAD_PKG/8-LOAD_ORDER_LINE_PKG.sql
+          args:
+            v_cdc_load_table_name: ORDER_LINE
+            v_cdc_oms_overlap: 0.02083333333
+
+        - description: load UPDATE_OL_LISTPRICE_SPEC_ORDER_PKG subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/06A_OMS_LOAD_PKG/9-UPDATE_OL_LISTPRICE_SPEC_ORDER_PKG.sql
+          args:
+            v_cdc_load_table_name: UPDATE_OL_LISTPRICE_SPEC_ORDER
+            v_cdc_oms_overlap: 0.02083333333
+
+        - description: load LOAD_PROMOTION_PKG subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/06A_OMS_LOAD_PKG/10-LOAD_PROMOTION_PKG.sql
+          args:
+            v_cdc_load_table_name: PROMOTION
+            v_cdc_oms_overlap: 0.02083333333
+
+        - description: load UPDATE_OH_STAFF_FLAG_PKG subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/06A_OMS_LOAD_PKG/11-UPDATE_OH_STAFF_FLAG_PKG.sql
+          args:
+            v_cdc_load_table_name: UPDATE_OH_STAFF_FLAG_PRC
+            v_cdc_oms_overlap: 0.02083333333
+
+        - description: load UPDATE_OH_SHIP_COMPLETE_IND_PKG subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/06A_OMS_LOAD_PKG/12-UPDATE_OH_SHIP_COMPLETE_IND_PKG.sql
+          args:
+            v_cdc_load_table_name: UPDATE_OH_SHIP_COMPLETE_PRC
+            v_cdc_oms_overlap: 0.02083333333
+
+        - description: load UPDATE_OH_ORDER_BUCKET_PKG subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/06A_OMS_LOAD_PKG/13-UPDATE_OH_ORDER_BUCKET_PKG.sql
+          args:
+            v_cdc_load_table_name: UPDATE_OH_ORDER_BUCKET_PRC
+            v_cdc_oms_overlap: 0.02083333333
+
+        - description: load LOAD_HEADER_CHARGE_PKG subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/06A_OMS_LOAD_PKG/14-LOAD_HEADER_CHARGE_PKG.sql
+          args:
+            v_cdc_load_table_name: HEADER_CHARGE
+            v_cdc_oms_overlap: 0.02083333333
+
+        - description: load LOAD_LINE_CHARGE_PKG subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/06A_OMS_LOAD_PKG/15-LOAD_LINE_CHARGE_PKG.sql
+          args:
+            v_cdc_load_table_name: LINE_CHARGE
+            v_cdc_oms_overlap: 0.02083333333
+
+        - description: load UPDATE_ODS_ORDER_LINE_TAXES_PKG subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/06A_OMS_LOAD_PKG/16-UPDATE_ODS_ORDER_LINE_TAXES_PKG.sql
+          args:
+            v_cdc_load_table_name: ORDER_LINE
+            v_cdc_oms_overlap: 0.02083333333
+
+        - description: load UPDATE_ODS_HEADER_CHARGE_TAXES_PKG subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/06A_OMS_LOAD_PKG/17-UPDATE_ODS_HEADER_CHARGE_TAXES_PKG.sql
+          args:
+            v_cdc_load_table_name: ORDER_LINE
+            v_cdc_oms_overlap: 0.02083333333
+
+        - description: load UPDATE_OH_IMAGE_PREVIEW_ORDER_TYPE_PKG subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/06A_OMS_LOAD_PKG/18-UPDATE_OH_IMAGE_PREVIEW_ORDER_TYPE_PKG.sql
+          args:
+            v_cdc_load_table_name: UPDATE_OH_PREVIEW_OT_PRC
+            v_cdc_oms_overlap: 0.02083333333
+
+        - description: load REPAIR_OMS_A_E$TABLES_PROC subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/06A_OMS_LOAD_PKG/19-REPAIR_OMS_A_ETABLES_PROC.sql
+          args:
+            v_cdc_load_table_name: ORDER_LINE
+            v_cdc_oms_overlap: 0.02083333333
+
+        - description: load LOAD_ORDER_STATUS_PKG subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/06A_OMS_LOAD_PKG/20-LOAD_ORDER_STATUS_PKG.sql
+          args:
+            v_cdc_load_table_name: ORDER_STATUS
+            v_cdc_oms_overlap: 0.02083333333
+
+        - description: load UPDATE_APO_ONLINE_ORDERS_PKG subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/06A_OMS_LOAD_PKG/21-UPDATE_APO_ONLINE_ORDERS_PKG.sql
+          args:
+            v_cdc_load_table_name: APO_ONLINE_ORDERS_QTY
+            v_cdc_oms_overlap: 0.02083333333
+
+        - description: load UPDATE_OH_MLT_ORDER_TYPE_PKG subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/06A_OMS_LOAD_PKG/22-UPDATE_OH_MLT_ORDER_TYPE_PKG.sql
+          args:
+            v_cdc_load_table_name: OH_MLT_ORDER_TYPE
+            v_cdc_oms_overlap: 0.02083333333
+
+        - description: load UPDATE_OH_MLT_MULTI_PAYMENT_ID_PKG subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/06A_OMS_LOAD_PKG/23-UPDATE_OH_MLT_MULTI_PAYMENT_ID_PKG.sql
+          args:
+            v_cdc_load_table_name: OH_MLT_MULTI_PAYMENT_ID
+            v_cdc_oms_overlap: 0.02083333333
+
+        - description: load LOAD_SHIPMENT_CONTAINER_PKG subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/06A_OMS_LOAD_PKG/24-LOAD_SHIPMENT_CONTAINER_PKG.sql
+          args:
+            v_cdc_load_table_name: OMS3_SHIPMENT_CONTAINER
+            v_cdc_oms_overlap: 0.02083333333

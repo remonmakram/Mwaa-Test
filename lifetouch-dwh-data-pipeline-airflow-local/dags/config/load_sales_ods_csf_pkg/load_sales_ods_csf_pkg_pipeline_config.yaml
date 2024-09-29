@@ -1,0 +1,26 @@
+---
+
+pipeline:
+  name: lt_load_sales_ods_csf_pkg_dag
+  description: load_sales_ods_csf_pkg package
+  schedule: 0 */4 * * * #run the DAG every 4 hours 
+  tags:
+    - lifetouch
+    - load_sales_ods_csf_pkg
+  task_groups:
+            
+    - name: load_sales_ods_csf_pkg_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql/v_cdc_load_date_MART.sql
+      default_args:
+        v_cdc_sales_ods_overlap: 0.02083333333
+      tasks: 
+        - description: load load_sales_ods_csf_pkg batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/load_sales_ods_csf_pkg/LOAD_SALES_ODS_CSF_PKG.sql
+          args:
+            v_cdc_load_table_name: STG_SODS_CSF
+            v_cdc_oms_overlap: 0.02083333333
+        
+        

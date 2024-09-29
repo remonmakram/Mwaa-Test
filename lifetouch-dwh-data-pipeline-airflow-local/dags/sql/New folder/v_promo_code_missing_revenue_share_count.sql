@@ -1,0 +1,1 @@
+select count(*) ct from promo_code_miss_rev_share

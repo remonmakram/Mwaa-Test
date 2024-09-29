@@ -1,0 +1,47 @@
+---
+
+pipeline:
+  name: lt_99_DELAYED_SHIPMENT_PKG_dag
+  description: 99_DELAYED_SHIPMENT package
+  schedule: "@daily"
+  tags:
+    - lifetouch
+    - 99_DELAYED_SHIPMENT
+  
+  task_groups:
+    - name: 99_DELAYED_SHIPMENT_wait_for_data
+      description: run ODI wait command
+      schema_name: ODS_STAGE
+      session_name: 99_DELAYED_SHIPMENT_PKG
+      table_name: DATA_EXPORT_TRIGGER
+    
+
+    - name: 99_DELAYED_SHIPMENT_export
+      description: drop and recreate table then extract data and load to s3
+      export_file_name:
+        v_data_export_run_date_trigger_table_refresh: dags/sql/pre_sql/v_data_export_run_date_trigger_table_refresh.sql
+      export_args:
+        v_session_name: 99_DELAYED_SHIPMENT_PKG
+      
+      tasks:
+        - script_location: dags/sql/99_DELAYED_SHIPMENT_PKG/delayed_shipment_create_tmp.sql
+          export_files:
+            - extract_query: 99_DELAYED_SHIPMENT_PKG/delayed_shipment_export.sql
+              export_location: Delayed_Shipment/delayed_shipment
+
+
+    - name: 99_DELAYED_SHIPMENT_ODI_Update
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_data_export_trigger_table_id: dags/sql/pre_sql/v_data_export_trigger_table_id.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks: 
+        - description: run_pkg
+          type: oracle_sql
+          script_location: dags/sql/99_DELAYED_SHIPMENT_PKG/99_DELAYED_SHIPMENT_PKG.sql
+          args:
+            v_session_name: 99_DELAYED_SHIPMENT_PKG
+
+        
+        

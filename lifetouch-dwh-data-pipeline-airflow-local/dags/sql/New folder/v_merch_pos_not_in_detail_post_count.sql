@@ -1,0 +1,1 @@
+select count(*) ct from merch_pos_not_in_detail_post

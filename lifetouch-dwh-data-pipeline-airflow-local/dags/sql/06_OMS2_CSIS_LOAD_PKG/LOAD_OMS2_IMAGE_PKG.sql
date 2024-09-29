@@ -1,0 +1,1199 @@
+/* TASK No. 1 */
+
+/* NONE or SET VARIABLE STATEMENT FOUND, CHECK ODI TASK NO. 1 */
+
+
+
+
+/*-----------------------------------------------*/
+/* TASK No. 2 */
+
+/* SELECT STATEMENT FOUND, CHECK ODI TASK NO. 2 */
+
+
+
+
+/*-----------------------------------------------*/
+/* TASK No. 3 */
+
+/* SELECT STATEMENT FOUND, CHECK ODI TASK NO. 3 */
+
+
+
+
+/*-----------------------------------------------*/
+/* TASK No. 4 */
+/* Drop work table */
+
+-- drop table RAX_APP_USER.C$_0OMS2_LT_IMAGE_STG purge
+
+-- &
+
+
+-- /*-----------------------------------------------*/
+-- /* TASK No. 5 */
+-- /* Create work table */
+
+-- create table RAX_APP_USER.C$_0OMS2_LT_IMAGE_STG
+-- (
+-- 	C1_IMAGE_KEY	VARCHAR2(24) NULL,
+-- 	C2_IMAGE_ID	VARCHAR2(40) NULL,
+-- 	C3_SESSION_KEY	VARCHAR2(24) NULL,
+-- 	C4_PHOTOGRAPHER_ID	VARCHAR2(24) NULL,
+-- 	C5_SELLABLE	VARCHAR2(1) NULL,
+-- 	C6_PRINTABLE	VARCHAR2(1) NULL,
+-- 	C7_RETOUCH_REQUIRED	VARCHAR2(1) NULL,
+-- 	C8_YEARBOOK_ACCEPTABLE	VARCHAR2(1) NULL,
+-- 	C9_IMAGE_TYPE	VARCHAR2(24) NULL,
+-- 	C10_PRIMARY_LAB	VARCHAR2(24) NULL,
+-- 	C11_PRIMARY_IMAGE_IMPORT_GROUP	VARCHAR2(24) NULL,
+-- 	C12_IMAGE_STATUS	VARCHAR2(15) NULL,
+-- 	C13_CREATETS	DATE NULL,
+-- 	C14_MODIFYTS	DATE NULL,
+-- 	C15_CREATEUSERID	VARCHAR2(40) NULL,
+-- 	C16_MODIFYUSERID	VARCHAR2(40) NULL,
+-- 	C17_CREATEPROGID	VARCHAR2(40) NULL,
+-- 	C18_MODIFYPROGID	VARCHAR2(40) NULL,
+-- 	C19_LOCKID	NUMBER NULL,
+-- 	C20_LAB_REVISION_NO	NUMBER NULL
+-- )
+-- NOLOGGING
+
+-- &
+
+
+/*-----------------------------------------------*/
+/* TASK No. 6 */
+/* Load data */
+
+/* SOURCE CODE */
+
+
+-- select	
+-- 	trim(LT_IMAGE.IMAGE_KEY)	   C1_IMAGE_KEY,
+-- 	LT_IMAGE.IMAGE_ID	   C2_IMAGE_ID,
+-- 	trim(LT_IMAGE.SESSION_KEY)	   C3_SESSION_KEY,
+-- 	trim(LT_IMAGE.PHOTOGRAPHER_ID)	   C4_PHOTOGRAPHER_ID,
+-- 	LT_IMAGE.SELLABLE	   C5_SELLABLE,
+-- 	LT_IMAGE.PRINTABLE	   C6_PRINTABLE,
+-- 	LT_IMAGE.RETOUCH_REQUIRED	   C7_RETOUCH_REQUIRED,
+-- 	LT_IMAGE.YEARBOOK_ACCEPTABLE	   C8_YEARBOOK_ACCEPTABLE,
+-- 	trim(LT_IMAGE.IMAGE_TYPE)	   C9_IMAGE_TYPE,
+-- 	trim(LT_IMAGE.PRIMARY_LAB)	   C10_PRIMARY_LAB,
+-- 	trim(LT_IMAGE.PRIMARY_IMAGE_IMPORT_GROUP_ID)	   C11_PRIMARY_IMAGE_IMPORT_GROUP,
+-- 	LT_IMAGE.IMAGE_STATUS	   C12_IMAGE_STATUS,
+-- 	LT_IMAGE.CREATETS	   C13_CREATETS,
+-- 	LT_IMAGE.MODIFYTS	   C14_MODIFYTS,
+-- 	LT_IMAGE.CREATEUSERID	   C15_CREATEUSERID,
+-- 	LT_IMAGE.MODIFYUSERID	   C16_MODIFYUSERID,
+-- 	LT_IMAGE.CREATEPROGID	   C17_CREATEPROGID,
+-- 	LT_IMAGE.MODIFYPROGID	   C18_MODIFYPROGID,
+-- 	LT_IMAGE.LOCKID	   C19_LOCKID,
+-- 	LT_IMAGE.LAB_REVISION_NO	   C20_LAB_REVISION_NO
+-- from	OMS2_OWN.LT_IMAGE   LT_IMAGE
+-- where	(1=1)
+-- And (LT_IMAGE.MODIFYTS >= TO_DATE(SUBSTR(:v_cdc_load_date, 1, 19), 'YYYY-MM-DD HH24:MI:SS')  -:v_cdc_overlap
+-- )
+--  And (LT_IMAGE.IMAGE_ID is not null)
+
+
+
+
+
+
+
+-- &
+
+-- /* TARGET CODE */
+-- insert /*+ append */ into RAX_APP_USER.C$_0OMS2_LT_IMAGE_STG
+-- (
+-- 	C1_IMAGE_KEY,
+-- 	C2_IMAGE_ID,
+-- 	C3_SESSION_KEY,
+-- 	C4_PHOTOGRAPHER_ID,
+-- 	C5_SELLABLE,
+-- 	C6_PRINTABLE,
+-- 	C7_RETOUCH_REQUIRED,
+-- 	C8_YEARBOOK_ACCEPTABLE,
+-- 	C9_IMAGE_TYPE,
+-- 	C10_PRIMARY_LAB,
+-- 	C11_PRIMARY_IMAGE_IMPORT_GROUP,
+-- 	C12_IMAGE_STATUS,
+-- 	C13_CREATETS,
+-- 	C14_MODIFYTS,
+-- 	C15_CREATEUSERID,
+-- 	C16_MODIFYUSERID,
+-- 	C17_CREATEPROGID,
+-- 	C18_MODIFYPROGID,
+-- 	C19_LOCKID,
+-- 	C20_LAB_REVISION_NO
+-- )
+-- values
+-- (
+-- 	:C1_IMAGE_KEY,
+-- 	:C2_IMAGE_ID,
+-- 	:C3_SESSION_KEY,
+-- 	:C4_PHOTOGRAPHER_ID,
+-- 	:C5_SELLABLE,
+-- 	:C6_PRINTABLE,
+-- 	:C7_RETOUCH_REQUIRED,
+-- 	:C8_YEARBOOK_ACCEPTABLE,
+-- 	:C9_IMAGE_TYPE,
+-- 	:C10_PRIMARY_LAB,
+-- 	:C11_PRIMARY_IMAGE_IMPORT_GROUP,
+-- 	:C12_IMAGE_STATUS,
+-- 	:C13_CREATETS,
+-- 	:C14_MODIFYTS,
+-- 	:C15_CREATEUSERID,
+-- 	:C16_MODIFYUSERID,
+-- 	:C17_CREATEPROGID,
+-- 	:C18_MODIFYPROGID,
+-- 	:C19_LOCKID,
+-- 	:C20_LAB_REVISION_NO
+-- )
+
+-- &
+
+
+/*-----------------------------------------------*/
+/* TASK No. 7 */
+/* Analyze work table */
+
+
+
+BEGIN
+DBMS_STATS.GATHER_TABLE_STATS (
+    ownname =>	'RAX_APP_USER',
+    tabname =>	'C$_0OMS2_LT_IMAGE_STG',
+    estimate_percent =>	DBMS_STATS.AUTO_SAMPLE_SIZE
+);
+END;
+
+
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 9 */
+/* Set vID */
+
+/* NONE or SET VARIABLE STATEMENT FOUND, CHECK ODI TASK NO. 9 */
+
+
+
+
+/*-----------------------------------------------*/
+/* TASK No. 10 */
+/* Drop flow table */
+
+-- drop table RAX_APP_USER.I$_OMS2_LT_IMAGE_STG1995001 
+BEGIN
+    EXECUTE IMMEDIATE 'drop table RAX_APP_USER.I$_OMS2_LT_IMAGE_STG1995001';
+    EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        END IF;
+    END;
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 11 */
+/* Create flow table I$ */
+
+create table RAX_APP_USER.I$_OMS2_LT_IMAGE_STG1995001
+(
+	IMAGE_KEY	VARCHAR2(24) NULL,
+	IMAGE_ID	VARCHAR2(40) NULL,
+	SESSION_KEY	VARCHAR2(24) NULL,
+	PHOTOGRAPHER_ID	VARCHAR2(24) NULL,
+	SELLABLE	VARCHAR2(1) NULL,
+	PRINTABLE	VARCHAR2(1) NULL,
+	RETOUCH_REQUIRED	VARCHAR2(1) NULL,
+	YEARBOOK_ACCEPTABLE	VARCHAR2(1) NULL,
+	IMAGE_TYPE	VARCHAR2(24) NULL,
+	PRIMARY_LAB	VARCHAR2(24) NULL,
+	PRIMARY_IMAGE_IMPORT_GROUP_ID	VARCHAR2(24) NULL,
+	IMAGE_STATUS	VARCHAR2(15) NULL,
+	CREATETS	DATE NULL,
+	MODIFYTS	DATE NULL,
+	CREATEUSERID	VARCHAR2(40) NULL,
+	MODIFYUSERID	VARCHAR2(40) NULL,
+	CREATEPROGID	VARCHAR2(40) NULL,
+	MODIFYPROGID	VARCHAR2(40) NULL,
+	LOCKID	NUMBER NULL,
+	LAB_REVISION_NO	NUMBER NULL,
+	ODS_CREATE_DATE	DATE NULL,
+	ODS_MODIFY_DATE	DATE NULL
+	,IND_UPDATE		char(1)
+)
+NOLOGGING
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 12 */
+/* Insert flow into I$ table */
+
+/* DETECTION_STRATEGY = NOT_EXISTS */
+ 
+
+
+  
+
+
+insert into	RAX_APP_USER.I$_OMS2_LT_IMAGE_STG1995001
+(
+	IMAGE_KEY,
+	IMAGE_ID,
+	SESSION_KEY,
+	PHOTOGRAPHER_ID,
+	SELLABLE,
+	PRINTABLE,
+	RETOUCH_REQUIRED,
+	YEARBOOK_ACCEPTABLE,
+	IMAGE_TYPE,
+	PRIMARY_LAB,
+	PRIMARY_IMAGE_IMPORT_GROUP_ID,
+	IMAGE_STATUS,
+	CREATETS,
+	MODIFYTS,
+	CREATEUSERID,
+	MODIFYUSERID,
+	CREATEPROGID,
+	MODIFYPROGID,
+	LOCKID,
+	LAB_REVISION_NO,
+	IND_UPDATE
+)
+select 
+IMAGE_KEY,
+	IMAGE_ID,
+	SESSION_KEY,
+	PHOTOGRAPHER_ID,
+	SELLABLE,
+	PRINTABLE,
+	RETOUCH_REQUIRED,
+	YEARBOOK_ACCEPTABLE,
+	IMAGE_TYPE,
+	PRIMARY_LAB,
+	PRIMARY_IMAGE_IMPORT_GROUP_ID,
+	IMAGE_STATUS,
+	CREATETS,
+	MODIFYTS,
+	CREATEUSERID,
+	MODIFYUSERID,
+	CREATEPROGID,
+	MODIFYPROGID,
+	LOCKID,
+	LAB_REVISION_NO,
+	IND_UPDATE
+ from (
+
+
+select 	 
+	
+	C1_IMAGE_KEY IMAGE_KEY,
+	C2_IMAGE_ID IMAGE_ID,
+	C3_SESSION_KEY SESSION_KEY,
+	C4_PHOTOGRAPHER_ID PHOTOGRAPHER_ID,
+	C5_SELLABLE SELLABLE,
+	C6_PRINTABLE PRINTABLE,
+	C7_RETOUCH_REQUIRED RETOUCH_REQUIRED,
+	C8_YEARBOOK_ACCEPTABLE YEARBOOK_ACCEPTABLE,
+	C9_IMAGE_TYPE IMAGE_TYPE,
+	C10_PRIMARY_LAB PRIMARY_LAB,
+	C11_PRIMARY_IMAGE_IMPORT_GROUP PRIMARY_IMAGE_IMPORT_GROUP_ID,
+	C12_IMAGE_STATUS IMAGE_STATUS,
+	C13_CREATETS CREATETS,
+	C14_MODIFYTS MODIFYTS,
+	C15_CREATEUSERID CREATEUSERID,
+	C16_MODIFYUSERID MODIFYUSERID,
+	C17_CREATEPROGID CREATEPROGID,
+	C18_MODIFYPROGID MODIFYPROGID,
+	C19_LOCKID LOCKID,
+	C20_LAB_REVISION_NO LAB_REVISION_NO,
+
+	'I' IND_UPDATE
+
+from	RAX_APP_USER.C$_0OMS2_LT_IMAGE_STG
+where	(1=1)
+
+
+
+
+
+
+) S
+where NOT EXISTS 
+	( select 1 from ODS_STAGE.OMS2_LT_IMAGE_STG T
+	where	T.IMAGE_KEY	= S.IMAGE_KEY 
+		 and ((T.IMAGE_ID = S.IMAGE_ID) or (T.IMAGE_ID IS NULL and S.IMAGE_ID IS NULL)) and
+		((T.SESSION_KEY = S.SESSION_KEY) or (T.SESSION_KEY IS NULL and S.SESSION_KEY IS NULL)) and
+		((T.PHOTOGRAPHER_ID = S.PHOTOGRAPHER_ID) or (T.PHOTOGRAPHER_ID IS NULL and S.PHOTOGRAPHER_ID IS NULL)) and
+		((T.SELLABLE = S.SELLABLE) or (T.SELLABLE IS NULL and S.SELLABLE IS NULL)) and
+		((T.PRINTABLE = S.PRINTABLE) or (T.PRINTABLE IS NULL and S.PRINTABLE IS NULL)) and
+		((T.RETOUCH_REQUIRED = S.RETOUCH_REQUIRED) or (T.RETOUCH_REQUIRED IS NULL and S.RETOUCH_REQUIRED IS NULL)) and
+		((T.YEARBOOK_ACCEPTABLE = S.YEARBOOK_ACCEPTABLE) or (T.YEARBOOK_ACCEPTABLE IS NULL and S.YEARBOOK_ACCEPTABLE IS NULL)) and
+		((T.IMAGE_TYPE = S.IMAGE_TYPE) or (T.IMAGE_TYPE IS NULL and S.IMAGE_TYPE IS NULL)) and
+		((T.PRIMARY_LAB = S.PRIMARY_LAB) or (T.PRIMARY_LAB IS NULL and S.PRIMARY_LAB IS NULL)) and
+		((T.PRIMARY_IMAGE_IMPORT_GROUP_ID = S.PRIMARY_IMAGE_IMPORT_GROUP_ID) or (T.PRIMARY_IMAGE_IMPORT_GROUP_ID IS NULL and S.PRIMARY_IMAGE_IMPORT_GROUP_ID IS NULL)) and
+		((T.IMAGE_STATUS = S.IMAGE_STATUS) or (T.IMAGE_STATUS IS NULL and S.IMAGE_STATUS IS NULL)) and
+		((T.CREATETS = S.CREATETS) or (T.CREATETS IS NULL and S.CREATETS IS NULL)) and
+		((T.MODIFYTS = S.MODIFYTS) or (T.MODIFYTS IS NULL and S.MODIFYTS IS NULL)) and
+		((T.CREATEUSERID = S.CREATEUSERID) or (T.CREATEUSERID IS NULL and S.CREATEUSERID IS NULL)) and
+		((T.MODIFYUSERID = S.MODIFYUSERID) or (T.MODIFYUSERID IS NULL and S.MODIFYUSERID IS NULL)) and
+		((T.CREATEPROGID = S.CREATEPROGID) or (T.CREATEPROGID IS NULL and S.CREATEPROGID IS NULL)) and
+		((T.MODIFYPROGID = S.MODIFYPROGID) or (T.MODIFYPROGID IS NULL and S.MODIFYPROGID IS NULL)) and
+		((T.LOCKID = S.LOCKID) or (T.LOCKID IS NULL and S.LOCKID IS NULL)) and
+		((T.LAB_REVISION_NO = S.LAB_REVISION_NO) or (T.LAB_REVISION_NO IS NULL and S.LAB_REVISION_NO IS NULL))
+        )
+
+  
+  
+
+  
+
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 13 */
+/* Analyze integration table */
+
+
+
+begin
+    dbms_stats.gather_table_stats(
+	ownname => 'RAX_APP_USER',
+	tabname => 'I$_OMS2_LT_IMAGE_STG1995001',
+	estimate_percent => dbms_stats.auto_sample_size
+    );
+end;
+
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 14 */
+/* Create Index on flow table */
+
+-- create index	RAX_APP_USER.I$_OMS2_LT_IMAGE_STG_IDX1995001
+-- on		RAX_APP_USER.I$_OMS2_LT_IMAGE_STG1995001 (IMAGE_KEY)
+-- NOLOGGING
+
+BEGIN
+    EXECUTE IMMEDIATE 'create index	RAX_APP_USER.I$_OMS2_LT_IMAGE_STG_IDX1995001
+on		RAX_APP_USER.I$_OMS2_LT_IMAGE_STG1995001 (IMAGE_KEY)
+NOLOGGING';
+    EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -972 AND SQLCODE != -1418 AND SQLCODE != -1408 AND SQLCODE != -955 THEN
+            RAISE;
+        END IF;
+    END;
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 15 */
+/* Merge Rows */
+
+merge into	ODS_STAGE.OMS2_LT_IMAGE_STG T
+using	RAX_APP_USER.I$_OMS2_LT_IMAGE_STG1995001 S
+on	(
+		T.IMAGE_KEY=S.IMAGE_KEY
+	)
+when matched
+then update set
+	T.IMAGE_ID	= S.IMAGE_ID,
+	T.SESSION_KEY	= S.SESSION_KEY,
+	T.PHOTOGRAPHER_ID	= S.PHOTOGRAPHER_ID,
+	T.SELLABLE	= S.SELLABLE,
+	T.PRINTABLE	= S.PRINTABLE,
+	T.RETOUCH_REQUIRED	= S.RETOUCH_REQUIRED,
+	T.YEARBOOK_ACCEPTABLE	= S.YEARBOOK_ACCEPTABLE,
+	T.IMAGE_TYPE	= S.IMAGE_TYPE,
+	T.PRIMARY_LAB	= S.PRIMARY_LAB,
+	T.PRIMARY_IMAGE_IMPORT_GROUP_ID	= S.PRIMARY_IMAGE_IMPORT_GROUP_ID,
+	T.IMAGE_STATUS	= S.IMAGE_STATUS,
+	T.CREATETS	= S.CREATETS,
+	T.MODIFYTS	= S.MODIFYTS,
+	T.CREATEUSERID	= S.CREATEUSERID,
+	T.MODIFYUSERID	= S.MODIFYUSERID,
+	T.CREATEPROGID	= S.CREATEPROGID,
+	T.MODIFYPROGID	= S.MODIFYPROGID,
+	T.LOCKID	= S.LOCKID,
+	T.LAB_REVISION_NO	= S.LAB_REVISION_NO
+	,                   T.ODS_MODIFY_DATE	= sysdate
+when not matched
+then insert
+	(
+	T.IMAGE_KEY,
+	T.IMAGE_ID,
+	T.SESSION_KEY,
+	T.PHOTOGRAPHER_ID,
+	T.SELLABLE,
+	T.PRINTABLE,
+	T.RETOUCH_REQUIRED,
+	T.YEARBOOK_ACCEPTABLE,
+	T.IMAGE_TYPE,
+	T.PRIMARY_LAB,
+	T.PRIMARY_IMAGE_IMPORT_GROUP_ID,
+	T.IMAGE_STATUS,
+	T.CREATETS,
+	T.MODIFYTS,
+	T.CREATEUSERID,
+	T.MODIFYUSERID,
+	T.CREATEPROGID,
+	T.MODIFYPROGID,
+	T.LOCKID,
+	T.LAB_REVISION_NO
+	,                    T.ODS_CREATE_DATE,
+	T.ODS_MODIFY_DATE
+	)
+values
+	(
+	S.IMAGE_KEY,
+	S.IMAGE_ID,
+	S.SESSION_KEY,
+	S.PHOTOGRAPHER_ID,
+	S.SELLABLE,
+	S.PRINTABLE,
+	S.RETOUCH_REQUIRED,
+	S.YEARBOOK_ACCEPTABLE,
+	S.IMAGE_TYPE,
+	S.PRIMARY_LAB,
+	S.PRIMARY_IMAGE_IMPORT_GROUP_ID,
+	S.IMAGE_STATUS,
+	S.CREATETS,
+	S.MODIFYTS,
+	S.CREATEUSERID,
+	S.MODIFYUSERID,
+	S.CREATEPROGID,
+	S.MODIFYPROGID,
+	S.LOCKID,
+	S.LAB_REVISION_NO
+	,                    sysdate,
+	sysdate
+	)
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 16 */
+/* Commit transaction */
+
+/*commit*/
+
+
+/*-----------------------------------------------*/
+/* TASK No. 17 */
+/* Drop flow table */
+
+drop table RAX_APP_USER.I$_OMS2_LT_IMAGE_STG1995001 
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 1000008 */
+/* Drop work table */
+
+drop table RAX_APP_USER.C$_0OMS2_LT_IMAGE_STG purge
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 18 */
+/* CDC for late arriving SM recipes */
+
+update ODS_STAGE.OMS2_LT_IMAGE_STG t
+set t.ods_modify_date = sysdate
+where exists
+(
+select 1
+from ODS_STAGE.OMS2_LT_RECIPE_STG rec
+, ODS_STAGE.SM_IMAGE_LOOK_RECIPE_STG ilr
+where rec.RECIPE_ID=ilr.LOOK_RECIPE_GUID
+and rec.image_key = t.image_key
+and ilr.ods_modify_date >= TO_DATE(SUBSTR(:v_cdc_load_date, 1, 19), 'YYYY-MM-DD HH24:MI:SS') -:v_cdc_overlap
+)
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 19 */
+/* Mark duplicate by OMS2_IMAGE_KEY */
+
+--
+MERGE INTO ODS_STAGE.IMAGE_XR d 
+USING 
+(
+select 
+    i_xr.IMAGE_OID
+    ,'D' || i_xr.OMS2_IMAGE_KEY OMS2_IMAGE_KEY
+     ,sysdate as ODS_MODIFY_DATE
+-- select *
+from (
+  SELECT
+     case when cand.IMAGE_OID is not null then cand.IMAGE_OID else null end IMAGE_OID
+    ,a.IMAGE_KEY OMS2_IMAGE_KEY
+  FROM 
+    ODS_STAGE.OMS2_LT_IMAGE_STG a
+    ,(select 
+        rec.IMAGE_KEY
+        ,min(i_xr.IMAGE_OID) IMAGE_OID
+        ,min(i_xr.SYSTEM_OF_RECORD) SYSTEM_OF_RECORD
+        ,min(i_xr.IMAGE_ID) IMAGE_ID
+        ,min(i_xr.CAPTURE_SESS_ID) CAPTURE_SESS_ID
+    from
+        ODS_STAGE.OMS2_LT_RECIPE_STG rec
+        ,ODS_STAGE.SM_IMAGE_LOOK_RECIPE_STG ilr
+        ,ODS_STAGE.IMAGE_XR i_xr
+    where (1=1)
+        and rec.RECIPE_ID=ilr.LOOK_RECIPE_GUID
+        and ilr.IMAGE_ID=i_xr.IMAGE_ID
+    group by 
+        rec.IMAGE_KEY
+    ) cand
+  WHERE (1=1)	
+    and a.IMAGE_KEY=cand.IMAGE_KEY
+    and a.ODS_MODIFY_DATE >= TO_DATE(SUBSTR(:v_cdc_load_date, 1, 19), 'YYYY-MM-DD HH24:MI:SS') -:v_cdc_overlap
+) bad
+,ODS_STAGE.IMAGE_XR i_xr
+where (1=1)
+    and i_xr.OMS2_IMAGE_KEY = bad.OMS2_IMAGE_KEY 
+    and bad.IMAGE_OID <> i_xr.IMAGE_OID
+    and i_xr.IMAGE_ID is null
+) s
+ON (s.IMAGE_OID=d.IMAGE_OID)
+WHEN MATCHED THEN UPDATE SET
+     d.OMS2_IMAGE_KEY = s.OMS2_IMAGE_KEY
+    ,d.ODS_MODIFY_DATE = s.ODS_MODIFY_DATE
+WHERE 
+    decode(s.OMS2_IMAGE_KEY,d.OMS2_IMAGE_KEY,1,0) = 0
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 20 */
+/* ODS_STAGE.IMAGE_XR */
+
+-- OMS2 That match SM
+MERGE INTO ODS_STAGE.IMAGE_XR d 
+USING 
+(
+  SELECT
+     case when cand.IMAGE_OID is not null then cand.IMAGE_OID else null end IMAGE_OID
+    ,cand.IMAGE_ID
+    ,cand.CAPTURE_SESS_ID
+    ,a.IMAGE_KEY OMS2_IMAGE_KEY
+    ,a.IMAGE_ID OMS2_IMAGE_ID
+    ,a.SESSION_KEY OMS2_SESSION_KEY
+    ,a.PHOTOGRAPHER_ID OMS2_PHOTOGRAPHER_ID
+    ,case when cand.IMAGE_OID is not null then cand.SYSTEM_OF_RECORD else 'OMS2' end SYSTEM_OF_RECORD
+    ,sysdate as ODS_CREATE_DATE
+    ,sysdate as ODS_MODIFY_DATE
+  FROM 
+    ODS_STAGE.OMS2_LT_IMAGE_STG a
+    ,(select 
+        rec.IMAGE_KEY
+        ,min(i_xr.IMAGE_OID) IMAGE_OID
+        ,min(i_xr.SYSTEM_OF_RECORD) SYSTEM_OF_RECORD
+        ,min(i_xr.IMAGE_ID) IMAGE_ID
+        ,min(i_xr.CAPTURE_SESS_ID) CAPTURE_SESS_ID
+    from
+        ODS_STAGE.OMS2_LT_RECIPE_STG rec
+        ,ODS_STAGE.SM_IMAGE_LOOK_RECIPE_STG ilr
+        ,ODS_STAGE.IMAGE_XR i_xr
+    where (1=1)
+        and rec.RECIPE_ID=ilr.LOOK_RECIPE_GUID
+        and ilr.IMAGE_ID=i_xr.IMAGE_ID
+    group by 
+        rec.IMAGE_KEY
+    ) cand
+  WHERE (1=1)	
+    and a.IMAGE_KEY=cand.IMAGE_KEY
+    and a.ODS_MODIFY_DATE >= TO_DATE(SUBSTR(:v_cdc_load_date, 1, 19), 'YYYY-MM-DD HH24:MI:SS') -:v_cdc_overlap
+) s
+ON (s.IMAGE_ID=d.IMAGE_ID)
+WHEN MATCHED THEN UPDATE SET
+     d.OMS2_IMAGE_KEY = s.OMS2_IMAGE_KEY
+    ,d.OMS2_IMAGE_ID = s.OMS2_IMAGE_ID
+    ,d.OMS2_SESSION_KEY = s.OMS2_SESSION_KEY
+    ,d.OMS2_PHOTOGRAPHER_ID = s.OMS2_PHOTOGRAPHER_ID
+    ,d.ODS_MODIFY_DATE = s.ODS_MODIFY_DATE
+WHERE 
+    decode(s.OMS2_IMAGE_KEY,d.OMS2_IMAGE_KEY,1,0) = 0
+    or decode(s.OMS2_IMAGE_ID,d.OMS2_IMAGE_ID,1,0) = 0
+    or decode(s.OMS2_SESSION_KEY,d.OMS2_SESSION_KEY,1,0) = 0
+    or decode(s.OMS2_PHOTOGRAPHER_ID,d.OMS2_PHOTOGRAPHER_ID,1,0) = 0
+--WHEN NOT MATCHED THEN INSERT 
+--(
+--     IMAGE_OID
+--    ,IMAGE_ID
+--    ,CAPTURE_SESS_ID
+--    ,OMS2_IMAGE_KEY
+--    ,OMS2_IMAGE_ID
+--    ,OMS2_SESSION_KEY
+--    ,OMS2_PHOTOGRAPHER_ID
+--    ,SYSTEM_OF_RECORD
+--    ,ODS_CREATE_DATE
+--    ,ODS_MODIFY_DATE
+--)
+--VALUES 
+--(
+--     case when s.IMAGE_OID is null then ODS_STAGE.IMAGE_OID_SEQ.nextval else s.IMAGE_OID end
+--    ,s.IMAGE_ID
+--    ,s.CAPTURE_SESS_ID
+--    ,s.OMS2_IMAGE_KEY
+--    ,s.OMS2_IMAGE_ID
+--    ,s.OMS2_SESSION_KEY
+--    ,s.OMS2_PHOTOGRAPHER_ID
+--    ,s.SYSTEM_OF_RECORD
+--    ,s.ODS_CREATE_DATE
+--    ,s.ODS_MODIFY_DATE
+--)
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 21 */
+/* ODS_STAGE.IMAGE_XR */
+
+-- OMS2
+MERGE INTO ODS_STAGE.IMAGE_XR d 
+USING 
+(
+  SELECT
+     case when cand.IMAGE_OID is not null then cand.IMAGE_OID else null end IMAGE_OID
+    ,cand.IMAGE_ID
+    ,cand.CAPTURE_SESS_ID
+    ,a.IMAGE_KEY OMS2_IMAGE_KEY
+    ,a.IMAGE_ID OMS2_IMAGE_ID
+    ,a.SESSION_KEY OMS2_SESSION_KEY
+    ,a.PHOTOGRAPHER_ID OMS2_PHOTOGRAPHER_ID
+    ,case when cand.IMAGE_OID is not null then cand.SYSTEM_OF_RECORD else 'OMS2' end SYSTEM_OF_RECORD
+    ,sysdate as ODS_CREATE_DATE
+    ,sysdate as ODS_MODIFY_DATE
+  FROM 
+    ODS_STAGE.OMS2_LT_IMAGE_STG a
+    ,(select 
+        rec.IMAGE_KEY
+        ,min(i_xr.IMAGE_OID) IMAGE_OID
+        ,min(i_xr.SYSTEM_OF_RECORD) SYSTEM_OF_RECORD
+        ,min(i_xr.IMAGE_ID) IMAGE_ID
+        ,min(i_xr.CAPTURE_SESS_ID) CAPTURE_SESS_ID
+    from
+        ODS_STAGE.OMS2_LT_RECIPE_STG rec
+        ,ODS_STAGE.SM_IMAGE_LOOK_RECIPE_STG ilr
+        ,ODS_STAGE.IMAGE_XR i_xr
+    where (1=1)
+        and rec.RECIPE_ID=ilr.LOOK_RECIPE_GUID(+)
+        and ilr.IMAGE_ID=i_xr.IMAGE_ID(+)
+    group by 
+        rec.IMAGE_KEY
+    ) cand
+  WHERE (1=1)	
+    and a.IMAGE_KEY=cand.IMAGE_KEY(+)
+    and a.ODS_MODIFY_DATE >= TO_DATE(SUBSTR(:v_cdc_load_date, 1, 19), 'YYYY-MM-DD HH24:MI:SS') -:v_cdc_overlap
+) s
+ON (s.OMS2_IMAGE_KEY=d.OMS2_IMAGE_KEY)
+WHEN MATCHED THEN UPDATE SET
+     d.OMS2_IMAGE_ID = s.OMS2_IMAGE_ID
+    ,d.OMS2_SESSION_KEY = s.OMS2_SESSION_KEY
+    ,d.OMS2_PHOTOGRAPHER_ID = s.OMS2_PHOTOGRAPHER_ID
+    ,d.ODS_MODIFY_DATE = s.ODS_MODIFY_DATE
+WHERE 
+    decode(s.OMS2_IMAGE_ID,d.OMS2_IMAGE_ID,1,0) = 0
+    or decode(s.OMS2_SESSION_KEY,d.OMS2_SESSION_KEY,1,0) = 0
+    or decode(s.OMS2_PHOTOGRAPHER_ID,d.OMS2_PHOTOGRAPHER_ID,1,0) = 0
+WHEN NOT MATCHED THEN INSERT 
+(
+     IMAGE_OID
+    ,IMAGE_ID
+    ,CAPTURE_SESS_ID
+    ,OMS2_IMAGE_KEY
+    ,OMS2_IMAGE_ID
+    ,OMS2_SESSION_KEY
+    ,OMS2_PHOTOGRAPHER_ID
+    ,SYSTEM_OF_RECORD
+    ,ODS_CREATE_DATE
+    ,ODS_MODIFY_DATE
+)
+VALUES 
+(
+     case when s.IMAGE_OID is null then ODS_STAGE.IMAGE_OID_SEQ.nextval else s.IMAGE_OID end
+    ,s.IMAGE_ID
+    ,s.CAPTURE_SESS_ID
+    ,s.OMS2_IMAGE_KEY
+    ,s.OMS2_IMAGE_ID
+    ,s.OMS2_SESSION_KEY
+    ,s.OMS2_PHOTOGRAPHER_ID
+    ,s.SYSTEM_OF_RECORD
+    ,s.ODS_CREATE_DATE
+    ,s.ODS_MODIFY_DATE
+)
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 22 */
+/* ODS_OWN.IMAGE */
+
+-- OMS2
+MERGE INTO ODS_OWN.IMAGE d 
+USING 
+(
+  SELECT
+    xr.IMAGE_OID
+    ,cs_xr.CAPTURE_SESSION_OID
+--    ,CAMERA_TYPE
+--    ,CAMERA_CODE
+--    ,GUEST_VIS_IMG
+--    ,IS_DEGISTERED
+--    ,IS_IMAGE_AVAILABLE
+    ,case when a.PRINTABLE= 'Y' then 1 else 0 end PRINTABLE_IND 
+    ,xr.OMS2_PHOTOGRAPHER_ID PHOTOGRAPHER_VISION_EMP_CODE
+--    ,xr.IMAGE_ID
+--    ,BAG
+--    ,CAPTURE_SEQUENCE
+    ,a.PRIMARY_IMAGE_IMPORT_GROUP_ID IMAGE_IMPORT_GROUP
+--    ,ORIENTATION
+--    ,POSE_ID
+--    ,LTI_IMAGE_URL
+    ,a.CREATETS IMAGE_CAPTURE_TIME
+    ,ss.SOURCE_SYSTEM_OID
+    ,pemp.PHOTO_EMPLOYEE_OID EMPLOYEE_OID
+--    ,ASSET_ID
+--    ,SUBJECTS_TYPE
+    ,xr.OMS2_IMAGE_ID SR_IMAGE_ID
+    ,sysdate as ODS_CREATE_DATE
+    ,sysdate as ODS_MODIFY_DATE
+-- select *
+  FROM 
+    ODS_STAGE.OMS2_LT_IMAGE_STG a
+    ,ODS_STAGE.IMAGE_XR xr
+    ,ODS_STAGE.CAPTURE_SESSION_XR cs_xr
+    ,ODS_OWN.SOURCE_SYSTEM ss
+    ,(select 
+        xr.IMAGE_OID,max(emp.EMPLOYEE_OID) PHOTO_EMPLOYEE_OID
+      from 
+         ODS_STAGE.IMAGE_XR xr
+        ,ODS_OWN.EMPLOYEE emp
+      where (1=1)
+        and xr.OMS2_PHOTOGRAPHER_ID = EMP.VISION_EMPLOYEE_CODE(+)
+        and (xr.ODS_CREATE_DATE >= EMP.ODS_CREATE_DATE(+)
+            and xr.ODS_CREATE_DATE <= nvl( EMP.TERM_DATE(+),to_date('29990101','YYYYMMDD')))
+      group by xr.IMAGE_OID
+    ) pemp
+  WHERE (1=1)	
+    and xr.SYSTEM_OF_RECORD = 'OMS2'
+    and a.IMAGE_KEY=xr.OMS2_IMAGE_KEY
+    and ss.SOURCE_SYSTEM_SHORT_NAME='OMS2'
+    and xr.OMS2_SESSION_KEY=cs_xr.OMS2_SESSION_KEY(+)
+    and xr.IMAGE_OID=pemp.IMAGE_OID(+)
+and not exists (select 1 from  ods_own.event e where cs_xr.job_nbr = e.event_ref_id and e.event_type = 'PRESTIGEIMAGES')
+    and a.ODS_MODIFY_DATE >= TO_DATE(SUBSTR(:v_cdc_load_date, 1, 19), 'YYYY-MM-DD HH24:MI:SS') -:v_cdc_overlap
+and xr.IMAGE_OID not in   ('2722317669','2722317667','2722317668','2722317670','1994262707',
+'2745329715','2745329716','2751360907','2751360916','2757251937','2757251940',
+'2757251933','2757251925','2757251934','2757251935','2757251936','2757251941',
+'2757251923','2757251938','2757251939','2757251924')
+) s
+ON (s.IMAGE_OID=d.IMAGE_OID)
+WHEN MATCHED THEN UPDATE SET
+    d.CAPTURE_SESSION_OID=s.CAPTURE_SESSION_OID 
+    ,d.PRINTABLE_IND=s.PRINTABLE_IND
+    ,d.PHOTOGRAPHER_VISION_EMP_CODE=s.PHOTOGRAPHER_VISION_EMP_CODE
+    ,d.IMAGE_IMPORT_GROUP=s.IMAGE_IMPORT_GROUP
+    ,d.IMAGE_CAPTURE_TIME=s.IMAGE_CAPTURE_TIME
+    ,d.SOURCE_SYSTEM_OID=s.SOURCE_SYSTEM_OID
+    ,d.EMPLOYEE_OID=s.EMPLOYEE_OID
+    ,d.SR_IMAGE_ID=s.SR_IMAGE_ID
+    ,d.ODS_MODIFY_DATE = s.ODS_MODIFY_DATE
+WHERE 
+    decode(s.CAPTURE_SESSION_OID,d.CAPTURE_SESSION_OID,1,0) = 0
+    or decode(s.PRINTABLE_IND,d.PRINTABLE_IND,1,0) = 0
+    or decode(s.PHOTOGRAPHER_VISION_EMP_CODE,d.PHOTOGRAPHER_VISION_EMP_CODE,1,0) = 0
+    or decode(s.IMAGE_IMPORT_GROUP,d.IMAGE_IMPORT_GROUP,1,0) = 0
+    or decode(s.IMAGE_CAPTURE_TIME,d.IMAGE_CAPTURE_TIME,1,0) = 0
+    or decode(s.SOURCE_SYSTEM_OID,d.SOURCE_SYSTEM_OID,1,0) = 0
+    or decode(s.EMPLOYEE_OID,d.EMPLOYEE_OID,1,0) = 0
+    or decode(s.SR_IMAGE_ID,d.SR_IMAGE_ID,1,0) = 0
+WHEN NOT MATCHED THEN INSERT 
+(
+  IMAGE_OID
+  ,CAPTURE_SESSION_OID
+--  ,CAMERA_TYPE
+--  ,CAMERA_CODE
+--  ,GUEST_VIS_IMG
+--  ,IS_DEGISTERED
+--  ,IS_IMAGE_AVAILABLE
+  ,PRINTABLE_IND
+  ,PHOTOGRAPHER_VISION_EMP_CODE
+--  ,IMAGE_ID
+--  ,BAG
+--  ,CAPTURE_SEQUENCE
+  ,IMAGE_IMPORT_GROUP
+--  ,ORIENTATION
+--  ,POSE_ID
+--  ,LTI_IMAGE_URL
+  ,IMAGE_CAPTURE_TIME
+  ,ODS_CREATE_DATE
+  ,ODS_MODIFY_DATE
+  ,SOURCE_SYSTEM_OID
+  ,EMPLOYEE_OID
+--  ,ASSET_ID
+--  ,SUBJECTS_TYPE
+  ,SR_IMAGE_ID
+) 
+VALUES 
+(
+  s.IMAGE_OID
+  ,s.CAPTURE_SESSION_OID
+--  ,s.CAMERA_TYPE
+--  ,s.CAMERA_CODE
+--  ,s.GUEST_VIS_IMG
+--  ,s.IS_DEGISTERED
+--  ,s.IS_IMAGE_AVAILABLE
+  ,s.PRINTABLE_IND
+  ,s.PHOTOGRAPHER_VISION_EMP_CODE
+--  ,s.IMAGE_ID
+--  ,s.BAG
+--  ,s.CAPTURE_SEQUENCE
+  ,s.IMAGE_IMPORT_GROUP
+--  ,s.ORIENTATION
+--  ,s.POSE_ID
+--  ,s.LTI_IMAGE_URL
+  ,s.IMAGE_CAPTURE_TIME
+  ,s.ODS_CREATE_DATE
+  ,s.ODS_MODIFY_DATE
+  ,s.SOURCE_SYSTEM_OID
+  ,s.EMPLOYEE_OID
+--  ,s.ASSET_ID
+--  ,s.SUBJECTS_TYPE
+  ,s.SR_IMAGE_ID
+)
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 23 */
+/* ODS_OWN.IMAGE regardless of SYSTEM_OF_RECORD */
+
+-- OMS2 regardless of SYSTEM_OF_RECORD
+MERGE INTO ODS_OWN.IMAGE d 
+USING 
+(
+  SELECT
+    xr.IMAGE_OID
+    ,xr.OMS2_IMAGE_ID SR_IMAGE_ID
+    ,sysdate as ODS_CREATE_DATE
+    ,sysdate as ODS_MODIFY_DATE
+-- select *
+  FROM 
+    ODS_STAGE.OMS2_LT_IMAGE_STG a
+    ,ODS_STAGE.IMAGE_XR xr
+  WHERE (1=1)	
+    and a.IMAGE_KEY=xr.OMS2_IMAGE_KEY
+    and a.ODS_MODIFY_DATE >= TO_DATE(SUBSTR(:v_cdc_load_date, 1, 19), 'YYYY-MM-DD HH24:MI:SS') -:v_cdc_overlap
+) s
+ON (s.IMAGE_OID=d.IMAGE_OID)
+WHEN MATCHED THEN UPDATE SET
+    d.SR_IMAGE_ID=s.SR_IMAGE_ID
+    ,d.ODS_MODIFY_DATE = s.ODS_MODIFY_DATE
+WHERE 
+    decode(s.SR_IMAGE_ID,d.SR_IMAGE_ID,1,0) = 0
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 24 */
+/* Repair CAPTURE_SESSION_OID */
+
+MERGE INTO ODS_OWN.IMAGE d 
+USING 
+(
+  SELECT
+    xr.IMAGE_OID
+    ,max(cs_xr.CAPTURE_SESSION_OID) as capture_session_oid
+    ,max(sysdate) as ODS_MODIFY_DATE
+-- select *
+  FROM 
+    ODS_STAGE.IMAGE_XR xr
+    ,ODS_STAGE.CAPTURE_SESSION_XR cs_xr
+    , ods_own.apo
+    , ods_own.sub_program sp
+    , ods_own.program p
+  WHERE (1=1)	
+    and xr.SYSTEM_OF_RECORD = 'OMS2'
+    and xr.OMS2_SESSION_KEY=cs_xr.OMS2_SESSION_KEY
+    and apo.sub_program_oid = sp.sub_program_oid
+    and sp.program_oid = p.program_oid
+    and p.program_name = 'Senior/Studio Style'
+    and cs_xr.ODS_MODIFY_DATE >= TO_DATE(SUBSTR(:v_cdc_load_date, 1, 19), 'YYYY-MM- DD HH24:MI:SS') -:v_cdc_overlap
+group by xr.image_oid
+) s
+ON (s.IMAGE_OID=d.IMAGE_OID)
+WHEN MATCHED THEN UPDATE SET
+    d.CAPTURE_SESSION_OID=s.CAPTURE_SESSION_OID 
+    ,d.ODS_MODIFY_DATE = s.ODS_MODIFY_DATE
+WHERE 
+    decode(s.CAPTURE_SESSION_OID,d.CAPTURE_SESSION_OID,1,0) = 0
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 25 */
+/* Repair EMPLOYEE_OID */
+
+MERGE INTO ODS_OWN.IMAGE d 
+USING 
+(
+  SELECT
+    xr.IMAGE_OID
+    ,xr.OMS2_PHOTOGRAPHER_ID PHOTOGRAPHER_VISION_EMP_CODE
+    ,pemp.PHOTO_EMPLOYEE_OID EMPLOYEE_OID
+    ,sysdate as ODS_MODIFY_DATE
+-- select *
+  FROM 
+    ODS_STAGE.IMAGE_XR xr
+    ,(select 
+        xr.IMAGE_OID,max(emp.EMPLOYEE_OID) PHOTO_EMPLOYEE_OID
+      from 
+         ODS_STAGE.IMAGE_XR xr
+        ,ODS_OWN.EMPLOYEE emp
+      where (1=1)
+        and xr.OMS2_PHOTOGRAPHER_ID = EMP.VISION_EMPLOYEE_CODE
+        and (xr.ODS_CREATE_DATE >= EMP.ODS_CREATE_DATE(+)
+            and xr.ODS_CREATE_DATE <= nvl( EMP.TERM_DATE(+),to_date('29990101','YYYYMMDD')))
+      group by xr.IMAGE_OID
+    ) pemp
+  WHERE (1=1)	
+    and xr.SYSTEM_OF_RECORD = 'OMS2'
+    and xr.IMAGE_OID=pemp.IMAGE_OID
+    and xr.ODS_MODIFY_DATE >= TO_DATE(SUBSTR(:v_cdc_load_date, 1, 19), 'YYYY-MM-DD HH24:MI:SS') -:v_cdc_overlap
+) s
+ON (s.IMAGE_OID=d.IMAGE_OID)
+WHEN MATCHED THEN UPDATE SET
+     d.PHOTOGRAPHER_VISION_EMP_CODE=s.PHOTOGRAPHER_VISION_EMP_CODE
+    ,d.EMPLOYEE_OID=s.EMPLOYEE_OID
+    ,d.ODS_MODIFY_DATE = s.ODS_MODIFY_DATE
+WHERE 
+    decode(s.PHOTOGRAPHER_VISION_EMP_CODE,d.PHOTOGRAPHER_VISION_EMP_CODE,1,0) = 0
+    or decode(s.EMPLOYEE_OID,d.EMPLOYEE_OID,1,0) = 0
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 26 */
+/* CREATE TABLE OMS2_IMAGE_OID_FIX */
+
+-- CREATE TABLE OMS2_IMAGE_OID_FIX
+-- (
+--   OLD_IMAGE_OID  NUMBER               NOT NULL,
+--   NEW_IMAGE_OID  NUMBER               NOT NULL,
+--   OMS2_IMAGE_KEY         VARCHAR2(50 BYTE),
+--   ODS_CREATE_DATE          DATE
+-- )
+
+BEGIN
+    EXECUTE IMMEDIATE 'CREATE TABLE OMS2_IMAGE_OID_FIX
+(
+  OLD_IMAGE_OID  NUMBER               NOT NULL,
+  NEW_IMAGE_OID  NUMBER               NOT NULL,
+  OMS2_IMAGE_KEY         VARCHAR2(50 BYTE),
+  ODS_CREATE_DATE          DATE
+)';
+    EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -955 THEN
+            RAISE;
+        END IF;
+    END;
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 27 */
+/* CREATE UNIQUE INDEX */
+
+-- CREATE UNIQUE INDEX IOIDF_01_IX ON OMS2_IMAGE_OID_FIX (OLD_IMAGE_OID) TABLESPACE ODS_INDX
+
+BEGIN
+    EXECUTE IMMEDIATE 'CREATE UNIQUE INDEX IOIDF_01_IX ON OMS2_IMAGE_OID_FIX (OLD_IMAGE_OID) TABLESPACE ODS_INDX';
+    EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -972 AND SQLCODE != -1418 AND SQLCODE != -1408 AND SQLCODE != -955 THEN
+            RAISE;
+        END IF;
+    END;
+
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 28 */
+/* INSERT INTO OMS2_IMAGE_OID_FIX */
+
+INSERT INTO OMS2_IMAGE_OID_FIX (
+   OLD_IMAGE_OID, NEW_IMAGE_OID, OMS2_IMAGE_KEY, 
+   ODS_CREATE_DATE) 
+select 
+xr.IMAGE_OID OLD_IMAGE_OID ,new_xr.IMAGE_OID NEW_IMAGE_OID, new_xr.OMS2_IMAGE_KEY OMS2_IMAGE_KEY,sysdate as ODS_CREATE_DATE
+from
+ODS_STAGE.IMAGE_XR xr
+,ODS_STAGE.IMAGE_XR new_xr
+where (1=1)
+and xr.OMS2_IMAGE_KEY like 'D%' 
+and xr.SYSTEM_OF_RECORD = 'OMS2'
+and xr.OMS2_IMAGE_KEY = 'D' || new_xr.OMS2_IMAGE_KEY
+/*and exists (select 1 from ODS_STAGE.IMAGE_XR z where (1=1)
+            and z.ODS_MODIFY_DATE >= TO_DATE(SUBSTR(:v_cdc_load_date, 1, 19), 'YYYY-MM-DD HH24:MI:SS') -:v_cdc_overlap
+            and z.IMAGE_OID = new_xr.IMAGE_OID)*/
+and not exists (select 1 from OMS2_IMAGE_OID_FIX z where z.OLD_IMAGE_OID = xr.IMAGE_OID)
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 29 */
+/* Fix RECIPE IMAGE_OID */
+
+merge into ODS_OWN.RECIPE d USING (
+select
+    i.RECIPE_OID
+    ,cif.NEW_IMAGE_OID
+    ,cif.OLD_IMAGE_OID
+    ,sysdate as ODS_MODIFY_DATE
+from
+    OMS2_IMAGE_OID_FIX cif
+    ,ODS_OWN.RECIPE i
+where (1=1)
+    and cif.OLD_IMAGE_OID = i.IMAGE_OID
+    and i.IMAGE_OID <> cif.NEW_IMAGE_OID
+) s
+ON (s.RECIPE_OID=d.RECIPE_OID)
+WHEN MATCHED THEN UPDATE SET
+    d.IMAGE_OID = s.NEW_IMAGE_OID
+    ,d.ODS_MODIFY_DATE = s.ODS_MODIFY_DATE
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 30 */
+/* Update CDC Load Status */
+
+UPDATE ODS_OWN.ODS_CDC_LOAD_STATUS
+SET LAST_CDC_COMPLETION_DATE=TO_DATE(
+             SUBSTR(:v_sess_beg, 1, 19), 'RRRR-MM-DD HH24:MI:SS')
++ nvl((TIMEZONE_OFFSET/24), 0) 
+WHERE ODS_TABLE_NAME=:v_cdc_load_table_name
+AND CONTEXT_NAME = :v_env
+
+/*
+UPDATE ODS_OWN.ODS_CDC_LOAD_STATUS
+SET LAST_CDC_COMPLETION_DATE=TO_DATE(
+             SUBSTR(:v_sess_beg, 1, 19), 'RRRR-MM-DD HH24:MI:SS')
+WHERE ODS_TABLE_NAME=:v_cdc_load_table_name
+AND CONTEXT_NAME = :v_env
+*/
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 31 */
+/* Insert CDC Audit Record */
+
+INSERT INTO RAX_APP_USER.ODS_CDC_LOAD_STATUS_AUDIT
+(TABLE_NAME,
+SESS_NO,                      
+SESS_NAME,                    
+SCEN_VERSION,                 
+SESS_BEG,                     
+ORIG_LAST_CDC_COMPLETION_DATE,
+OVERLAP,
+CREATE_DATE,
+CONTEXT_NAME,
+TIMEZONE_OFFSET              
+)
+select 
+:v_cdc_load_table_name
+,:v_sess_no
+,'LOAD_OMS2_IMAGE_PKG'
+,'064'
+,TO_DATE(SUBSTR(:v_sess_beg, 1, 19), 'RRRR-MM-DD HH24:MI:SS')
+,TO_DATE (SUBSTR(:v_cdc_load_date, 1, 19),'YYYY-MM-DD HH24:MI:SS')
+,:v_cdc_overlap
+,SYSDATE
+,:v_env
+,TIMEZONE_OFFSET
+from 
+ODS_OWN.ODS_CDC_LOAD_STATUS
+WHERE ODS_TABLE_NAME=:v_cdc_load_table_name
+AND CONTEXT_NAME = :v_env
+
+/*
+INSERT INTO RAX_APP_USER.ODS_CDC_LOAD_STATUS_AUDIT
+(TABLE_NAME,
+SESS_NO,                      
+SESS_NAME,                    
+SCEN_VERSION,                 
+SESS_BEG,                     
+ORIG_LAST_CDC_COMPLETION_DATE,
+OVERLAP,
+CREATE_DATE,
+CONTEXT_NAME              
+)
+values (
+:v_cdc_load_table_name,
+:v_sess_no,
+'LOAD_OMS2_IMAGE_PKG',
+'064',
+TO_DATE(
+             SUBSTR(:v_sess_beg, 1, 19), 'RRRR-MM-DD HH24:MI:SS'),
+TO_DATE (SUBSTR (:v_cdc_load_date, 1, 19),
+                           'YYYY-MM-DD HH24:MI:SS'
+                          )
+,:v_cdc_overlap,
+SYSDATE,
+ :v_env)
+*/
+
+
+&
+
+
+/*-----------------------------------------------*/

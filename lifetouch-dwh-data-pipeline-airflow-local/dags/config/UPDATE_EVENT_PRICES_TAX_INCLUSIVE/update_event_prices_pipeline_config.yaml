@@ -1,0 +1,17 @@
+---
+
+pipeline:
+  name: lt_update_event_prices
+  description: lifetouch UPDATE_EVENT_PRICES_TAX_INCLUSIVE package
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - UPDATE_EVENT_PRICES_TAX_INCLUSIVE
+  task_groups:
+    - name: UPDATE_EVENT_PRICES_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      tasks: 
+        - name: UPDATE_EVENT_PRICES_TAX_INCLUSIVE
+          description: load update_event_prices
+          type: oracle_sql
+          script_location: dags/sql/UPDATE_EVENT_PRICES_TAX_INCLUSIVE/UPDATE_EVENT_PRICES_TAX_INCLUSIVE.sql

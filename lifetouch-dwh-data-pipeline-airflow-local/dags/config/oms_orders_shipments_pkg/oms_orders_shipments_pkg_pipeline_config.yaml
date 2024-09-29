@@ -1,0 +1,58 @@
+---
+
+pipeline:
+  name: lt_oms_orders_shipments_pkg_dag
+  description: oms_orders_shipments_pkg package
+  schedule: 0 2,14 * * * # every 12 hours starting at 2 AM
+  tags:
+    - lifetouch
+    - oms_orders_shipments_pkg
+  task_groups:
+  
+    - name: oms_orders_shipments_pkg_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      
+      tasks: 
+        - description: UPDATE_SUBJECT_ID_ORDER_FACT_TABLES
+          type: oracle_sql
+          script_location: dags/sql/oms_orders_shipments_pkg/UPDATE_SUBJECT_ID_ORDER_FACT_TABLES_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+          args:
+            v_cdc_load_table_name: UPDATE_SUBJECTID_COUNTER
+        - description: ORDER_HEADER_FACT
+          type: oracle_sql
+          script_location: dags/sql/oms_orders_shipments_pkg/ORDER_HEADER_FACT_PKG.sql
+          pre_sql:
+            v_cdc_load_date_ODS_DM: dags/sql/pre_sql/v_cdc_load_date_ODS_DM.sql
+          args:
+            v_cdc_load_table_name: ORDER_HEADER_FACT
+          trigger_rule: all_done
+        - description: ORDER_LINE_FACT
+          type: oracle_sql
+          script_location: dags/sql/oms_orders_shipments_pkg/ORDER_LINE_FACT_PKG.sql
+          pre_sql:
+            v_cdc_load_date_ODS_DM: dags/sql/pre_sql/v_cdc_load_date_ODS_DM.sql
+          args:
+            v_cdc_load_table_name: ORDER_LINE_FACT
+          trigger_rule: all_success
+        - description: ORDER_LOOK_FACT
+          type: oracle_sql
+          script_location: dags/sql/oms_orders_shipments_pkg/ORDER_LOOK_FACT_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+          args:
+            v_cdc_load_table_name: ORDER_LOOK_FACT
+          trigger_rule: all_done
+        - description: ORDER_PROMOTION_FACT
+          type: oracle_sql
+          script_location: dags/sql/oms_orders_shipments_pkg/ORDER_PROMOTION_FACT_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+          args:
+            v_cdc_load_table_name: ORDER_PROMOTION_FACT
+          trigger_rule: all_done
+          
+        

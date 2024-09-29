@@ -1,0 +1,456 @@
+/* TASK No. 1 */
+
+/* NONE or SET VARIABLE STATEMENT FOUND, CHECK ODI TASK NO. 1 */
+
+
+
+
+/*-----------------------------------------------*/
+/* TASK No. 2 */
+
+/* SELECT STATEMENT FOUND, CHECK ODI TASK NO. 2 */
+
+
+
+
+/*-----------------------------------------------*/
+/* TASK No. 3 */
+/* DROP REPORT TABLE */
+
+BEGIN
+   EXECUTE IMMEDIATE 'DROP TABLE  RAX_APP_USER.PYC_TERRITORY_REPORT_STAGE';
+EXCEPTION
+   WHEN OTHERS THEN
+      IF SQLCODE != -942 THEN
+         RAISE;
+      END IF;
+END;
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 4 */
+/* CREATE REPORT TABLE */
+
+CREATE TABLE RAX_APP_USER.PYC_TERRITORY_REPORT_STAGE AS
+SELECT ACCOUNT.APO_ID,
+  EVENT.EVENT_REF_ID,
+  ACCOUNT.ACCOUNT_NAME,
+  SUBSTR (ACCOUNT.GLOSSIES_OUTPUT, 1, 1) AS NUM_CHOICES,
+  ACCOUNT.GLOSSIES_PAPER_DEADLINE        AS POSE_SELECTION_DEADLINE,
+  STATUS.YB_CHOICE_STATUS,
+  STATUS.YB_CHOICE_SUBMIT_DATE,
+  NVL (TOTALSTUDENT.TOTAL, 0) AS TOTAL,
+  NVL (PHOTO.PHOTOGRAPHED, 0) AS PHOTOGRAPHED,
+  NVL (CHOICES.CHOICES, 0)    AS CHOICES,
+  NVL (APPROVED.APPROVED, 0)  AS APPROVED,
+  CASE
+    WHEN STATUS.YB_CHOICE_STATUS = 'Confirmed'
+    THEN 1
+    ELSE 0
+  END AS CONFIRMED,
+  CASE
+    WHEN STATUS.YB_CHOICE_STATUS = 'Open'
+    THEN 1
+    ELSE 0
+  END AS OPEN,
+  CASE
+    WHEN STATUS.YB_CHOICE_STATUS = 'Done'
+    THEN 1
+    ELSE 0
+  END AS DONE,
+  CASE
+    WHEN NVL (STATUS.YB_CHOICE_STATUS, 'UNK') NOT IN ('Confirmed', 'Open', 'Done')
+    THEN 1
+    ELSE 0
+  END AS UNKNOWN ,
+  ACCOUNT.SCHOOL_YEAR ,
+  ACCOUNT.TERRITORY_CODE
+FROM
+  ( -- Account
+  SELECT A.APO_ID,
+    ACCT.ACCOUNT_NAME,
+    A.GLOSSIES_OUTPUT,
+    A.GLOSSIES_PAPER_DEADLINE ,
+    A.SCHOOL_YEAR,
+    A.TERRITORY_CODE
+  FROM ODS_OWN.APO A,
+    ODS_OWN.SUB_PROGRAM SP,
+    ODS_OWN.PROGRAM P,
+    ODS_OWN.ACCOUNT ACCT
+  WHERE A.SUB_PROGRAM_OID = SP.SUB_PROGRAM_OID
+  AND SP.PROGRAM_OID      = P.PROGRAM_OID
+  AND A.ACCOUNT_OID       = ACCT.ACCOUNT_OID
+  AND P.PROGRAM_NAME      = 'Senior/Studio Style'
+  AND A.STATUS            = 'Active'
+  AND A.ODS_MODIFY_DATE  >= TO_DATE(SUBSTR(:v_cdc_load_date, 1, 19), 'YYYY-MM-DD HH24:MI:SS') - :v_cdc_overlap
+    --    AND A.TERRITORY_CODE = UPPER((:TERRITORY))
+    --   AND A.SCHOOL_YEAR = (:SCHOOL_YEAR)
+  ) ACCOUNT,
+  ( -- Event
+  SELECT APO_ID,
+    ACCOUNT_NAME,
+    EVENT_REF_ID,
+    SCHOOL_YEAR,
+    TERRITORY_CODE
+  FROM
+    (SELECT A.APO_ID,
+      ACCT.ACCOUNT_ALIAS AS ACCOUNT_NAME,
+      EIF.EVENT_REF_ID EVENT_REF_ID,
+      EIF.ODS_MODIFY_DATE,
+      MAX (EIF.ODS_MODIFY_DATE) OVER (PARTITION BY EIF.APO_ID) AS MAX_DATE,
+      A.TERRITORY_CODE,
+      A.SCHOOL_YEAR
+    FROM ODS_OWN.APO A,
+      ODS_OWN.SM_EVENT_IMAGE_FACT EIF,
+      ODS_OWN.SUB_PROGRAM SP,
+      ODS_OWN.PROGRAM P,
+      ODS_OWN.ACCOUNT ACCT
+    WHERE A.APO_ID          = EIF.APO_ID
+    AND A.SUB_PROGRAM_OID   = SP.SUB_PROGRAM_OID
+    AND SP.PROGRAM_OID      = P.PROGRAM_OID
+    AND A.ACCOUNT_OID       = ACCT.ACCOUNT_OID
+    AND EIF.EVENT_REF_ID   IS NOT NULL
+    AND P.PROGRAM_NAME      = 'Senior/Studio Style'
+    AND (A.ODS_MODIFY_DATE >= TO_DATE(SUBSTR(:v_cdc_load_date, 1, 19), 'YYYY-MM-DD HH24:MI:SS') - :v_cdc_overlap
+    OR EIF.ODS_MODIFY_DATE >= TO_DATE(SUBSTR(:v_cdc_load_date, 1, 19), 'YYYY-MM-DD HH24:MI:SS') - :v_cdc_overlap)
+      --   AND A.TERRITORY_CODE = UPPER((:TERRITORY))
+      --   AND A.SCHOOL_YEAR = (:SCHOOL_YEAR)
+    )
+  WHERE ODS_MODIFY_DATE = MAX_DATE
+  ) EVENT,
+  ( -- Status
+  SELECT A.APO_ID,
+    YJ.YB_CHOICE_STATUS,
+    YJ.YB_CHOICE_SUBMIT_DATE,
+    A.SCHOOL_YEAR,
+    A.TERRITORY_CODE
+  FROM ODS_OWN.APO A,
+    ODS_OWN.SUB_PROGRAM SP,
+    ODS_OWN.PROGRAM P,
+    ODS_OWN.YEARBOOK_JOB YJ
+  WHERE A.APO_OID         = YJ.APO_OID
+  AND A.SUB_PROGRAM_OID   = SP.SUB_PROGRAM_OID
+  AND SP.PROGRAM_OID      = P.PROGRAM_OID
+  AND P.PROGRAM_NAME      = 'Senior/Studio Style'
+  AND (A.ODS_MODIFY_DATE >= TO_DATE(SUBSTR(:v_cdc_load_date, 1, 19), 'YYYY-MM-DD HH24:MI:SS') - :v_cdc_overlap
+  OR YJ.ODS_MODIFY_DATE  >= TO_DATE(SUBSTR(:v_cdc_load_date, 1, 19), 'YYYY-MM-DD HH24:MI:SS') - :v_cdc_overlap)
+    --    AND A.SCHOOL_YEAR = (:SCHOOL_YEAR)
+    --   AND A.TERRITORY_CODE = UPPER((:TERRITORY))
+  ) STATUS,
+  ( -- Total and Photographed
+  SELECT APO_ID,
+    COUNT (*) PHOTOGRAPHED,
+    TERRITORY_CODE,
+    SCHOOL_YEAR
+  FROM
+    (SELECT DISTINCT A.APO_ID,
+      YC.SUBJECT_OID,
+      A.SCHOOL_YEAR,
+      A.TERRITORY_CODE
+    FROM ODS_OWN.APO A,
+      ODS_OWN.YEARBOOK_CHOICE YC,
+      ODS_OWN.SUB_PROGRAM SP,
+      ODS_OWN.PROGRAM P
+    WHERE A.APO_OID         = YC.APO_OID
+    AND A.SUB_PROGRAM_OID   = SP.SUB_PROGRAM_OID
+    AND P.PROGRAM_OID       = SP.PROGRAM_OID
+    AND P.PROGRAM_NAME      = 'Senior/Studio Style'
+    AND (A.ODS_MODIFY_DATE >= TO_DATE(SUBSTR(:v_cdc_load_date, 1, 19), 'YYYY-MM-DD HH24:MI:SS') - :v_cdc_overlap
+    OR YC.ODS_MODIFY_DATE  >= TO_DATE(SUBSTR(:v_cdc_load_date, 1, 19), 'YYYY-MM-DD HH24:MI:SS') - :v_cdc_overlap)
+      --   AND A.TERRITORY_CODE = UPPER((:TERRITORY))
+      --   AND A.SCHOOL_YEAR = (:SCHOOL_YEAR)
+    AND NVL (YC.CHOICE_NUMBER, 0) != 0
+    AND YC.choice_made_by_role     ='Lab'
+      --AND a.APO_ID = '7JJPX'
+    )
+  GROUP BY APO_ID,
+    TERRITORY_CODE,
+    SCHOOL_YEAR
+  ) PHOTO,
+  ( -- Choices
+  SELECT APO_ID,
+    COUNT (*) CHOICES,
+    TERRITORY_CODE,
+    SCHOOL_YEAR
+  FROM
+    (SELECT DISTINCT A.APO_ID,
+      YC.SUBJECT_OID,
+      A.SCHOOL_YEAR,
+      A.TERRITORY_CODE
+    FROM ODS_OWN.APO A,
+      ODS_OWN.YEARBOOK_CHOICE YC,
+      ODS_OWN.SUB_PROGRAM SP,
+      ODS_OWN.PROGRAM P
+    WHERE A.APO_OID         = YC.APO_OID
+    AND A.SUB_PROGRAM_OID   = SP.SUB_PROGRAM_OID
+    AND P.PROGRAM_OID       = SP.PROGRAM_OID
+    AND P.PROGRAM_NAME      = 'Senior/Studio Style'
+    AND (A.ODS_MODIFY_DATE >= TO_DATE(SUBSTR(:v_cdc_load_date, 1, 19), 'YYYY-MM-DD HH24:MI:SS') - :v_cdc_overlap
+    OR YC.ODS_MODIFY_DATE  >= TO_DATE(SUBSTR(:v_cdc_load_date, 1, 19), 'YYYY-MM-DD HH24:MI:SS') - :v_cdc_overlap)
+      --   AND A.TERRITORY_CODE = UPPER((:TERRITORY))
+      --   AND A.SCHOOL_YEAR = (:SCHOOL_YEAR)
+    AND NVL (YC.CHOICE_NUMBER, 0) != 0
+    AND YC.choice_made_by_role     ='Student'
+      --AND a.APO_ID = '7JJPX'
+    )
+  GROUP BY APO_ID,
+    TERRITORY_CODE,
+    SCHOOL_YEAR
+  ) CHOICES,
+  (SELECT APO_ID,
+    COUNT (*) AS TOTAL
+  FROM
+    (SELECT Distinct A.APO_ID,UPPER(s.first_name),UPPER( s.last_name),
+       max(s.subject_oid)
+    FROM ODS_OWN.APO A ,
+      ods_own.sm_event_image_fact eif,
+      ods_own.subject s,
+      ods_own.subject_event_info sei,
+      ODS_OWN.SUB_PROGRAM SP,
+      ODS_OWN.PROGRAM P
+    WHERE A.APO_ID                  = eif.APO_ID
+    AND sei.SM_EVENT_IMAGE_FACT_OID = eif.SM_EVENT_IMAGE_FACT_OID
+    AND s.subject_oid               = sei.subject_oid
+    AND A.SUB_PROGRAM_OID           = SP.SUB_PROGRAM_OID
+    AND P.PROGRAM_OID               = SP.PROGRAM_OID
+    AND P.PROGRAM_NAME              = 'Senior/Studio Style'
+    AND (A.ODS_MODIFY_DATE         >= TO_DATE(SUBSTR(:v_cdc_load_date, 1, 19), 'YYYY-MM-DD HH24:MI:SS') - :v_cdc_overlap
+    OR S.ODS_MODIFY_DATE           >= TO_DATE(SUBSTR(:v_cdc_load_date, 1, 19), 'YYYY-MM-DD HH24:MI:SS') - :v_cdc_overlap)
+      --AND A.TERRITORY_CODE  = 'BY'
+      -- AND A.SCHOOL_YEAR     = 2022
+      --AND a.APO_ID          = '8J9R2'
+ GROUP BY A.APO_ID,UPPER(s.first_name),UPPER( s.last_name)
+    )
+  GROUP BY APO_ID
+  )TOTALSTUDENT,
+  ( -- Approved
+  SELECT APO_ID,
+    COUNT (*) AS APPROVED,
+    TERRITORY_CODE,
+    SCHOOL_YEAR
+  FROM
+    (SELECT A.APO_ID,
+      --   yc.SUBJECT_OID,
+      --   yc.CHOICE_MADE_WHEN,
+      YC.CONFIRMED,
+      RANK () OVER (PARTITION BY YC.SUBJECT_OID ORDER BY YC.CHOICE_MADE_WHEN DESC) AS RNK,
+      A.TERRITORY_CODE,
+      A.SCHOOL_YEAR
+    FROM ODS_OWN.APO A,
+      ODS_OWN.YEARBOOK_CHOICE YC,
+      ODS_OWN.SUB_PROGRAM SP,
+      ODS_OWN.PROGRAM P
+    WHERE A.APO_OID         = YC.APO_OID
+    AND A.SUB_PROGRAM_OID   = SP.SUB_PROGRAM_OID
+    AND P.PROGRAM_OID       = SP.PROGRAM_OID
+    AND P.PROGRAM_NAME      = 'Senior/Studio Style'
+    AND (A.ODS_MODIFY_DATE >= TO_DATE(SUBSTR(:v_cdc_load_date, 1, 19), 'YYYY-MM-DD HH24:MI:SS') - :v_cdc_overlap
+    OR YC.ODS_MODIFY_DATE  >= TO_DATE(SUBSTR(:v_cdc_load_date, 1, 19), 'YYYY-MM-DD HH24:MI:SS') - :v_cdc_overlap)
+      --   AND A.TERRITORY_CODE = UPPER((:TERRITORY))
+      --   AND A.SCHOOL_YEAR = (:SCHOOL_YEAR)   
+      --AND a.APO_ID = '7J7DZ'
+    )
+  WHERE RNK     = 1
+  AND CONFIRMED = 'Y'
+  GROUP BY APO_ID,
+    TERRITORY_CODE,
+    SCHOOL_YEAR
+  ) APPROVED
+WHERE ACCOUNT.APO_ID = EVENT.APO_ID(+)
+AND ACCOUNT.APO_ID   = STATUS.APO_ID(+)
+AND ACCOUNT.APO_ID   = PHOTO.APO_ID(+)
+AND ACCOUNT.APO_ID   = CHOICES.APO_ID(+)
+AND ACCOUNT.APO_ID   = APPROVED.APO_ID(+)
+AND ACCOUNT.APO_ID   = TOTALSTUDENT.APO_ID(+)
+ORDER BY EVENT.APO_ID
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 5 */
+/* MERGE INTO ODS_APP_USER.PYC_TERRITORY_REP_STG */
+
+MERGE INTO RAX_APP_USER.PYC_TERRITORY_REP_STG d
+     USING (
+SELECT  distinct
+t.APO_ID	,
+a.lifetouch_id ,
+t.EVENT_REF_ID	,
+t.ACCOUNT_NAME	,
+NUM_CHOICES	,
+t.POSE_SELECTION_DEADLINE	,
+YB_CHOICE_STATUS	,
+YB_CHOICE_SUBMIT_DATE	,
+t.TOTAL	,
+PHOTOGRAPHED	,
+CHOICES	,
+APPROVED	,
+CONFIRMED	,
+t.OPEN	,
+t.DONE	,
+t.UNKNOWN	,
+t.SCHOOL_YEAR,
+t.TERRITORY_CODE
+FROM 
+RAX_APP_USER.PYC_TERRITORY_REPORT_STAGE t
+inner join ods_own.apo a on a.apo_id = t.apo_id 
+
+) s
+  ON (d.APO_ID = s.APO_ID  and d.EVENT_REF_ID= s.EVENT_REF_ID)
+WHEN MATCHED
+THEN
+   UPDATE SET
+d.LIFETOUCH_ID =s.LIFETOUCH_ID,
+d.ACCOUNT_NAME= s.ACCOUNT_NAME,
+d.NUM_CHOICES=s.NUM_CHOICES	,
+d.POSE_SELECTION_DEADLINE=s.POSE_SELECTION_DEADLINE	,
+d.YB_CHOICE_STATUS =s.YB_CHOICE_STATUS	,
+d.YB_CHOICE_SUBMIT_DATE =s.YB_CHOICE_SUBMIT_DATE	,
+d.TOTAL=s.TOTAL	,
+d.PHOTOGRAPHED =s.PHOTOGRAPHED	,
+d.CHOICES =s.CHOICES	,
+d.APPROVED	= s.APPROVED,
+d.CONFIRMED=s.CONFIRMED	,
+d.OPEN	=s.OPEN,
+d.DONE	=s.done,
+d.UNKNOWN	 =s.UNKNOWN,
+d.SCHOOL_YEAR =s.SCHOOL_YEAR,
+d.TERRITORY_CODE=s.TERRITORY_CODE,
+d.ODS_MODIFY_DATE=sysdate
+WHEN NOT MATCHED
+THEN
+   INSERT     (
+APO_ID	,
+LIFETOUCH_ID,
+EVENT_REF_ID	,
+ACCOUNT_NAME	,
+NUM_CHOICES	,
+POSE_SELECTION_DEADLINE	,
+YB_CHOICE_STATUS	,
+YB_CHOICE_SUBMIT_DATE	,
+TOTAL	,
+PHOTOGRAPHED	,
+CHOICES	,
+APPROVED	,
+CONFIRMED	,
+OPEN	,
+DONE	,
+UNKNOWN	,
+SCHOOL_YEAR,
+TERRITORY_CODE,
+ODS_CREATE_DATE,
+ODS_MODIFY_DATE
+)VALUES(
+s.APO_ID	,
+s.LIFETOUCH_ID,
+s.EVENT_REF_ID	,
+s.ACCOUNT_NAME	,
+s.NUM_CHOICES	,
+s.POSE_SELECTION_DEADLINE	,
+s.YB_CHOICE_STATUS	,
+s.YB_CHOICE_SUBMIT_DATE	,
+s.TOTAL	,
+s.PHOTOGRAPHED	,
+s.CHOICES	,
+s.APPROVED	,
+s.CONFIRMED	,
+s.OPEN	,
+s.DONE	,
+s.UNKNOWN	,
+s.SCHOOL_YEAR,
+s.TERRITORY_CODE,
+SYSDATE,
+SYSDATE)
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 6 */
+/* Update CDC Load Status */
+
+UPDATE ODS_OWN.ODS_CDC_LOAD_STATUS
+SET LAST_CDC_COMPLETION_DATE=TO_DATE(
+             SUBSTR(:v_sess_beg, 1, 19), 'RRRR-MM-DD HH24:MI:SS')
++ nvl((TIMEZONE_OFFSET/24), 0) 
+WHERE ODS_TABLE_NAME=:v_cdc_load_table_name
+AND CONTEXT_NAME = :v_env
+
+/*
+UPDATE ODS_OWN.ODS_CDC_LOAD_STATUS
+SET LAST_CDC_COMPLETION_DATE=TO_DATE(
+             SUBSTR(:v_sess_beg, 1, 19), 'RRRR-MM-DD HH24:MI:SS')
+WHERE ODS_TABLE_NAME=:v_cdc_load_table_name
+AND CONTEXT_NAME = :v_env
+*/
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 7 */
+/* Insert CDC Audit Record */
+
+INSERT INTO RAX_APP_USER.ODS_CDC_LOAD_STATUS_AUDIT
+(TABLE_NAME,
+SESS_NO,                      
+SESS_NAME,                    
+SCEN_VERSION,                 
+SESS_BEG,                     
+ORIG_LAST_CDC_COMPLETION_DATE,
+OVERLAP,
+CREATE_DATE,
+CONTEXT_NAME,
+TIMEZONE_OFFSET              
+)
+select 
+:v_cdc_load_table_name
+,:v_sess_no
+,'99_PYC_TERRITORY_REPORT_PKG'
+,'007'
+,TO_DATE(SUBSTR(:v_sess_beg, 1, 19), 'RRRR-MM-DD HH24:MI:SS')
+,TO_DATE (SUBSTR(:v_cdc_load_date, 1, 19),'YYYY-MM-DD HH24:MI:SS')
+,:v_cdc_overlap
+,SYSDATE
+,:v_env
+,TIMEZONE_OFFSET
+from 
+ODS_OWN.ODS_CDC_LOAD_STATUS
+WHERE ODS_TABLE_NAME=:v_cdc_load_table_name
+AND CONTEXT_NAME = :v_env
+
+/*
+INSERT INTO RAX_APP_USER.ODS_CDC_LOAD_STATUS_AUDIT
+(TABLE_NAME,
+SESS_NO,                      
+SESS_NAME,                    
+SCEN_VERSION,                 
+SESS_BEG,                     
+ORIG_LAST_CDC_COMPLETION_DATE,
+OVERLAP,
+CREATE_DATE,
+CONTEXT_NAME              
+)
+values (
+:v_cdc_load_table_name,
+:v_sess_no,
+'99_PYC_TERRITORY_REPORT_PKG',
+'007',
+TO_DATE(
+             SUBSTR(:v_sess_beg, 1, 19), 'RRRR-MM-DD HH24:MI:SS'),
+TO_DATE (SUBSTR (:v_cdc_load_date, 1, 19),
+                           'YYYY-MM-DD HH24:MI:SS'
+                          )
+,:v_cdc_overlap,
+SYSDATE,
+ :v_env)
+*/
+
+
+&
+
+
+/*-----------------------------------------------*/

@@ -1,0 +1,1 @@
+select trim(dc.data_center_name) from ODS_OWN.DATA_CENTER dc

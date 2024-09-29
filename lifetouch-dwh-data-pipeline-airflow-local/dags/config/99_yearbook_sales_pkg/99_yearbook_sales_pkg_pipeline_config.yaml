@@ -1,0 +1,32 @@
+---
+
+pipeline:
+  name: lt_99_yearbook_sales_pkg_dag
+  description: 99_yearbook_sales_pkgpackage
+  schedule: 0 5 * * * #daily at 5 AM
+  tags:
+    - lifetouch
+    - 99_yearbook_sales_pkg
+  
+  task_groups:
+
+    
+    - name: 99_yearbook_sales_pkg_export
+      description: drop and recreate table then extract data and load to s3
+      export_file_name:
+        v_data_export_run_date : dags/sql/pre_sql/v_data_export_run_date.sql
+        
+      tasks:
+        - script_location: dags/sql/99_yearbook_sales_pkg/YEARBOOK_SALES_create.sql
+          export_files:
+            - extract_query: 99_yearbook_sales_pkg/YEARBOOK_SALES_export.sql
+              export_location: finance/yearbook_sales/SalesReport
+
+        - script_location: dags/sql/99_yearbook_sales_pkg/YEARBOOK_SALESADJUSTMENT_STAGE_create.sql
+          export_files:
+            - extract_query: 99_yearbook_sales_pkg/YEARBOOK_SALESADJUSTMENT_STAGE_export.sql
+              export_location: finance/yearbook_sales/YB_SalesAdjustmentReport
+
+
+        
+        

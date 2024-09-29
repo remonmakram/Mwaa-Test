@@ -1,0 +1,33 @@
+---
+
+pipeline:
+  name: lt_LPIP_KREPORT_DATA_FEED_PKG_dag
+  description: LPIP_KREPORT_DATA_FEED_PKG LPIP_KREPORT_DATA_FEED_PKG
+  schedule: "@daily"
+  tags:
+    - lifetouch
+    - lt_LPIP_KREPORT_DATA_FEED_PKG
+    - files
+  task_groups:
+
+    - name: lt_LPIP_KREPORT_DATA_FEED_PKG_export
+      description: create tables then extract data and load to s3
+      export_file_name: 
+        v_kreport_data_feed_file_name: dags/sql/pre_sql/LPIP_KREPORT_DATA_FEED_PKG/v_kreport_data_feed_file_name.sql
+      tasks:
+        - script_location: dags/sql/LPIP_KREPORT_DATA_FEED_PKG/LPIP_KREPORT_DATA_FEED_PKG.sql
+          export_files: 
+          - extract_query: 'LPIP_KREPORT_DATA_FEED_PKG/export_KREPORT_DATA_FEED_1.sql'
+            export_location: pre_sql/LPIP_KREPORT_DATA_FEED_PKG/v_rnet_target_directory.sql
+            file_ext: "txt"
+          - extract_query: 'LPIP_KREPORT_DATA_FEED_PKG/export_KREPORT_DATA_FEED_2.sql'
+            export_location: pre_sql/LPIP_KREPORT_DATA_FEED_PKG/v_rnet_target_directory.sql
+            file_ext: "txt"
+            
+    - name: LPIP_KREPORT_DATA_FEED_PKG_ODI_Transformation_update
+      description: continue LPIP_KREPORT_DATA_FEED_PKG_ODI_Transformation_update
+      tasks: 
+        - description: LPIP_KREPORT_DATA_FEED_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/LPIP_KREPORT_DATA_FEED_PKG/update_statement.sql
+    

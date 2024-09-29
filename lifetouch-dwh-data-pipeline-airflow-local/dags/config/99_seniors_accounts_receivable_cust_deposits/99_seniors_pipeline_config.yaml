@@ -1,0 +1,31 @@
+---
+
+pipeline:
+  name: lt_99_seniors_accounts_receivable_pkg_dag
+  description: 99_seniors accounts receivable cust deposits package
+  schedule: 0 7 1 * * #runs 1st day of each month at 7 AM
+  tags:
+    - lifetouch
+    - 99_seniors_accounts
+    
+  task_groups:
+
+    - name: 99_package_export
+      description: drop and recreate table then extract data and load to s3
+      export_file_name:
+        v_actuate_sysdate: dags/sql/pre_sql/v_actuate_sysdate.sql
+
+      tasks:
+        - script_location:  dags/sql/99_seniors_accounts_receivable_cust_deposits/actuate_reccust_depo_act_create.sql
+          export_files:
+            - extract_query:  99_seniors_accounts_receivable_cust_deposits/actuate_reccust_depo_acct_export.sql
+              export_location: finance/seniors_account_receivable_cust_depo/actuate_reccust_depo_acct
+        
+        - script_location: dags/sql/99_seniors_accounts_receivable_cust_deposits/actuate_reccust_depo_stg_create_tmp.sql
+          export_files:
+            - extract_query: 99_seniors_accounts_receivable_cust_deposits/actuate_reccust_depo_stg_export.sql
+              export_location: finance/seniors_account_receivable_cust_depo/actuate_reccust_depo_terr
+
+            - extract_query: 99_seniors_accounts_receivable_cust_deposits/actuate_reccust_depo_comp_export.sql
+              export_location: finance/seniors_account_receivable_cust_depo/actuate_reccust_depo_comp
+        

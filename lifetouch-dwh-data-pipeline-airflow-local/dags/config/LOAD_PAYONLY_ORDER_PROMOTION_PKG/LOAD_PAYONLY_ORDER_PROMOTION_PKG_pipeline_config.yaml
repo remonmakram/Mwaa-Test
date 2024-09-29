@@ -1,0 +1,26 @@
+---
+
+pipeline:
+  name: lt_LOAD_PAYONLY_ORDER_PROMOTION_PKG_dag
+  description: LOAD_PAYONLY_ORDER_PROMOTION_PKG package
+  schedule: "30 1 * * *"
+  tags:
+    - lifetouch
+    - LOAD_PAYONLY_ORDER_PROMOTION_PKG
+  task_groups:
+  
+    - name: LOAD_PAYONLY_ORDER_PROMOTION_PKG_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+        v_cdc_oms_overlap: 0.02083333333
+      tasks: 
+        - description: LOAD_PAYONLY_ORDER_PROMOTION batch package
+          type: oracle_sql
+          script_location: dags/sql/LOAD_PAYONLY_ORDER_PROMOTION_PKG/LOAD_PAYONLY_ORDER_PROMOTION_PKG.sql
+          args:
+            v_cdc_load_table_name: PAYONLY_ORDER_PROMOTION
+        
+        

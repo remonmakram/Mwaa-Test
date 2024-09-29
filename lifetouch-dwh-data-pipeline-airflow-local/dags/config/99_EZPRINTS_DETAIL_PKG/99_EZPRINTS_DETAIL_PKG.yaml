@@ -1,0 +1,25 @@
+---
+
+pipeline:
+  name: lt_99_EZPRINTS_DETAIL_PKG_dag
+  description: 99_EZPRINTS_DETAIL package
+  schedule: "00 14 * * *"
+  tags:
+    - lifetouch
+    - 99_EZPRINTS_DETAIL
+  
+  task_groups:
+    
+
+    - name: 99_EZPRINTS_DETAIL_export
+      description: drop and recreate table then extract data and load to s3
+      export_file_name:
+        v_actuate_sysdate: dags/sql/pre_sql/v_actuate_sysdate.sql
+      pre_sql:
+        v_actuate_fiscal_year: dags/sql/99_EZPRINTS_DETAIL_PKG/v_actuate_fiscal_year.sql
+        v_actuate_sysdate:  dags/sql/pre_sql/v_actuate_sysdate.sql
+      tasks:
+        - script_location: dags/sql/99_EZPRINTS_DETAIL_PKG/ezprints_detail_create_tmp.sql
+          export_files:
+            - extract_query: '99_EZPRINTS_DETAIL_PKG/EZPRINTS_DETAIL_export.sql'
+              export_location: finance/ezprints_detail/ezprints_detail

@@ -1,0 +1,1 @@
+select count(*) ct from std_org_load_incorrect

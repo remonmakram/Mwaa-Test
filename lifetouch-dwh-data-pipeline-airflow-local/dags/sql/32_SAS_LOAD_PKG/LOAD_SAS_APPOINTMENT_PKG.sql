@@ -1,0 +1,1418 @@
+/* TASK No. 1 */
+
+/* NONE or SET VARIABLE STATEMENT FOUND, CHECK ODI TASK NO. 1 */
+
+
+
+
+/*-----------------------------------------------*/
+/* TASK No. 2 */
+
+/* SELECT STATEMENT FOUND, CHECK ODI TASK NO. 2 */
+
+
+
+
+/*-----------------------------------------------*/
+/* TASK No. 3 */
+
+/* SELECT STATEMENT FOUND, CHECK ODI TASK NO. 3 */
+
+
+
+
+/*-----------------------------------------------*/
+/* TASK No. 4 */
+/* Drop work table */
+
+-- drop table RAX_APP_USER.C$_0SAS_APPOINTMENT_STG purge
+
+-- &
+
+
+/*-----------------------------------------------*/
+/* TASK No. 5 */
+/* Create work table */
+
+-- create table RAX_APP_USER.C$_0SAS_APPOINTMENT_STG
+-- (
+-- 	C1_APPOINTMENT_ID	NUMBER NULL,
+-- 	C2_APPOINTMENT_CODE	VARCHAR2(8) NULL,
+-- 	C3_STATUS	VARCHAR2(1) NULL,
+-- 	C4_SUBJECT_ID	NUMBER NULL,
+-- 	C5_APPOINTMENT_SLOT_ID	NUMBER NULL,
+-- 	C6_AUDIT_CREATE_DATE	TIMESTAMP(6) NULL,
+-- 	C7_AUDIT_CREATED_BY	VARCHAR2(255) NULL,
+-- 	C8_AUDIT_MODIFY_DATE	TIMESTAMP(6) NULL,
+-- 	C9_AUDIT_MODIFIED_BY	VARCHAR2(255) NULL,
+-- 	C10_LANGUAGE	VARCHAR2(255) NULL,
+-- 	C11_TIME_ZONE	NUMBER NULL,
+-- 	C12_EVENT_REF_ID	VARCHAR2(10) NULL,
+-- 	C13_APPOINTMENT_COMMENTS	VARCHAR2(500) NULL,
+-- 	C14_APO_ID	VARCHAR2(255) NULL
+-- )
+-- NOLOGGING
+
+-- &
+
+
+/*-----------------------------------------------*/
+/* TASK No. 6 */
+/* Load data */
+
+/* SOURCE CODE */
+
+
+-- select	
+-- 	APPOINTMENT.APPOINTMENT_ID	   C1_APPOINTMENT_ID,
+-- 	APPOINTMENT.APPOINTMENT_CODE	   C2_APPOINTMENT_CODE,
+-- 	APPOINTMENT.STATUS	   C3_STATUS,
+-- 	APPOINTMENT.SUBJECT_ID	   C4_SUBJECT_ID,
+-- 	APPOINTMENT.APPOINTMENT_SLOT_ID	   C5_APPOINTMENT_SLOT_ID,
+-- 	APPOINTMENT.AUDIT_CREATE_DATE	   C6_AUDIT_CREATE_DATE,
+-- 	APPOINTMENT.AUDIT_CREATED_BY	   C7_AUDIT_CREATED_BY,
+-- 	APPOINTMENT.AUDIT_MODIFY_DATE	   C8_AUDIT_MODIFY_DATE,
+-- 	APPOINTMENT.AUDIT_MODIFIED_BY	   C9_AUDIT_MODIFIED_BY,
+-- 	APPOINTMENT.LANGUAGE	   C10_LANGUAGE,
+-- 	APPOINTMENT.TIME_ZONE	   C11_TIME_ZONE,
+-- 	APPOINTMENT.EVENT_REF_ID	   C12_EVENT_REF_ID,
+-- 	APPOINTMENT.APPOINTMENT_COMMENTS	   C13_APPOINTMENT_COMMENTS,
+-- 	APPOINTMENT.APO_ID	   C14_APO_ID
+-- from	SAS_SIT_OWN.APPOINTMENT   APPOINTMENT
+-- where	(1=1)
+-- And (APPOINTMENT.AUDIT_MODIFY_DATE >= TO_DATE(SUBSTR(:v_cdc_load_date, 1, 19), 'YYYY-MM-DD HH24:MI:SS')  -:v_cdc_overlap)
+
+
+
+
+
+
+
+-- &
+
+-- /* TARGET CODE */
+-- insert /*+ append */ into RAX_APP_USER.C$_0SAS_APPOINTMENT_STG
+-- (
+-- 	C1_APPOINTMENT_ID,
+-- 	C2_APPOINTMENT_CODE,
+-- 	C3_STATUS,
+-- 	C4_SUBJECT_ID,
+-- 	C5_APPOINTMENT_SLOT_ID,
+-- 	C6_AUDIT_CREATE_DATE,
+-- 	C7_AUDIT_CREATED_BY,
+-- 	C8_AUDIT_MODIFY_DATE,
+-- 	C9_AUDIT_MODIFIED_BY,
+-- 	C10_LANGUAGE,
+-- 	C11_TIME_ZONE,
+-- 	C12_EVENT_REF_ID,
+-- 	C13_APPOINTMENT_COMMENTS,
+-- 	C14_APO_ID
+-- )
+-- values
+-- (
+-- 	:C1_APPOINTMENT_ID,
+-- 	:C2_APPOINTMENT_CODE,
+-- 	:C3_STATUS,
+-- 	:C4_SUBJECT_ID,
+-- 	:C5_APPOINTMENT_SLOT_ID,
+-- 	:C6_AUDIT_CREATE_DATE,
+-- 	:C7_AUDIT_CREATED_BY,
+-- 	:C8_AUDIT_MODIFY_DATE,
+-- 	:C9_AUDIT_MODIFIED_BY,
+-- 	:C10_LANGUAGE,
+-- 	:C11_TIME_ZONE,
+-- 	:C12_EVENT_REF_ID,
+-- 	:C13_APPOINTMENT_COMMENTS,
+-- 	:C14_APO_ID
+-- )
+
+-- &
+
+
+/*-----------------------------------------------*/
+/* TASK No. 7 */
+/* Analyze work table */
+
+
+
+BEGIN
+DBMS_STATS.GATHER_TABLE_STATS (
+    ownname =>	'RAX_APP_USER',
+    tabname =>	'C$_0SAS_APPOINTMENT_STG',
+    estimate_percent =>	DBMS_STATS.AUTO_SAMPLE_SIZE
+);
+END;
+
+
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 9 */
+/* Set vID */
+
+/* NONE or SET VARIABLE STATEMENT FOUND, CHECK ODI TASK NO. 9 */
+
+
+
+
+/*-----------------------------------------------*/
+/* TASK No. 10 */
+/* Drop flow table */
+
+-- drop table RAX_APP_USER.I$_SAS_APPOINTMENT_STG1724001
+
+BEGIN
+  EXECUTE IMMEDIATE 'drop table RAX_APP_USER.I$_SAS_APPOINTMENT_STG1724001';
+EXCEPTION
+  WHEN OTHERS THEN
+   IF SQLCODE != -942 THEN
+     RAISE;
+   END IF;
+END;
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 11 */
+/* Create flow table I$ */
+
+
+create table RAX_APP_USER.I$_SAS_APPOINTMENT_STG1724001
+(
+	APPOINTMENT_ID	NUMBER NULL,
+	APPOINTMENT_CODE	VARCHAR2(8) NULL,
+	STATUS	VARCHAR2(1) NULL,
+	SUBJECT_ID	NUMBER NULL,
+	APPOINTMENT_SLOT_ID	NUMBER NULL,
+	AUDIT_CREATE_DATE	TIMESTAMP(6) NULL,
+	AUDIT_CREATED_BY	VARCHAR2(255) NULL,
+	AUDIT_MODIFY_DATE	TIMESTAMP(6) NULL,
+	AUDIT_MODIFIED_BY	VARCHAR2(255) NULL,
+	LANGUAGE	VARCHAR2(255) NULL,
+	TIME_ZONE	NUMBER NULL,
+	ODS_CREATE_DATE	DATE NULL,
+	ODS_MODIFY_DATE	DATE NULL,
+	EVENT_REF_ID	VARCHAR2(10) NULL,
+	APPOINTMENT_COMMENTS	VARCHAR2(500) NULL,
+	APO_ID	VARCHAR2(255) NULL
+	,IND_UPDATE		char(1)
+)
+NOLOGGING
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 12 */
+/* Insert flow into I$ table */
+
+/* DETECTION_STRATEGY = NOT_EXISTS */
+ 
+
+
+  
+
+
+insert into	RAX_APP_USER.I$_SAS_APPOINTMENT_STG1724001
+(
+	APPOINTMENT_ID,
+	APPOINTMENT_CODE,
+	STATUS,
+	SUBJECT_ID,
+	APPOINTMENT_SLOT_ID,
+	AUDIT_CREATE_DATE,
+	AUDIT_CREATED_BY,
+	AUDIT_MODIFY_DATE,
+	AUDIT_MODIFIED_BY,
+	LANGUAGE,
+	TIME_ZONE,
+	EVENT_REF_ID,
+	APPOINTMENT_COMMENTS,
+	APO_ID,
+	IND_UPDATE
+)
+select 
+APPOINTMENT_ID,
+	APPOINTMENT_CODE,
+	STATUS,
+	SUBJECT_ID,
+	APPOINTMENT_SLOT_ID,
+	AUDIT_CREATE_DATE,
+	AUDIT_CREATED_BY,
+	AUDIT_MODIFY_DATE,
+	AUDIT_MODIFIED_BY,
+	LANGUAGE,
+	TIME_ZONE,
+	EVENT_REF_ID,
+	APPOINTMENT_COMMENTS,
+	APO_ID,
+	IND_UPDATE
+ from (
+
+
+select 	 
+	
+	C1_APPOINTMENT_ID APPOINTMENT_ID,
+	C2_APPOINTMENT_CODE APPOINTMENT_CODE,
+	C3_STATUS STATUS,
+	C4_SUBJECT_ID SUBJECT_ID,
+	C5_APPOINTMENT_SLOT_ID APPOINTMENT_SLOT_ID,
+	C6_AUDIT_CREATE_DATE AUDIT_CREATE_DATE,
+	C7_AUDIT_CREATED_BY AUDIT_CREATED_BY,
+	C8_AUDIT_MODIFY_DATE AUDIT_MODIFY_DATE,
+	C9_AUDIT_MODIFIED_BY AUDIT_MODIFIED_BY,
+	C10_LANGUAGE LANGUAGE,
+	C11_TIME_ZONE TIME_ZONE,
+	C12_EVENT_REF_ID EVENT_REF_ID,
+	C13_APPOINTMENT_COMMENTS APPOINTMENT_COMMENTS,
+	C14_APO_ID APO_ID,
+
+	'I' IND_UPDATE
+
+from	RAX_APP_USER.C$_0SAS_APPOINTMENT_STG
+where	(1=1)
+
+
+
+
+
+
+) S
+where NOT EXISTS 
+	( select 1 from ODS_STAGE.SAS_APPOINTMENT_STG T
+	where	T.APPOINTMENT_ID	= S.APPOINTMENT_ID 
+		 and ((T.APPOINTMENT_CODE = S.APPOINTMENT_CODE) or (T.APPOINTMENT_CODE IS NULL and S.APPOINTMENT_CODE IS NULL)) and
+		((T.STATUS = S.STATUS) or (T.STATUS IS NULL and S.STATUS IS NULL)) and
+		((T.SUBJECT_ID = S.SUBJECT_ID) or (T.SUBJECT_ID IS NULL and S.SUBJECT_ID IS NULL)) and
+		((T.APPOINTMENT_SLOT_ID = S.APPOINTMENT_SLOT_ID) or (T.APPOINTMENT_SLOT_ID IS NULL and S.APPOINTMENT_SLOT_ID IS NULL)) and
+		((T.AUDIT_CREATE_DATE = S.AUDIT_CREATE_DATE) or (T.AUDIT_CREATE_DATE IS NULL and S.AUDIT_CREATE_DATE IS NULL)) and
+		((T.AUDIT_CREATED_BY = S.AUDIT_CREATED_BY) or (T.AUDIT_CREATED_BY IS NULL and S.AUDIT_CREATED_BY IS NULL)) and
+		((T.AUDIT_MODIFY_DATE = S.AUDIT_MODIFY_DATE) or (T.AUDIT_MODIFY_DATE IS NULL and S.AUDIT_MODIFY_DATE IS NULL)) and
+		((T.AUDIT_MODIFIED_BY = S.AUDIT_MODIFIED_BY) or (T.AUDIT_MODIFIED_BY IS NULL and S.AUDIT_MODIFIED_BY IS NULL)) and
+		((T.LANGUAGE = S.LANGUAGE) or (T.LANGUAGE IS NULL and S.LANGUAGE IS NULL)) and
+		((T.TIME_ZONE = S.TIME_ZONE) or (T.TIME_ZONE IS NULL and S.TIME_ZONE IS NULL)) and
+		((T.EVENT_REF_ID = S.EVENT_REF_ID) or (T.EVENT_REF_ID IS NULL and S.EVENT_REF_ID IS NULL)) and
+		((T.APPOINTMENT_COMMENTS = S.APPOINTMENT_COMMENTS) or (T.APPOINTMENT_COMMENTS IS NULL and S.APPOINTMENT_COMMENTS IS NULL)) and
+		((T.APO_ID = S.APO_ID) or (T.APO_ID IS NULL and S.APO_ID IS NULL))
+        )
+
+  
+  
+
+  
+
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 13 */
+/* Analyze integration table */
+
+
+
+begin
+    dbms_stats.gather_table_stats(
+	ownname => 'RAX_APP_USER',
+	tabname => 'I$_SAS_APPOINTMENT_STG1724001',
+	estimate_percent => dbms_stats.auto_sample_size
+    );
+end;
+
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 14 */
+/* Create Index on flow table */
+
+-- create index	RAX_APP_USER.I$_SAS_APPOINTMENT_STG_IDX1724001
+-- on		RAX_APP_USER.I$_SAS_APPOINTMENT_STG1724001 (APPOINTMENT_ID)
+-- NOLOGGING
+
+BEGIN
+  EXECUTE IMMEDIATE 'create index RAX_APP_USER.I$_SAS_APPOINTMENT_STG_IDX1724001
+on   RAX_APP_USER.I$_SAS_APPOINTMENT_STG1724001 (APPOINTMENT_ID)';
+EXCEPTION
+  WHEN OTHERS THEN
+   -- Handle the case where the identifier is too long (ORA-00972)
+   IF SQLCODE = -972 or  SQLCODE = -1408 or SQLCODE = -955  THEN
+     DBMS_OUTPUT.PUT_LINE('Identifier is too long. Skipping creation of index.');
+   ELSE
+     RAISE;
+   END IF;
+END;
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 15 */
+/* create check table */
+
+
+-- create table RAX_APP_USER.SNP_CHECK_TAB
+-- (
+-- 	CATALOG_NAME	VARCHAR2(100 CHAR) NULL ,
+-- 	SCHEMA_NAME	VARCHAR2(100 CHAR) NULL ,
+-- 	RESOURCE_NAME	VARCHAR2(100 CHAR) NULL,
+-- 	FULL_RES_NAME	VARCHAR2(100 CHAR) NULL,
+-- 	ERR_TYPE		VARCHAR2(1 CHAR) NULL,
+-- 	ERR_MESS		VARCHAR2(250 CHAR) NULL ,
+-- 	CHECK_DATE	DATE NULL,
+-- 	ORIGIN		VARCHAR2(100 CHAR) NULL,
+-- 	CONS_NAME	VARCHAR2(35 CHAR) NULL,
+-- 	CONS_TYPE		VARCHAR2(2 CHAR) NULL,
+-- 	ERR_COUNT		NUMBER(10) NULL
+-- )
+	
+
+
+
+BEGIN
+  EXECUTE IMMEDIATE 'drop table RAX_APP_USER.SNP_CHECK_TAB';
+EXCEPTION
+  WHEN OTHERS THEN
+   IF SQLCODE != -942 THEN
+     RAISE;
+   END IF;
+END;
+
+&
+
+BEGIN
+   EXECUTE IMMEDIATE '
+		create table RAX_APP_USER.SNP_CHECK_TAB
+		(
+			CATALOG_NAME	VARCHAR2(100 CHAR) NULL ,
+			SCHEMA_NAME	VARCHAR2(100 CHAR) NULL ,
+			RESOURCE_NAME	VARCHAR2(100 CHAR) NULL,
+			FULL_RES_NAME	VARCHAR2(100 CHAR) NULL,
+			ERR_TYPE		VARCHAR2(1 CHAR) NULL,
+			ERR_MESS		VARCHAR2(250 CHAR) NULL ,
+			CHECK_DATE	DATE NULL,
+			ORIGIN		VARCHAR2(100 CHAR) NULL,
+			CONS_NAME	VARCHAR2(35 CHAR) NULL,
+			CONS_TYPE		VARCHAR2(2 CHAR) NULL,
+			ERR_COUNT		NUMBER(10) NULL
+		)
+   ';
+END;
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 16 */
+/* delete previous check sum */
+
+delete from	RAX_APP_USER.SNP_CHECK_TAB
+where	SCHEMA_NAME	= 'ODS_STAGE'
+and	ORIGIN 		= '(1724001)ODS_Project.LOAD_SAS_APPOINTMENT_STG_INT'
+and	ERR_TYPE 		= 'F'
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 17 */
+/* create error table */
+
+BEGIN
+  EXECUTE IMMEDIATE 'drop table RAX_APP_USER.E$_SAS_APPOINTMENT_STG1724001';
+EXCEPTION
+  WHEN OTHERS THEN
+   IF SQLCODE != -942 THEN
+     RAISE;
+   END IF;
+END;
+
+&
+
+create table RAX_APP_USER.E$_SAS_APPOINTMENT_STG1724001
+(
+	ODI_ROW_ID 		UROWID,
+	ODI_ERR_TYPE		VARCHAR2(1 CHAR) NULL, 
+	ODI_ERR_MESS		VARCHAR2(250 CHAR) NULL,
+	ODI_CHECK_DATE	DATE NULL, 
+	APPOINTMENT_ID	NUMBER NULL,
+	APPOINTMENT_CODE	VARCHAR2(8) NULL,
+	STATUS	VARCHAR2(1) NULL,
+	SUBJECT_ID	NUMBER NULL,
+	APPOINTMENT_SLOT_ID	NUMBER NULL,
+	AUDIT_CREATE_DATE	TIMESTAMP(6) NULL,
+	AUDIT_CREATED_BY	VARCHAR2(255) NULL,
+	AUDIT_MODIFY_DATE	TIMESTAMP(6) NULL,
+	AUDIT_MODIFIED_BY	VARCHAR2(255) NULL,
+	LANGUAGE	VARCHAR2(255) NULL,
+	TIME_ZONE	NUMBER NULL,
+	ODS_CREATE_DATE	DATE NULL,
+	ODS_MODIFY_DATE	DATE NULL,
+	EVENT_REF_ID	VARCHAR2(10) NULL,
+	APPOINTMENT_COMMENTS	VARCHAR2(500) NULL,
+	APO_ID	VARCHAR2(255) NULL,
+	ODI_ORIGIN		VARCHAR2(100 CHAR) NULL,
+	ODI_CONS_NAME	VARCHAR2(35 CHAR) NULL,
+	ODI_CONS_TYPE		VARCHAR2(2 CHAR) NULL,
+	ODI_PK			VARCHAR2(32 CHAR) PRIMARY KEY,
+	ODI_SESS_NO		VARCHAR2(19 CHAR)
+)
+
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 18 */
+/* delete previous errors */
+
+delete from 	RAX_APP_USER.E$_SAS_APPOINTMENT_STG1724001
+where	(ODI_ERR_TYPE = 'S'	and 'F' = 'S')
+or	(ODI_ERR_TYPE = 'F'	and ODI_ORIGIN = '(1724001)ODS_Project.LOAD_SAS_APPOINTMENT_STG_INT')
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 19 */
+/* Create index on PK */
+
+ 
+/* FLOW CONTROL CREATE THE iNDEX ON THE I$TABLE */
+-- create index 	RAX_APP_USER.I$_SAS_APPOINTMENT_STG1724001
+-- on	RAX_APP_USER.I$_SAS_APPOINTMENT_STG1724001 (APPOINTMENT_ID)
+
+BEGIN
+  EXECUTE IMMEDIATE 'create index 	RAX_APP_USER.I$_SAS_APPOINTMENT_STG1724001
+on   RAX_APP_USER.I$_SAS_APPOINTMENT_STG1724001 (APPOINTMENT_ID)';
+EXCEPTION
+  WHEN OTHERS THEN
+   -- Handle the case where the identifier is too long or such column list already indexed (ORA-00972 or ORA-01408)
+   IF SQLCODE = -972 or  SQLCODE = -1408 or SQLCODE = -955  THEN
+     DBMS_OUTPUT.PUT_LINE('Skipping creation of index.');
+   ELSE
+     RAISE;
+   END IF;
+END;
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 20 */
+/* insert PK errors */
+
+DECLARE
+               CheckTable                             VarChar2(60);
+               TargetTable                            VarChar2(60);
+               VariableCheckTable                     VarChar2(60);
+
+BEGIN
+               SELECT 'RAX_APP_USER.I$_SAS_APPOINTMENT_STG' INTO CheckTable FROM DUAL;
+               SELECT 'ODS_STAGE.SAS_APPOINTMENT_STG' INTO TargetTable FROM DUAL;
+
+IF CheckTable = TargetTable THEN
+   VariableCheckTable := CheckTable; 
+ELSE
+   VariableCheckTable := CheckTable || '1724001';
+END IF;
+
+execute immediate '
+insert into RAX_APP_USER.E$_SAS_APPOINTMENT_STG1724001
+(
+	ODI_PK,
+	ODI_SESS_NO,
+	ODI_ROW_ID,
+	ODI_ERR_TYPE,
+	ODI_ERR_MESS,
+	ODI_ORIGIN,
+	ODI_CHECK_DATE,
+	ODI_CONS_NAME,
+	ODI_CONS_TYPE,
+	APPOINTMENT_ID,
+	APPOINTMENT_CODE,
+	STATUS,
+	SUBJECT_ID,
+	APPOINTMENT_SLOT_ID,
+	AUDIT_CREATE_DATE,
+	AUDIT_CREATED_BY,
+	AUDIT_MODIFY_DATE,
+	AUDIT_MODIFIED_BY,
+	LANGUAGE,
+	TIME_ZONE,
+	ODS_CREATE_DATE,
+	ODS_MODIFY_DATE,
+	EVENT_REF_ID,
+	APPOINTMENT_COMMENTS,
+	APO_ID
+)
+select	SYS_GUID(),
+	:v_sess_no, 
+	rowid,
+	''F'', 
+	''ODI-15064: The primary key APPOINTMENT_PK is not unique.'',
+	''(1724001)ODS_Project.LOAD_SAS_APPOINTMENT_STG_INT'',
+	sysdate,
+	''APPOINTMENT_PK'',
+	''PK'',	
+	SAS_APPOINTMENT_STG.APPOINTMENT_ID,
+	SAS_APPOINTMENT_STG.APPOINTMENT_CODE,
+	SAS_APPOINTMENT_STG.STATUS,
+	SAS_APPOINTMENT_STG.SUBJECT_ID,
+	SAS_APPOINTMENT_STG.APPOINTMENT_SLOT_ID,
+	SAS_APPOINTMENT_STG.AUDIT_CREATE_DATE,
+	SAS_APPOINTMENT_STG.AUDIT_CREATED_BY,
+	SAS_APPOINTMENT_STG.AUDIT_MODIFY_DATE,
+	SAS_APPOINTMENT_STG.AUDIT_MODIFIED_BY,
+	SAS_APPOINTMENT_STG.LANGUAGE,
+	SAS_APPOINTMENT_STG.TIME_ZONE,
+	SAS_APPOINTMENT_STG.ODS_CREATE_DATE,
+	SAS_APPOINTMENT_STG.ODS_MODIFY_DATE,
+	SAS_APPOINTMENT_STG.EVENT_REF_ID,
+	SAS_APPOINTMENT_STG.APPOINTMENT_COMMENTS,
+	SAS_APPOINTMENT_STG.APO_ID
+from	'
+ || VariableCheckTable || 
+' SAS_APPOINTMENT_STG 
+where	exists  (
+		select	SUB1.APPOINTMENT_ID
+		from 	' 
+|| VariableCheckTable ||
+'  SUB1
+		where 	SUB1.APPOINTMENT_ID=SAS_APPOINTMENT_STG.APPOINTMENT_ID
+		group by 	SUB1.APPOINTMENT_ID
+		having 	count(1) > 1
+		)
+';
+
+END;
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 21 */
+/* Create index on AK */
+
+ 
+/* FLOW CONTROL CREATE THE iNDEX ON THE I$TABLE */
+-- create index 	SAS_APPOINTMENT_PK_flow
+-- on	RAX_APP_USER.I$_SAS_APPOINTMENT_STG1724001 
+-- 	(APPOINTMENT_ID)
+
+BEGIN
+  EXECUTE IMMEDIATE 'create index 	SAS_APPOINTMENT_PK_flow
+on   RAX_APP_USER.I$_SAS_APPOINTMENT_STG1724001  (APPOINTMENT_ID)';
+EXCEPTION
+  WHEN OTHERS THEN
+   -- Handle the case where the identifier is too long or such column list already indexed (ORA-00972 or ORA-01408)
+   IF SQLCODE = -972 or  SQLCODE = -1408 or SQLCODE = -955  THEN
+     DBMS_OUTPUT.PUT_LINE('Skipping creation of index.');
+   ELSE
+     RAISE;
+   END IF;
+END;
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 22 */
+/* insert AK errors */
+
+DECLARE
+               CheckTable                             VarChar2(60);
+               TargetTable                            VarChar2(60);
+               VariableCheckTable                VarChar2(60);
+
+BEGIN
+               SELECT 'RAX_APP_USER.I$_SAS_APPOINTMENT_STG' INTO CheckTable FROM DUAL;
+               SELECT 'ODS_STAGE.SAS_APPOINTMENT_STG' INTO TargetTable FROM DUAL;
+
+IF CheckTable = TargetTable THEN
+   VariableCheckTable := CheckTable; 
+ELSE
+   VariableCheckTable := CheckTable || '1724001';
+END IF;
+
+execute immediate '
+insert into RAX_APP_USER.E$_SAS_APPOINTMENT_STG1724001
+(
+	ODI_PK,
+	ODI_SESS_NO,
+	ODI_ROW_ID,
+	ODI_ERR_TYPE,
+	ODI_ERR_MESS,
+	ODI_ORIGIN,
+	ODI_CHECK_DATE,
+	ODI_CONS_NAME,
+	ODI_CONS_TYPE,
+	APPOINTMENT_ID,
+	APPOINTMENT_CODE,
+	STATUS,
+	SUBJECT_ID,
+	APPOINTMENT_SLOT_ID,
+	AUDIT_CREATE_DATE,
+	AUDIT_CREATED_BY,
+	AUDIT_MODIFY_DATE,
+	AUDIT_MODIFIED_BY,
+	LANGUAGE,
+	TIME_ZONE,
+	ODS_CREATE_DATE,
+	ODS_MODIFY_DATE,
+	EVENT_REF_ID,
+	APPOINTMENT_COMMENTS,
+	APO_ID
+)
+select	SYS_GUID(),
+	:v_sess_no, 
+	rowid,
+	''F'', 
+	''ODI-15063: The alternate key SAS_APPOINTMENT_PK is not unique.'',
+	''(1724001)ODS_Project.LOAD_SAS_APPOINTMENT_STG_INT'',
+	sysdate,
+	''SAS_APPOINTMENT_PK'',
+	''AK'',	
+	SAS_APPOINTMENT_STG.APPOINTMENT_ID,
+	SAS_APPOINTMENT_STG.APPOINTMENT_CODE,
+	SAS_APPOINTMENT_STG.STATUS,
+	SAS_APPOINTMENT_STG.SUBJECT_ID,
+	SAS_APPOINTMENT_STG.APPOINTMENT_SLOT_ID,
+	SAS_APPOINTMENT_STG.AUDIT_CREATE_DATE,
+	SAS_APPOINTMENT_STG.AUDIT_CREATED_BY,
+	SAS_APPOINTMENT_STG.AUDIT_MODIFY_DATE,
+	SAS_APPOINTMENT_STG.AUDIT_MODIFIED_BY,
+	SAS_APPOINTMENT_STG.LANGUAGE,
+	SAS_APPOINTMENT_STG.TIME_ZONE,
+	SAS_APPOINTMENT_STG.ODS_CREATE_DATE,
+	SAS_APPOINTMENT_STG.ODS_MODIFY_DATE,
+	SAS_APPOINTMENT_STG.EVENT_REF_ID,
+	SAS_APPOINTMENT_STG.APPOINTMENT_COMMENTS,
+	SAS_APPOINTMENT_STG.APO_ID
+from              '	
+ || VariableCheckTable || 
+' SAS_APPOINTMENT_STG
+where	exists  (
+		select	SUB.APPOINTMENT_ID
+		from 	'
+ || VariableCheckTable || 
+' SUB
+		where 	SUB.APPOINTMENT_ID=SAS_APPOINTMENT_STG.APPOINTMENT_ID
+		group by 	SUB.APPOINTMENT_ID
+		having 	count(1) > 1
+		)
+ ';
+
+END;
+
+/*  Checked Datastore =RAX_APP_USER.I$_SAS_APPOINTMENT_STG  */
+/*  Integration Datastore =RAX_APP_USER.I$_SAS_APPOINTMENT_STG   */
+/*  Target Datastore =ODS_STAGE.SAS_APPOINTMENT_STG */
+
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 23 */
+/* Create index on AK */
+
+ 
+/* FLOW CONTROL CREATE THE iNDEX ON THE I$TABLE */
+-- create index 	SAS_APPOINTMENT_01_flow
+-- on	RAX_APP_USER.I$_SAS_APPOINTMENT_STG1724001 
+-- 	(APPOINTMENT_CODE)
+
+BEGIN
+  EXECUTE IMMEDIATE 'create index 	SAS_APPOINTMENT_01_flow
+on   RAX_APP_USER.I$_SAS_APPOINTMENT_STG1724001  (APPOINTMENT_CODE)';
+EXCEPTION
+  WHEN OTHERS THEN
+   -- Handle the case where the identifier is too long or such column list already indexed (ORA-00972 or ORA-01408)
+   IF SQLCODE = -972 or  SQLCODE = -1408 or SQLCODE = -955  THEN
+     DBMS_OUTPUT.PUT_LINE('Skipping creation of index.');
+   ELSE
+     RAISE;
+   END IF;
+END;
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 24 */
+/* insert AK errors */
+
+DECLARE
+               CheckTable                             VarChar2(60);
+               TargetTable                            VarChar2(60);
+               VariableCheckTable                VarChar2(60);
+
+BEGIN
+               SELECT 'RAX_APP_USER.I$_SAS_APPOINTMENT_STG' INTO CheckTable FROM DUAL;
+               SELECT 'ODS_STAGE.SAS_APPOINTMENT_STG' INTO TargetTable FROM DUAL;
+
+IF CheckTable = TargetTable THEN
+   VariableCheckTable := CheckTable; 
+ELSE
+   VariableCheckTable := CheckTable || '1724001';
+END IF;
+
+execute immediate '
+insert into RAX_APP_USER.E$_SAS_APPOINTMENT_STG1724001
+(
+	ODI_PK,
+	ODI_SESS_NO,
+	ODI_ROW_ID,
+	ODI_ERR_TYPE,
+	ODI_ERR_MESS,
+	ODI_ORIGIN,
+	ODI_CHECK_DATE,
+	ODI_CONS_NAME,
+	ODI_CONS_TYPE,
+	APPOINTMENT_ID,
+	APPOINTMENT_CODE,
+	STATUS,
+	SUBJECT_ID,
+	APPOINTMENT_SLOT_ID,
+	AUDIT_CREATE_DATE,
+	AUDIT_CREATED_BY,
+	AUDIT_MODIFY_DATE,
+	AUDIT_MODIFIED_BY,
+	LANGUAGE,
+	TIME_ZONE,
+	ODS_CREATE_DATE,
+	ODS_MODIFY_DATE,
+	EVENT_REF_ID,
+	APPOINTMENT_COMMENTS,
+	APO_ID
+)
+select	SYS_GUID(),
+	:v_sess_no, 
+	rowid,
+	''F'', 
+	''ODI-15063: The alternate key SAS_APPOINTMENT_01 is not unique.'',
+	''(1724001)ODS_Project.LOAD_SAS_APPOINTMENT_STG_INT'',
+	sysdate,
+	''SAS_APPOINTMENT_01'',
+	''AK'',	
+	SAS_APPOINTMENT_STG.APPOINTMENT_ID,
+	SAS_APPOINTMENT_STG.APPOINTMENT_CODE,
+	SAS_APPOINTMENT_STG.STATUS,
+	SAS_APPOINTMENT_STG.SUBJECT_ID,
+	SAS_APPOINTMENT_STG.APPOINTMENT_SLOT_ID,
+	SAS_APPOINTMENT_STG.AUDIT_CREATE_DATE,
+	SAS_APPOINTMENT_STG.AUDIT_CREATED_BY,
+	SAS_APPOINTMENT_STG.AUDIT_MODIFY_DATE,
+	SAS_APPOINTMENT_STG.AUDIT_MODIFIED_BY,
+	SAS_APPOINTMENT_STG.LANGUAGE,
+	SAS_APPOINTMENT_STG.TIME_ZONE,
+	SAS_APPOINTMENT_STG.ODS_CREATE_DATE,
+	SAS_APPOINTMENT_STG.ODS_MODIFY_DATE,
+	SAS_APPOINTMENT_STG.EVENT_REF_ID,
+	SAS_APPOINTMENT_STG.APPOINTMENT_COMMENTS,
+	SAS_APPOINTMENT_STG.APO_ID
+from              '	
+ || VariableCheckTable || 
+' SAS_APPOINTMENT_STG
+where	exists  (
+		select	SUB.APPOINTMENT_CODE
+		from 	'
+ || VariableCheckTable || 
+' SUB
+		where 	SUB.APPOINTMENT_CODE=SAS_APPOINTMENT_STG.APPOINTMENT_CODE
+		group by 	SUB.APPOINTMENT_CODE
+		having 	count(1) > 1
+		)
+ ';
+
+END;
+
+/*  Checked Datastore =RAX_APP_USER.I$_SAS_APPOINTMENT_STG  */
+/*  Integration Datastore =RAX_APP_USER.I$_SAS_APPOINTMENT_STG   */
+/*  Target Datastore =ODS_STAGE.SAS_APPOINTMENT_STG */
+
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 25 */
+/* insert Not Null errors */
+
+insert into RAX_APP_USER.E$_SAS_APPOINTMENT_STG1724001
+(
+	ODI_PK,
+	ODI_SESS_NO,
+	ODI_ROW_ID,
+	ODI_ERR_TYPE,
+	ODI_ERR_MESS,
+	ODI_CHECK_DATE,
+	ODI_ORIGIN,
+	ODI_CONS_NAME,
+	ODI_CONS_TYPE,
+	APPOINTMENT_ID,
+	APPOINTMENT_CODE,
+	STATUS,
+	SUBJECT_ID,
+	APPOINTMENT_SLOT_ID,
+	AUDIT_CREATE_DATE,
+	AUDIT_CREATED_BY,
+	AUDIT_MODIFY_DATE,
+	AUDIT_MODIFIED_BY,
+	LANGUAGE,
+	TIME_ZONE,
+	ODS_CREATE_DATE,
+	ODS_MODIFY_DATE,
+	EVENT_REF_ID,
+	APPOINTMENT_COMMENTS,
+	APO_ID
+)
+select
+	SYS_GUID(),
+	:v_sess_no, 
+	rowid,
+	'F', 
+	'ODI-15066: The column APPOINTMENT_ID cannot be null.',
+	sysdate,
+	'(1724001)ODS_Project.LOAD_SAS_APPOINTMENT_STG_INT',
+	'APPOINTMENT_ID',
+	'NN',	
+	APPOINTMENT_ID,
+	APPOINTMENT_CODE,
+	STATUS,
+	SUBJECT_ID,
+	APPOINTMENT_SLOT_ID,
+	AUDIT_CREATE_DATE,
+	AUDIT_CREATED_BY,
+	AUDIT_MODIFY_DATE,
+	AUDIT_MODIFIED_BY,
+	LANGUAGE,
+	TIME_ZONE,
+	ODS_CREATE_DATE,
+	ODS_MODIFY_DATE,
+	EVENT_REF_ID,
+	APPOINTMENT_COMMENTS,
+	APO_ID
+from	RAX_APP_USER.I$_SAS_APPOINTMENT_STG1724001
+where	APPOINTMENT_ID is null
+
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 26 */
+/* create index on error table */
+
+ 
+/* FLOW CONTROL CREATE INDEX ON THE E$TABLE */
+-- create index 	RAX_APP_USER.E$_SAS_APPOINTMENT_STG1724001
+-- on	RAX_APP_USER.E$_SAS_APPOINTMENT_STG1724001 (ODI_ROW_ID)
+
+BEGIN
+  EXECUTE IMMEDIATE 'create index 	RAX_APP_USER.E$_SAS_APPOINTMENT_STG1724001
+on   RAX_APP_USER.E$_SAS_APPOINTMENT_STG1724001 (ODI_ROW_ID)';
+EXCEPTION
+  WHEN OTHERS THEN
+   -- Handle the case where the identifier is too long or such column list already indexed (ORA-00972 or ORA-01408)
+   IF SQLCODE = -972 or  SQLCODE = -1408 or SQLCODE = -955  THEN
+     DBMS_OUTPUT.PUT_LINE('Skipping creation of index.');
+   ELSE
+     RAISE;
+   END IF;
+END;
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 27 */
+/* delete errors from controlled table */
+
+delete from	RAX_APP_USER.I$_SAS_APPOINTMENT_STG1724001  T
+where	exists 	(
+		select	1
+		from	RAX_APP_USER.E$_SAS_APPOINTMENT_STG1724001 E
+		where ODI_SESS_NO = :v_sess_no
+		and T.rowid = E.ODI_ROW_ID
+		)
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 28 */
+/* insert check sum into check table */
+
+insert into RAX_APP_USER.SNP_CHECK_TAB
+(
+	SCHEMA_NAME,
+	RESOURCE_NAME,
+	FULL_RES_NAME,
+	ERR_TYPE,
+	ERR_MESS,
+	CHECK_DATE,
+	ORIGIN,
+	CONS_NAME,
+	CONS_TYPE,
+	ERR_COUNT
+)
+select	
+	'ODS_STAGE',
+	'SAS_APPOINTMENT_STG',
+	'ODS_STAGE.SAS_APPOINTMENT_STG1724001',
+	E.ODI_ERR_TYPE,
+	E.ODI_ERR_MESS,
+	E.ODI_CHECK_DATE,
+	E.ODI_ORIGIN,
+	E.ODI_CONS_NAME,
+	E.ODI_CONS_TYPE,
+	count(1) 
+from	RAX_APP_USER.E$_SAS_APPOINTMENT_STG1724001 E
+where	E.ODI_ERR_TYPE	= 'F'
+and	E.ODI_ORIGIN 	= '(1724001)ODS_Project.LOAD_SAS_APPOINTMENT_STG_INT'
+group by	E.ODI_ERR_TYPE,
+	E.ODI_ERR_MESS,
+	E.ODI_CHECK_DATE,
+	E.ODI_ORIGIN,
+	E.ODI_CONS_NAME,
+	E.ODI_CONS_TYPE
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 29 */
+/* Merge Rows */
+
+merge into	ODS_STAGE.SAS_APPOINTMENT_STG T
+using	RAX_APP_USER.I$_SAS_APPOINTMENT_STG1724001 S
+on	(
+		T.APPOINTMENT_ID=S.APPOINTMENT_ID
+	)
+when matched
+then update set
+	T.APPOINTMENT_CODE	= S.APPOINTMENT_CODE,
+	T.STATUS	= S.STATUS,
+	T.SUBJECT_ID	= S.SUBJECT_ID,
+	T.APPOINTMENT_SLOT_ID	= S.APPOINTMENT_SLOT_ID,
+	T.AUDIT_CREATE_DATE	= S.AUDIT_CREATE_DATE,
+	T.AUDIT_CREATED_BY	= S.AUDIT_CREATED_BY,
+	T.AUDIT_MODIFY_DATE	= S.AUDIT_MODIFY_DATE,
+	T.AUDIT_MODIFIED_BY	= S.AUDIT_MODIFIED_BY,
+	T.LANGUAGE	= S.LANGUAGE,
+	T.TIME_ZONE	= S.TIME_ZONE,
+	T.EVENT_REF_ID	= S.EVENT_REF_ID,
+	T.APPOINTMENT_COMMENTS	= S.APPOINTMENT_COMMENTS,
+	T.APO_ID	= S.APO_ID
+	,             T.ODS_MODIFY_DATE	= sysdate
+when not matched
+then insert
+	(
+	T.APPOINTMENT_ID,
+	T.APPOINTMENT_CODE,
+	T.STATUS,
+	T.SUBJECT_ID,
+	T.APPOINTMENT_SLOT_ID,
+	T.AUDIT_CREATE_DATE,
+	T.AUDIT_CREATED_BY,
+	T.AUDIT_MODIFY_DATE,
+	T.AUDIT_MODIFIED_BY,
+	T.LANGUAGE,
+	T.TIME_ZONE,
+	T.EVENT_REF_ID,
+	T.APPOINTMENT_COMMENTS,
+	T.APO_ID
+	,              T.ODS_CREATE_DATE,
+	T.ODS_MODIFY_DATE
+	)
+values
+	(
+	S.APPOINTMENT_ID,
+	S.APPOINTMENT_CODE,
+	S.STATUS,
+	S.SUBJECT_ID,
+	S.APPOINTMENT_SLOT_ID,
+	S.AUDIT_CREATE_DATE,
+	S.AUDIT_CREATED_BY,
+	S.AUDIT_MODIFY_DATE,
+	S.AUDIT_MODIFIED_BY,
+	S.LANGUAGE,
+	S.TIME_ZONE,
+	S.EVENT_REF_ID,
+	S.APPOINTMENT_COMMENTS,
+	S.APO_ID
+	,              sysdate,
+	sysdate
+	)
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 30 */
+/* Commit transaction */
+
+/*commit*/
+
+
+/*-----------------------------------------------*/
+/* TASK No. 31 */
+/* Drop flow table */
+
+-- drop table RAX_APP_USER.I$_SAS_APPOINTMENT_STG1724001
+
+BEGIN
+  EXECUTE IMMEDIATE 'drop table RAX_APP_USER.I$_SAS_APPOINTMENT_STG1724001';
+EXCEPTION
+  WHEN OTHERS THEN
+   IF SQLCODE != -942 THEN
+     RAISE;
+   END IF;
+END;
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 1000008 */
+/* Drop work table */
+
+-- drop table RAX_APP_USER.C$_0SAS_APPOINTMENT_STG purge
+
+BEGIN
+  EXECUTE IMMEDIATE 'drop table RAX_APP_USER.C$_0SAS_APPOINTMENT_STG purge';
+EXCEPTION
+  WHEN OTHERS THEN
+   IF SQLCODE != -942 THEN
+     RAISE;
+   END IF;
+END;
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 32 */
+/* MERGE INTO ODS_STAGE.SAS_APPOINTMENT_XR */
+
+-- SAS_APPOINTMENT_XR
+MERGE INTO ODS_STAGE.SAS_APPOINTMENT_XR d
+USING (
+select * from
+    (  Select
+        XR.APPOINTMENT_OID APPOINTMENT_OID,
+        STG.APPOINTMENT_ID as SK_APPOINTMENT_ID,
+        STG.APPOINTMENT_SLOT_ID as SK_APPOINTMENT_SLOT_ID,
+        STG.SUBJECT_ID as SK_SUBJECT_ID,
+        sysdate as ODS_CREATE_DATE,
+        sysdate as ODS_MODIFY_DATE
+    -- select *
+    FROM 
+        ODS_STAGE.SAS_APPOINTMENT_STG stg
+        ,ODS_STAGE.SAS_APPOINTMENT_XR xr
+    WHERE (1=1)
+        and stg.ODS_MODIFY_DATE >= TO_DATE(SUBSTR(:v_cdc_load_date, 1, 19), 'YYYY-MM-DD HH24:MI:SS')  -:v_cdc_overlap
+        and STG.APPOINTMENT_ID=XR.SK_APPOINTMENT_ID(+)
+     ) s
+where NOT EXISTS 
+	( select 1 from ODS_STAGE.SAS_APPOINTMENT_XR T
+	where	T.SK_APPOINTMENT_ID	= S.SK_APPOINTMENT_ID 
+		 and
+		((T.APPOINTMENT_OID = S.APPOINTMENT_OID) or (T.APPOINTMENT_OID IS NULL and S.APPOINTMENT_OID IS NULL)) and
+		((T.SK_APPOINTMENT_ID = S.SK_APPOINTMENT_ID) or (T.SK_APPOINTMENT_ID IS NULL and S.SK_APPOINTMENT_ID IS NULL)) and
+		((T.SK_APPOINTMENT_SLOT_ID = S.SK_APPOINTMENT_SLOT_ID) or (T.SK_APPOINTMENT_SLOT_ID IS NULL and S.SK_APPOINTMENT_SLOT_ID IS NULL)) and
+		((T.SK_SUBJECT_ID = S.SK_SUBJECT_ID) or (T.SK_SUBJECT_ID IS NULL and S.SK_SUBJECT_ID IS NULL)) 
+		        )
+) s 
+ON
+  (s.SK_APPOINTMENT_ID=d.SK_APPOINTMENT_ID)
+WHEN MATCHED
+THEN
+UPDATE SET
+  d.APPOINTMENT_OID = s.APPOINTMENT_OID,
+--  d.SK_APPOINTMENT_ID = s.SK_APPOINTMENT_ID,
+  d.SK_APPOINTMENT_SLOT_ID = s.SK_APPOINTMENT_SLOT_ID,
+  d.SK_SUBJECT_ID = s.SK_SUBJECT_ID,
+  d.ODS_MODIFY_DATE = s.ODS_MODIFY_DATE
+WHEN NOT MATCHED
+THEN
+INSERT (
+  APPOINTMENT_OID, SK_APPOINTMENT_ID, SK_APPOINTMENT_SLOT_ID,
+  SK_SUBJECT_ID, ODS_CREATE_DATE, ODS_MODIFY_DATE)
+VALUES (
+  ODS_STAGE.APPOINTMENT_OID_SEQ.nextval, s.SK_APPOINTMENT_ID, s.SK_APPOINTMENT_SLOT_ID,
+  s.SK_SUBJECT_ID, s.ODS_CREATE_DATE, s.ODS_MODIFY_DATE
+  )
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 33 */
+/* MERGE INTO ODS_OWN.APPOINTMENT */
+
+MERGE INTO ODS_OWN.APPOINTMENT d
+USING (
+select * from (
+      Select
+        XR.APPOINTMENT_OID as APPOINTMENT_OID,
+        SXR.APPOINTMENT_SLOT_OID as APPOINTMENT_SLOT_OID,
+        SUB_XR.SUBJECT_OID as SUBJECT_OID,
+        STG.APPOINTMENT_CODE as APPOINTMENT_CODE,
+        STG.STATUS as STATUS,
+        STG.AUDIT_CREATE_DATE as AUDIT_CREATE_DATE,
+        STG.AUDIT_CREATED_BY as AUDIT_CREATED_BY,
+        STG.AUDIT_MODIFY_DATE as AUDIT_MODIFY_DATE,
+        STG.AUDIT_MODIFIED_BY as AUDIT_MODIFIED_BY,
+        STG.LANGUAGE as LANGUAGE,
+        STG.TIME_ZONE as TIME_ZONE,
+        SS.SOURCE_SYSTEM_OID as SOURCE_SYSTEM_OID,
+        sysdate as ODS_CREATE_DATE,
+        sysdate as ODS_MODIFY_DATE,
+        STG.EVENT_REF_ID,
+        STG.APPOINTMENT_COMMENTS,
+        E.EVENT_OID,
+        STG.APO_ID
+-- select *
+    from
+        ODS_STAGE.SAS_APPOINTMENT_STG stg
+        ,ODS_STAGE.SAS_APPOINTMENT_XR xr
+        ,ODS_STAGE.SAS_APPOINTMENT_SLOT_XR sxr
+        ,ODS_STAGE.SAS_SUBJECT_XR SUB_XR
+        ,ODS_OWN.SOURCE_SYSTEM SS
+        ,ODS_OWN.EVENT E
+    where (1=1)
+        and stg.ODS_MODIFY_DATE >= TO_DATE(SUBSTR(:v_cdc_load_date, 1, 19), 'YYYY-MM-DD HH24:MI:SS')  -:v_cdc_overlap
+        and SS.SOURCE_SYSTEM_SHORT_NAME='SAS'
+        and STG.APPOINTMENT_ID=XR.SK_APPOINTMENT_ID(+)
+        and XR.SK_APPOINTMENT_SLOT_ID=SXR.SK_APPOINTMENT_SLOT_ID(+)
+        and XR.SK_SUBJECT_ID=SUB_XR.SK_SUBJECT_ID(+)
+        and STG.EVENT_REF_ID = E.EVENT_REF_ID(+)
+     ) s
+where NOT EXISTS 
+    ( select 1 from ODS_OWN.APPOINTMENT T
+    where    T.APPOINTMENT_OID    = S.APPOINTMENT_OID 
+         and ((T.APPOINTMENT_OID = S.APPOINTMENT_OID) or (T.APPOINTMENT_OID IS NULL and S.APPOINTMENT_OID IS NULL)) and
+        ((T.APPOINTMENT_SLOT_OID = S.APPOINTMENT_SLOT_OID) or (T.APPOINTMENT_SLOT_OID IS NULL and S.APPOINTMENT_SLOT_OID IS NULL)) and
+        ((T.SUBJECT_OID = S.SUBJECT_OID) or (T.SUBJECT_OID IS NULL and S.SUBJECT_OID IS NULL)) and
+        ((T.APPOINTMENT_CODE = S.APPOINTMENT_CODE) or (T.APPOINTMENT_CODE IS NULL and S.APPOINTMENT_CODE IS NULL)) and
+        ((T.STATUS = S.STATUS) or (T.STATUS IS NULL and S.STATUS IS NULL)) and
+        ((T.AUDIT_CREATE_DATE = S.AUDIT_CREATE_DATE) or (T.AUDIT_CREATE_DATE IS NULL and S.AUDIT_CREATE_DATE IS NULL)) and
+        ((T.AUDIT_CREATED_BY = S.AUDIT_CREATED_BY) or (T.AUDIT_CREATED_BY IS NULL and S.AUDIT_CREATED_BY IS NULL)) and
+        ((T.AUDIT_MODIFY_DATE = S.AUDIT_MODIFY_DATE) or (T.AUDIT_MODIFY_DATE IS NULL and S.AUDIT_MODIFY_DATE IS NULL)) and
+        ((T.AUDIT_MODIFIED_BY = S.AUDIT_MODIFIED_BY) or (T.AUDIT_MODIFIED_BY IS NULL and S.AUDIT_MODIFIED_BY IS NULL)) and
+        ((T.LANGUAGE = S.LANGUAGE) or (T.LANGUAGE IS NULL and S.LANGUAGE IS NULL)) and
+        ((T.SOURCE_SYSTEM_OID = S.SOURCE_SYSTEM_OID) or (T.SOURCE_SYSTEM_OID IS NULL and S.SOURCE_SYSTEM_OID IS NULL)) and
+        ((T.TIME_ZONE = S.TIME_ZONE) or (T.TIME_ZONE IS NULL and S.TIME_ZONE IS NULL))  AND
+       ((T.EVENT_REF_ID = S.EVENT_REF_ID) or (T.EVENT_REF_ID IS NULL and S.EVENT_REF_ID IS NULL))  AND
+       ((T.APPOINTMENT_COMMENTS = S.APPOINTMENT_COMMENTS) or (T.APPOINTMENT_COMMENTS IS NULL and S.APPOINTMENT_COMMENTS IS NULL))  AND
+        ((T.EVENT_OID = S.EVENT_OID) or (T.EVENT_OID IS NULL and S.EVENT_OID IS NULL)) AND
+        ((T.APO_ID = S.APO_ID) or (T.APO_ID IS NULL and S.APO_ID IS NULL))
+        ) 
+) s 
+ON
+  (d.APPOINTMENT_OID = s.APPOINTMENT_OID)
+WHEN MATCHED
+THEN
+UPDATE SET
+  d.APPOINTMENT_SLOT_OID = s.APPOINTMENT_SLOT_OID,
+  d.SUBJECT_OID = s.SUBJECT_OID,
+  d.APPOINTMENT_CODE = s.APPOINTMENT_CODE,
+  d.STATUS = s.STATUS,
+  d.AUDIT_CREATE_DATE = s.AUDIT_CREATE_DATE,
+  d.AUDIT_CREATED_BY = s.AUDIT_CREATED_BY,
+  d.AUDIT_MODIFY_DATE = s.AUDIT_MODIFY_DATE,
+  d.AUDIT_MODIFIED_BY = s.AUDIT_MODIFIED_BY,
+  d.LANGUAGE = s.LANGUAGE,
+  d.TIME_ZONE = s.TIME_ZONE,
+  d.SOURCE_SYSTEM_OID = s.SOURCE_SYSTEM_OID,
+  d.ODS_MODIFY_DATE = s.ODS_MODIFY_DATE,
+  d.EVENT_REF_ID = s.EVENT_REF_ID,
+  d.APPOINTMENT_COMMENTS = s.APPOINTMENT_COMMENTS,
+  d.EVENT_OID =s.EVENT_OID,
+  d.APO_ID =s.APO_ID
+WHEN NOT MATCHED
+THEN
+INSERT (
+  APPOINTMENT_OID, APPOINTMENT_SLOT_OID, SUBJECT_OID,
+  APPOINTMENT_CODE, STATUS, AUDIT_CREATE_DATE,
+  AUDIT_CREATED_BY, AUDIT_MODIFY_DATE, AUDIT_MODIFIED_BY,
+  LANGUAGE, TIME_ZONE, SOURCE_SYSTEM_OID, ODS_CREATE_DATE,EVENT_REF_ID,APPOINTMENT_COMMENTS,EVENT_OID,
+  ODS_MODIFY_DATE,APO_ID)
+VALUES (
+  s.APPOINTMENT_OID, s.APPOINTMENT_SLOT_OID, s.SUBJECT_OID,
+  s.APPOINTMENT_CODE, s.STATUS, s.AUDIT_CREATE_DATE,
+  s.AUDIT_CREATED_BY, s.AUDIT_MODIFY_DATE, s.AUDIT_MODIFIED_BY,
+  s.LANGUAGE, s.TIME_ZONE, s.SOURCE_SYSTEM_OID, s.ODS_CREATE_DATE,s.EVENT_REF_ID,s.APPOINTMENT_COMMENTS,s.EVENT_OID,
+  s.ODS_MODIFY_DATE,s.APO_ID)
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 34 */
+/* Catch late arriving events */
+
+merge into ods_own.appointment t
+using
+(
+select appt.appointment_oid
+, e.event_oid
+from ods_own.appointment appt
+, ods_own.event e
+where appt.event_ref_id = e.event_ref_id
+and e.ods_modify_date >= TO_DATE(SUBSTR(:v_cdc_load_date, 1, 19), 'YYYY-MM-DD HH24:MI:SS')  -:v_cdc_overlap
+and appt.event_oid is null
+and appt.event_ref_id is not null
+) s
+on ( s.appointment_oid = t.appointment_oid )
+when matched then update
+set t.event_oid = s.event_oid
+, t.ods_modify_date = sysdate
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 35 */
+/* To handle late arriving Appointment_Slots and Subjects */
+
+MERGE INTO ods_own.appointment d
+     USING (SELECT slot_xr.appointment_slot_oid, SUB_XR.SUBJECT_oid, appt.appointment_oid
+              FROM ods_own.appointment appt,
+                   ODS_STAGE.SAS_APPOINTMENT_XR xr,
+                   ods_stage.sas_appointment_slot_xr slot_xr,
+                   ODS_STAGE.SAS_SUBJECT_XR SUB_XR
+             WHERE     appt.APPOINTMENT_OID = XR.APPOINTMENT_OID
+                   AND xr.SK_APPOINTMENT_SLOT_ID  = slot_xr.SK_APPOINTMENT_SLOT_ID 
+                   AND xr.SK_SUBJECT_ID = SUB_XR.SK_SUBJECT_ID
+                   AND appt.SUBJECT_oid IS NULL
+                   AND SUB_XR.exists_on_source IS NULL
+                   AND xr.exists_on_source IS NULL
+                   AND (SUB_XR.ods_create_date >=
+                            TO_DATE (SUBSTR (:v_cdc_load_date, 1, 19),
+                                     'YYYY-MM-DD HH24:MI:SS')   - :v_cdc_overlap or  
+                          slot_xr.ods_create_date >=
+                            TO_DATE (SUBSTR (:v_cdc_load_date, 1, 19),
+                                     'YYYY-MM-DD HH24:MI:SS')   - :v_cdc_overlap )
+                          ) s
+        ON (s.appointment_oid = d.appointment_oid)
+WHEN MATCHED
+THEN
+   UPDATE SET
+      d.SUBJECT_oid = s.SUBJECT_oid,
+      d.appointment_slot_oid = s.appointment_slot_oid,
+      d.ods_modify_date = SYSDATE
+
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 36 */
+/* Update CDC Load Status */
+
+UPDATE ODS_OWN.ODS_CDC_LOAD_STATUS
+SET LAST_CDC_COMPLETION_DATE=TO_DATE(
+             SUBSTR(:v_sess_beg, 1, 19), 'RRRR-MM-DD HH24:MI:SS')
++ nvl((TIMEZONE_OFFSET/24), 0) 
+WHERE ODS_TABLE_NAME=:v_cdc_load_table_name
+AND CONTEXT_NAME = :v_env
+
+/*
+UPDATE ODS_OWN.ODS_CDC_LOAD_STATUS
+SET LAST_CDC_COMPLETION_DATE=TO_DATE(
+             SUBSTR(:v_sess_beg, 1, 19), 'RRRR-MM-DD HH24:MI:SS')
+WHERE ODS_TABLE_NAME=:v_cdc_load_table_name
+AND CONTEXT_NAME = :v_env
+*/
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 37 */
+/* Insert CDC Audit Record */
+
+INSERT INTO RAX_APP_USER.ODS_CDC_LOAD_STATUS_AUDIT
+(TABLE_NAME,
+SESS_NO,                      
+SESS_NAME,                    
+SCEN_VERSION,                 
+SESS_BEG,                     
+ORIG_LAST_CDC_COMPLETION_DATE,
+OVERLAP,
+CREATE_DATE,
+CONTEXT_NAME,
+TIMEZONE_OFFSET              
+)
+select 
+:v_cdc_load_table_name
+,:v_sess_no
+,'LOAD_SAS_APPOINTMENT_PKG'
+,'012'
+,TO_DATE(SUBSTR(:v_sess_beg, 1, 19), 'RRRR-MM-DD HH24:MI:SS')
+,TO_DATE (SUBSTR(:v_cdc_load_date, 1, 19),'YYYY-MM-DD HH24:MI:SS')
+,:v_cdc_overlap
+,SYSDATE
+,:v_env
+,TIMEZONE_OFFSET
+from 
+ODS_OWN.ODS_CDC_LOAD_STATUS
+WHERE ODS_TABLE_NAME=:v_cdc_load_table_name
+AND CONTEXT_NAME = :v_env
+
+/*
+INSERT INTO RAX_APP_USER.ODS_CDC_LOAD_STATUS_AUDIT
+(TABLE_NAME,
+SESS_NO,                      
+SESS_NAME,                    
+SCEN_VERSION,                 
+SESS_BEG,                     
+ORIG_LAST_CDC_COMPLETION_DATE,
+OVERLAP,
+CREATE_DATE,
+CONTEXT_NAME              
+)
+values (
+:v_cdc_load_table_name,
+:v_sess_no,
+'LOAD_SAS_APPOINTMENT_PKG',
+'012',
+TO_DATE(
+             SUBSTR(:v_sess_beg, 1, 19), 'RRRR-MM-DD HH24:MI:SS'),
+TO_DATE (SUBSTR (:v_cdc_load_date, 1, 19),
+                           'YYYY-MM-DD HH24:MI:SS'
+                          )
+,:v_cdc_overlap,
+SYSDATE,
+ :v_env)
+*/
+
+
+&
+
+
+/*-----------------------------------------------*/

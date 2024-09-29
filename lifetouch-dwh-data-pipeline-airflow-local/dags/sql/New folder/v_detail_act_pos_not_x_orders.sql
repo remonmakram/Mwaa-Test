@@ -1,0 +1,1 @@
+select count(*) ct from detail_act_pos_not_x_orders

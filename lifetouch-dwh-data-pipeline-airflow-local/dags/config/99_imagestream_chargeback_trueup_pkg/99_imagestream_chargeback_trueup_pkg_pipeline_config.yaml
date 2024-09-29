@@ -1,0 +1,30 @@
+---
+
+pipeline:
+  name: 99_imagestream_chargeback_trueup_pkg_dag
+  description: 99_imagestream_chargeback_trueup_pkgpackage
+  schedule: "0 0 1 * *"
+  tags:
+    - lifetouch
+    - 99_imagestream_chargeback_trueup_pkg
+
+  task_groups:
+    - name: 99_imagestream_chargeback_trueup_pkg_wait_for_data
+      description: drop and recreate table then extract data and load to s3
+      export_file_name:
+        v_actuate_sysdate: dags/sql/pre_sql/v_actuate_sysdate.sql
+      pre_sql:
+        v_actuate_sysdate:  dags/sql/pre_sql/v_actuate_sysdate.sql
+      tasks:
+        - script_location: dags/sql/99_imagestream_chargeback_trueup_pkg/imagestream_chargeback_create_tmp.sql
+          export_files:
+            - extract_query: '99_imagestream_chargeback_trueup_pkg/imagestream_chargeback_export.sql'
+              export_location: finance/imgstream_chrgeback_trueup/imgstream_chrgeback_trueup
+
+
+    
+
+
+
+        
+        

@@ -1,0 +1,1 @@
+select count(*) ct from order_code_new_prod_ccpricing

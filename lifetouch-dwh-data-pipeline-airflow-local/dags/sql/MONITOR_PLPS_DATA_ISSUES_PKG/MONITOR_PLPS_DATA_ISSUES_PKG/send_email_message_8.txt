@@ -1,0 +1,10 @@
+Data Center - :v_US_data_center
+
+PLPS Data Error in the last 24 hours:
+ORDER_GUID                                                                                                STD_ID                                                          ORDER_DATE                                                          QUERY_SOURCE
+
+--#v_order_guid_in_coh_not_in_cli_updates
+The source for this package is in:
+ODS_Project -> LPS_Folder -> MONITOR_PLPS_DATA_ISSUES_PKG
+
+Please feel free to enhance, improve, or refine as you see fit.

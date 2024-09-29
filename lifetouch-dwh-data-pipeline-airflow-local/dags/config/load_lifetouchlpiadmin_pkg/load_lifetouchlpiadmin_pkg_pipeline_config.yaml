@@ -1,0 +1,68 @@
+---
+
+pipeline:
+  name: lt_load_lifetouchlpiadmin_pkg_dag
+  description: load_lifetouchlpiadmin_pkg package
+  schedule: 0 */4 * * * #run the DAG every 4 hours
+  tags:
+    - lifetouch
+    - load_lifetouchlpiadmin_pkg
+  task_groups:
+    - name: load_lifetouchlpiadmin_pkg_Ingestion
+      description: extract and load part
+      ingestion_script: ingestion_script.py
+      data_sources:
+          - type: mssql
+            name: lpiadmin
+            default_args:
+              dest_schema: RAX_APP_USER
+              v_cdc_ods_overlap: 0.0104167
+              merge_required: False
+            entities:
+              - dest_table: C$_0LTLPIADM_TBLENROLLMENT09
+                v_cdc_load_table_name: tblEnrollment09               
+                tmp_create: 'mssql_sqls/load_lifetouchlpiadmin_pkg/tmp_create_TBLENROLLMENT09.sql'
+                extract_query: 'mssql_sqls/load_lifetouchlpiadmin_pkg/extract_query_TBLENROLLMENT09.sql'
+                src_table: dbo.tblEnrollment09
+
+              - dest_table: LTLPIADM_TBLENROLLMENT09_STG
+                v_cdc_load_table_name: tblEnrollment09
+                tmp_create: 'mssql_sqls/load_lifetouchlpiadmin_pkg/trunc_tblenrollment09_stg.sql'
+                extract_query: 'mssql_sqls/load_lifetouchlpiadmin_pkg/extract_query_tblenrollment09_stg.sql'
+                src_table: dbo.tblenrollment09_STG
+
+              - dest_table: C$_0LTLPIADM_TBLENRLMNT09_HIST
+                v_cdc_load_table_name: tblEnrollment09_History
+                tmp_create: 'mssql_sqls/load_lifetouchlpiadmin_pkg/tmp_create_tblEnrollment09_History.sql'
+                extract_query: 'mssql_sqls/load_lifetouchlpiadmin_pkg/extract_query_tblEnrollment09_History.sql'
+                src_table: dbo.tblEnrollment09_History
+              
+              - dest_table: LTLPIADM_TBLENRLMNT09HIST_STG
+                v_cdc_load_table_name: tblenrollment09_history
+                tmp_create: 'mssql_sqls/load_lifetouchlpiadmin_pkg/trunc_TBLENRLMNT09HIST_STG.sql'
+                extract_query: 'mssql_sqls/load_lifetouchlpiadmin_pkg/extract_query_TBLENRLMNT09HIST_STG.sql'
+                src_table: dbo.tblenrollment09_history_STG
+
+              - dest_table: C$_0LTLPIADM_TBLENRLMNT09_STAT
+                v_cdc_load_table_name: tblEnrollment09_Status
+                tmp_create: 'mssql_sqls/load_lifetouchlpiadmin_pkg/create_tmp_tblEnrollment09_Status.sql'
+                extract_query: 'mssql_sqls/load_lifetouchlpiadmin_pkg/extract_query_tblEnrollment09_Status.sql'
+                src_table: dbo.tblEnrollment09_Status
+
+              
+            
+    - name: load_lifetouchlpiadmin_pkg_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql/v_cdc_load_date_MART.sql
+      default_args:
+        v_cdc_ods_overlap: 0.0104167
+      tasks: 
+        - description: load load_lifetouchlpiadmin_pkg batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/load_lifetouchlpiadmin_pkg/LOAD_LIFETOUCHLPIADMIN_PKG.sql
+          args:
+            v_cdc_load_table_name: LOAD_LIFETOUCHLPIADMIN
+            v_cdc_ods_overlap: 0.0104167
+        
+        

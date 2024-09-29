@@ -1,0 +1,51 @@
+---
+
+pipeline:
+  name: PKG_NAME_dag
+  description: PKG_NAME pipeline
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - PKG_NAME
+  task_groups:
+    - name: PKG_NAME_Ingestion
+      description: extract and load part
+      ingestion_script: ingestion_script.py
+      data_sources:
+          - type: mysql
+            name: Name_to_be_used_for_secret
+            default_args:
+                src_prefix: 
+                dest_prefix: 
+                src_schema: 
+                dest_schema: RAX_APP_USER
+                stage_schema: ODS_STAGE
+                watermark_interval: 30
+                watermark_column:
+                excluded_columns : 
+                insert_date_columns: "ODS_CREATE_DATE, ODS_MODIFY_DATE"
+                update_date_columns: "ODS_MODIFY_DATE"
+                unique_keys: "ID"
+                merge_required: True
+            entities:
+                - src_table: 
+                  lnd_table:  
+                  #other attributes
+
+                
+
+
+    - name: PKG_NAME_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks:
+        - description: load PKG_NAME photo import batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/PKG_NAME/{YOUR_SUB_PKG_FILENAME}.sql
+          args:
+            v_cdc_load_table_name: YOUR_TABLENAME
+        
+       

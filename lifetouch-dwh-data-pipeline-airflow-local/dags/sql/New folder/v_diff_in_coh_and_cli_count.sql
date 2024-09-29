@@ -1,0 +1,1 @@
+select count(*) ct from diff_in_coh_and_cli

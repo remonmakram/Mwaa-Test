@@ -1,0 +1,22 @@
+pipeline:
+  name: lt_LOAD_APO_DIM_dag
+  description: Laod APO DIM Package
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - load_apo_dim
+  task_groups:
+
+    - name: LOAD_APO_DIM_ODI_Transformation
+      description: ODI SQL Transformation Logic for EVENT PAYMENT FACT
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql/v_cdc_load_date_ODS_DM.sql
+      default_args:
+        v_cdc_ods_overlap: 0.02083333333
+      tasks: 
+        - description: load LOAD_APO_DIM subpackage
+          type: oracle_sql
+          script_location: dags/sql/LOAD_APO_DIM/LOAD_APO_DIM.sql
+          args:
+            v_cdc_load_table_name: ODS_APO
+            v_cdc_sales_ods_overlap: 0.02083333333

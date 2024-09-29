@@ -1,0 +1,1 @@
+select count(*) ct from detail_post_adds_up

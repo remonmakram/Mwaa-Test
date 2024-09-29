@@ -1,0 +1,12 @@
+Data Center - :v_US_data_center
+
+Salesforce table(s) not updated in the last 24 hours:
+Table Name		Last Update Date
+:v_monitor_salesforce_updates
+
+
+
+The source for this package is in:
+ODS_Project -> Utilities -> MONITOR_SALESFORCE_UPDATES_PKG
+
+Please feel free to enhance, improve, or refine as you see fit.

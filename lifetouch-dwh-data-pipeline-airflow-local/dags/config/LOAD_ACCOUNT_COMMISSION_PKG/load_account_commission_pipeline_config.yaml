@@ -1,0 +1,25 @@
+---
+
+pipeline:
+  name: lt_load_account_commission_dag
+  description: load account commission pipeline
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - account_commission
+  task_groups:
+
+    - name: Account_Commission_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+        v_cdc_oms_overlap: 0.02083333333
+      tasks:
+        - description: load account principal subpackage
+          type: oracle_sql
+          script_location: dags/sql/LOAD_ACCOUNT_COMMISSION_PKG/LOAD_ACCOUNT_COMMISSION_PKG.sql
+          args:
+            v_cdc_load_table_name: ACCOUNT_COMMISSION
+

@@ -1,0 +1,42 @@
+---
+
+pipeline:
+  name: lt_LOAD_MLT_ORDER_LINE_ITEM_PKG
+  description: 17_BOC_LOAD_PKG pipeline
+  schedule: "21 16 * * *"
+  tags:
+    - lifetouch
+    - mlt
+  task_groups:
+    - name: MLT_Ingestion
+      description: extract and load part
+      ingestion_script: ingestion_script.py
+      data_sources:
+          - type: oracle
+            data_source_name: mlt
+            name: mlt
+            default_args:
+                dest_schema: RAX_APP_USER
+                merge_required: False
+                
+            entities:
+            - dest_table: "C$_0MLT_ORDER_LINE_ITEM"
+              v_cdc_load_table_name: MLT_ORDER_LINE_ITEM
+              v_cdc_oms_overlap: 0.02083333333
+              tmp_create: 'LOAD_MLT_ORDER_LINE_ITEM_PKG/tmp_create_order_line_item.sql'
+              extract_query: 'LOAD_MLT_ORDER_LINE_ITEM_PKG/extract_query_order_line_item.sql'
+              src_table: ORDER_LINE_ITEM
+       
+    - name: MLT_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks: 
+        - description: load mlt order_line_item batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/LOAD_MLT_ORDER_LINE_ITEM_PKG/LOAD_ORDER_LINE_ITEM_PKG.sql
+          args:
+            v_cdc_load_table_name: MLT_ORDER_LINE_ITEM
+            v_cdc_oms_overlap: 0.02083333333

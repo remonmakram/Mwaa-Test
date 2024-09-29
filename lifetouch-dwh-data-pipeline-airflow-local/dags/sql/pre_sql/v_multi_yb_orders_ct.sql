@@ -1,0 +1,1 @@
+select count(*) from ods_app_user.multi_yb_orders

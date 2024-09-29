@@ -1,0 +1,27 @@
+---
+
+pipeline:
+  name: lt_99_spectrum_senior_payment_PKG_dag
+  description: 99_spectrum_senior_paymentpackage
+  schedule: 0 5 1 * * #runs 1st day of each month at 5 AM
+  tags:
+    - lifetouch
+    - 99_spectrum_senior_payment
+  
+  task_groups:
+
+    
+    - name: 99_spectrum_senior_payment_export
+      description: drop and recreate table then extract data and load to s3
+      export_file_name:
+        v_actuate_sysdate: dags/sql/pre_sql/v_actuate_sysdate.sql
+
+      tasks:
+        - script_location: dags/sql/99_spectrum_senior_payment_pkg/spectrum_senior_payment_stg_create_tmp.sql
+          export_files:
+            - extract_query: 99_spectrum_senior_payment_pkg/spectrum_senior_payment_stg_export.sql
+              export_location: finance/spectrum_senior_payment/spectrum_senior_payment
+
+
+        
+        

@@ -1,0 +1,23 @@
+---
+
+pipeline:
+  name: lt_86_update_apparent_cc_numbers_in_names_prc__dag
+  description: 86 update apparent cc numbers in names prc pipeline
+  schedule: "0 8 * * *"
+  tags:
+    - lifetouch
+    - update_apparent_cc_numbers
+  task_groups:
+    - name: UPDATE_APPARENT_CC_NUMBERS_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql: 
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+        v_cdc_load_table_name: PERSON_INFO
+      tasks:
+        - description: update apparent cc numbers in names prc subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/86_UPDATE_APPARENT_CC_NUMBERS_IN_NAMES_PRC/86_UPDATE_APPARENT_CC_NUMBERS_IN_NAMES_PRC.sql
+          

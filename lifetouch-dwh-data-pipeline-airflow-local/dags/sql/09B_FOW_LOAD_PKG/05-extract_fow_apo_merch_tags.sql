@@ -1,0 +1,8 @@
+select	
+	APO_MERCH_TAGS.APO_ID	   C1_APO_ID,
+	APO_MERCH_TAGS.TAG_ID	   C2_TAG_ID,
+	APO_MERCH_TAGS.ID	   C3_ID
+from	<schema_name>.APO_MERCH_TAGS   APO_MERCH_TAGS, FOW_OWN.APO   APO
+where	(1=1)
+And (APO.LAST_UPDATED >=  ( TO_DATE(SUBSTR(:v_cdc_load_date, 1, 19), 'YYYY-MM-DD HH24:MI:SS')  - :v_cdc_oms_overlap))
+ And (APO_MERCH_TAGS.APO_ID=APO.ID)

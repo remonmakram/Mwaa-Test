@@ -1,0 +1,4 @@
+TrueData Center - :v_data_center Please check the ETL and investigate the failure.
+Package Name : X1_WORK_ORDER_UNSHIPPED_INCREMENTAL_PKG Location : FACT_Folder>Plant Operations>Packages Note - This data is used by Equeue Lab system downstream.
+This package Failure may affect the Labs directly.
+Thanks

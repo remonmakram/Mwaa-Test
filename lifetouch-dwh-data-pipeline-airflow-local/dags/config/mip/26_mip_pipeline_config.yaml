@@ -1,0 +1,56 @@
+---
+
+pipeline:
+  name: lt_26_mip_dag
+  description: lifetouch mip load package
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - mip
+  task_groups:
+    - name: MIP_Ingestion
+      description: extract and load part
+      ingestion_script: ingestion_script.py
+      data_sources:
+        - type: mysql
+          name: mip
+          default_args:
+            src_prefix: MIP_AF
+            dest_prefix: MIP
+            src_schema: MIP_OWN
+            dest_schema: RAX_APP_USER
+            stage_schema: ODS_STAGE
+            watermark_interval: 30
+            watermark_column: audit_modified_date
+            excluded_columns :   "'ODS_CREATE_DATE', 'ODS_MODIFY_DATE'"
+            insert_date_columns: "ODS_CREATE_DATE, ODS_MODIFY_DATE"
+            update_date_columns: "ODS_MODIFY_DATE"
+            unique_keys: "ID"
+            merge_required: True
+          entities:
+            - src_table: customer_order
+              unique_keys: "CUSTOMER_ORDER_ID"
+            - src_table: sfly_integration
+              unique_keys: "SFLY_INTEGRATION_ID"
+
+
+    - name: MIP_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks: 
+        - name: 01_LOAD_MIP_CUSTOMER_ORDER_PKG
+          description: load mip customer order subpackage
+          type: oracle_sql
+          script_location: dags/sql/26_MIP_LOAD_PKG/01-LOAD_MIP_CUSTOMER_ORDER_PKG.sql
+          args:
+            v_cdc_load_table_name: MIP_CUSTOMER_ORDER
+
+        - name: 02_LOAD_MIP_SFLY_INTEGRATOIN_PKG
+          description: load sfly_integratoin subpackage
+          type: oracle_sql
+          script_location: dags/sql/26_MIP_LOAD_PKG/02-LOAD_MIP_SFLY_INTEGRATOIN_PKG.sql
+          args:
+            v_cdc_load_table_name: MIP_SFLY_INTEGRATION

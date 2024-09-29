@@ -1,0 +1,22 @@
+---
+
+pipeline:
+  name: lt_99_solo_proof_dag
+  description: lifetouch 99_solo_proof_deposit package
+  schedule: "30 4 * * *"
+  tags:
+    - lifetouch
+    - 99_SOLO_PROOF_DEPOSIT
+  
+  task_groups:
+    - name: 99_SOLO_PROOF_DEPOSIT_export
+      description: drop and recreate table then extract data and load to s3
+      export_file_name:
+        v_actuate_sysdate: dags/sql/pre_sql/v_actuate_sysdate.sql
+      pre_sql:
+        v_actuate_sysdate:  dags/sql/pre_sql/v_actuate_sysdate.sql
+      tasks:
+        - script_location: dags/sql/99_SOLO_PROOF_DEPOSIT/create_tmp_actuate_solo_proof_deposit.sql
+          export_files:
+            - extract_query: '99_SOLO_PROOF_DEPOSIT/export_ACTUATE_SOLO_PROOF_DEPOSIT.sql'
+              export_location: finance/solo_proof_deposit/solo_proof_depositr

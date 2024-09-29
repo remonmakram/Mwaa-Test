@@ -1,0 +1,46 @@
+---
+
+pipeline:
+  name: lt_99_JOB_ACTIVITY_PKG_firstdayofmonth_dag
+  description: 99_JOB_ACTIVITY package 
+  schedule: "0 0 1 * 1-6 " #On the 1st of the Month except sundays
+
+  tags:
+    - lifetouch
+    - 99_JOB_ACTIVITY
+  
+  task_groups:
+    - name: 99_JOB_ACTIVITY_wait_for_data
+      description: run ODI wait command
+      schema_name: ODS_STAGE
+      session_name: 99_JOB_ACTIVITY_PKG
+      table_name: DATA_EXPORT_TRIGGER
+    
+
+    - name: 99_JOB_ACTIVITY_export
+      description: drop and recreate table then extract data and load to s3
+      export_file_name:
+        v_data_export_run_date_trigger_table_refresh:  dags/sql/pre_sql/v_data_export_run_date_trigger_table_refresh.sql
+      export_args:
+        v_session_name: 99_JOB_ACTIVITY_PKG  
+      pre_sql:
+        v_data_export_run_date_trigger_table_refresh: dags/sql/pre_sql/v_data_export_run_date_trigger_table_refresh.sql
+      tasks:
+        - script_location: dags/sql/99_JOB_ACTIVITY_PKG/job_activity_create_temp.sql
+          args:
+            v_session_name: 99_JOB_ACTIVITY_PKG
+
+          export_files:
+            - extract_query: '99_JOB_ACTIVITY_PKG/job_status_export.sql'
+              export_location: finance/job_activity/job_status
+
+    - name: 99_JOB_ACTIVITY_PKG_ODI_Update
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_data_export_trigger_table_id: dags/sql/pre_sql/v_data_export_trigger_table_id.sql 
+      tasks: 
+        - description: run_pkg
+          type: oracle_sql
+          script_location: dags/sql/99_JOB_ACTIVITY_PKG/99_JOB_ACTIVITY_PKG.sql
+          args:
+            v_session_name: 99_JOB_ACTIVITY_PKG

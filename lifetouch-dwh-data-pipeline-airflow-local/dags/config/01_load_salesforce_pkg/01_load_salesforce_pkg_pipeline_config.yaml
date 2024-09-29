@@ -1,0 +1,108 @@
+---
+
+pipeline:
+  name: lt_01_load_salesforce_pkg_dag
+  description: 01_load_salesforce_pkg package
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - 01_load_salesforce_pkg
+  task_groups:
+  
+    - name: 01_load_salesforce_pkg_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      default_args:
+        v_cdc_overlap: 0.02083333333
+        v_cdc_oms_overlap : 0.02083333333
+      tasks: 
+        - description: LOAD_SF_SERVICEAPPOINTMENT_STG_PKG batch package
+          type: oracle_sql
+          script_location: dags/sql/01_load_salesforce_pkg/LOAD_SF_SERVICEAPPOINTMENT_STG_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+            v_data_center_tz: dags/sql/pre_sql/pre_v_data_center_tz.sql
+          args:
+            v_cdc_load_table_name: SF_SERVICEAPPOINTMENT_STG
+        - description: LOAD_SF_LEGACYLOOKUP_STG_PKG batch package
+          type: oracle_sql
+          script_location: dags/sql/01_load_salesforce_pkg/LOAD_SF_LEGACYLOOKUP_STG_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+            v_data_center_tz: dags/sql/pre_sql/pre_v_data_center_tz.sql
+          args:
+            v_cdc_load_table_name: SF_LEGACYLOOKUP_STG
+          trigger_rule: all_done
+        - description: LOAD_SF_ACCOUNT_PKG batch package
+          type: oracle_sql
+          script_location: dags/sql/01_load_salesforce_pkg/LOAD_SF_ACCOUNT_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+            v_data_center_tz: dags/sql/pre_sql/pre_v_data_center_tz.sql
+          args:
+            v_cdc_load_table_name: SF_ACCOUNT_STG
+        - description: LOAD_SF_CONTACT_PKG batch package
+          type: oracle_sql
+          script_location: dags/sql/01_load_salesforce_pkg/LOAD_SF_CONTACT_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+            v_data_center_tz: dags/sql/pre_sql/pre_v_data_center_tz.sql
+          args:
+            v_cdc_load_table_name: SF_CONTACT_STG
+        - description: LOAD_SF_CONTACT_ADDRESSES_PKG batch package
+          type: oracle_sql
+          script_location: dags/sql/01_load_salesforce_pkg/LOAD_SF_CONTACT_ADDRESSES_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+            v_data_center_tz: dags/sql/pre_sql/pre_v_data_center_tz.sql
+          args:
+            v_cdc_load_table_name: SF_CONTACT_ADDRESSES
+          trigger_rule: all_done
+        - description: LOAD_SF_ACCOUNT_ADDRESSES_PKG batch package
+          type: oracle_sql
+          script_location: dags/sql/01_load_salesforce_pkg/LOAD_SF_ACCOUNT_ADDRESSES_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+            v_data_center_tz: dags/sql/pre_sql/pre_v_data_center_tz.sql
+          args:
+            v_cdc_load_table_name: SF_ACCOUNT_ADDRESSES
+        - description: LOAD_SF_OPPORTUNITY_PKG batch package
+          type: oracle_sql
+          script_location: dags/sql/01_load_salesforce_pkg/LOAD_SF_OPPORTUNITY_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+            v_data_center_tz: dags/sql/pre_sql/pre_v_data_center_tz.sql
+          args:
+            v_cdc_load_table_name: SF_OPPORTUNITY_STG
+        - description: LOAD_SF_ORGANIZATION_PKG batch package
+          type: oracle_sql
+          script_location: dags/sql/01_load_salesforce_pkg/LOAD_SF_ORGANIZATION_PKG.sql
+          trigger_rule: all_done
+        - description: LOAD_SF_ASSIGNMENT_PKG batch package
+          type: oracle_sql
+          script_location: dags/sql/01_load_salesforce_pkg/LOAD_SF_ASSIGNMENT_PKG.sql
+          trigger_rule: all_done
+        - description: LOAD_SF_PICTURE_DAY_PKG batch package
+          type: oracle_sql
+          script_location: dags/sql/01_load_salesforce_pkg/LOAD_SF_PICTURE_DAY_PKG.sql
+          trigger_rule: all_done
+        - description: LOAD_SF_PHOTOGRAPHY_HOURS_PKG batch package
+          type: oracle_sql
+          script_location: dags/sql/01_load_salesforce_pkg/LOAD_SF_PHOTOGRAPHY_HOURS_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+          args:
+            v_cdc_load_table_name: SF_PHOTOGRAPHY_HOURS
+          trigger_rule: all_done
+        - description: LOAD_SF_OPPORTUNITY_LINE_ITEM_PKG batch package
+          type: oracle_sql
+          script_location: dags/sql/01_load_salesforce_pkg/LOAD_SF_OPPORTUNITY_LINE_ITEM_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+            v_data_center_tz: dags/sql/pre_sql/pre_v_data_center_tz.sql
+          args:
+            v_cdc_load_table_name: SF_OPPORTUNITY_LINE_ITEM
+          trigger_rule: all_done
+        
+
+
+        

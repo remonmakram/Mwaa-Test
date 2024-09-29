@@ -1,0 +1,29 @@
+---
+
+pipeline:
+  name: lt_41_sr_e2ev_dag
+  description: SR_E2EV package
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - sr_e2ev
+  task_groups:
+    - name: SR_E2EV_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks: 
+        - description: load sr e2ev online order subpackage
+          type: oracle_sql
+          script_location: dags/sql/41_LOAD_SR_E2EV_PKG/LOAD_SR_E2EV_ONLINE_ORDER_PKG.sql
+          args:
+            v_cdc_load_table_name: SR_E2EV_ONLINE_ORDER
+        - description: load sr e2ev release subpackage
+          type: oracle_sql
+          script_location: dags/sql/41_LOAD_SR_E2EV_PKG/LOAD_SR_E2EV_RELEASE_PKG.sql
+          args:
+            v_cdc_load_table_name: SR_E2EV_RELEASE
+        
+        

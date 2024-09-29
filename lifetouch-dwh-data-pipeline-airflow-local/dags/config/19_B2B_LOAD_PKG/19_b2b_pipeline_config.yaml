@@ -1,0 +1,16 @@
+---
+
+pipeline:
+  name: lt_19_b2b_dag
+  description: 19_B2B_LOAD_PKG package
+  schedule: "@daily"
+  tags:
+    - lifetouch
+    - lt_19_b2b
+  task_groups:
+    - name: 19_B2B_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      tasks: 
+        - description: LOAD_B2B_OWN_PRC subpackage
+          type: oracle_sql
+          script_location: dags/sql/19_B2B_LOAD_PKG/LOAD_B2B_OWN_PRC.sql

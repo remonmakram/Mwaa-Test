@@ -1,0 +1,107 @@
+---
+
+pipeline:
+  name: 99_payments_for_auditors_pkg_dag
+  description: 99_payments_for_auditors_pkg
+  schedule: "@monthly"
+  tags:
+    - lifetouch
+    - 99_payments_for_auditors_pkg
+  
+  task_groups:
+    - name: 99_payments_for_auditors_pkg_monthly_cash
+      tasks: 
+        - script_location: dags/sql/99_payments_for_auditors_pkg/init_monthly_cash_create_temp.sql
+
+    - name: 99_payments_for_auditors_pkg_evaluate1
+      condition_script: dags/sql/pre_sql/v_record_count_ep_auditors.sql
+      compared_value: 0
+      operator: '>'                         # '>' '<' '>=' '<=' '=' '!='
+      task_ids: {'true': 99_payments_for_auditors_pkg_export1.deploy_export_files, 'false': SEND_EMAIL_1}
+         
+
+    - name: 99_payments_for_auditors_pkg_export1
+      description: create temp tables and export it to file
+      export_file_name:
+        v_ep_dump_file_num:  dags/sql/pre_sql/v_ep_dump_file_num.sql
+        v_actuate_sysdate: dags/sql/pre_sql/v_actuate_sysdate.sql
+    
+      tasks:
+        - script_location: dags/sql/99_payments_for_auditors_pkg/monthly_cash_create_temp.sql
+          description: monthly cash task for 99_payments_for_auditors_pkg
+          args:
+             v_ep_dump_file_max: 999999
+             v_ep_auditors_ctr:  1
+          export_files:
+            - extract_query: '99_payments_for_auditors_pkg/monthly_cash_export.sql'
+              export_location: finance/Audit/MONTHLY_CASH_CHECK 
+          email_configurations:
+              subject: Monthly Cash/Check Payment Files for Auditors Created
+              email_recipient_query: pre_sql/v_error_email_to.sql
+              email_recipient_query_args:
+                v_package_name: '99_PAYMENTS_FOR_AUDITORS_PKG'
+
+    - name: SEND_EMAIL_1
+      email_configurations:
+        subject: Monthly Cash/Check Payment Files for Auditors Created
+        email_recipient_query: pre_sql/v_error_email_to.sql
+        email_recipient_query_args:
+          v_package_name: '99_PAYMENTS_FOR_AUDITORS_PKG'
+
+
+    - name: 99_payments_for_auditors_pkg_init_monthly_credit
+      tasks: 
+        - script_location: dags/sql/99_payments_for_auditors_pkg/init_monthly_credit_create_temp.sql
+
+    - name: 99_payments_for_auditors_pkg_evaluate2
+      condition_script: dags/sql/pre_sql/v_record_count_ep_auditors.sql
+      compared_value: 0
+      operator: '>'                         # '>' '<' '>=' '<=' '=' '!='
+      task_ids: {'true': 99_payments_for_auditors_pkg_export2.deploy_export_files, 'false': SEND_EMAIL_2}
+         
+
+    - name: 99_payments_for_auditors_pkg_export2
+      description: create temp tables and export it to file
+      export_file_name:
+        v_ep_dump_file_num:  dags/sql/pre_sql/v_ep_dump_file_num.sql
+        v_actuate_sysdate: dags/sql/pre_sql/v_actuate_sysdate.sql
+    
+      tasks:
+        - script_location: dags/sql/99_payments_for_auditors_pkg/monthly_credit_create_temp.sql
+          description: monthly cash task for 99_payments_for_auditors_pkg
+          args:
+             v_ep_dump_file_max: 999999
+             v_ep_auditors_ctr:  1
+          export_files:
+            - extract_query: '99_payments_for_auditors_pkg/monthly_cash_export.sql'
+              export_location: finance/Audit/MONTHLY_CREDIT 
+          email_configurations:
+              subject: Monthly Credit Card/PayPal/Venmo Payment Files for Auditors Created
+              email_recipient_query: pre_sql/v_error_email_to.sql
+              email_recipient_query_args:
+                v_package_name: '99_PAYMENTS_FOR_AUDITORS_PKG'
+
+    - name: SEND_EMAIL_2
+      email_configurations:
+        subject:  Monthly Credit Card/PayPal/Venmo Payment Files for Auditors Created
+        email_recipient_query: pre_sql/v_error_email_to.sql
+        email_recipient_query_args:
+          v_package_name: '99_PAYMENTS_FOR_AUDITORS_PKG'
+
+
+    - name: 99_payments_for_auditors_pkg_ODI_Update
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks: 
+        - description: run_pkg
+          type: oracle_sql
+          script_location: dags/sql/99_payments_for_auditors_pkg/99_payment_auditors_cdc.sql
+          trigger_rule: all_done
+          args:
+            v_cdc_load_table_name: 99_PAYMENTS_FOR_AUDITORS
+
+        
+        

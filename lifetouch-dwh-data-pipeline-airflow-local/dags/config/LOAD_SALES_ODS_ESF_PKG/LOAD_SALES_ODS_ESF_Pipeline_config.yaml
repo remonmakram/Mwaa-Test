@@ -1,0 +1,37 @@
+---
+
+pipeline:
+  name: lt_load_sales_ods_esf_dag
+  description: lifetouch load sales ods esf package
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - LOAD_SALES_ODS_ESF_PKG
+  task_groups:            
+    - name: LOAD_SALES_ODS_ESF_PKG_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql/v_cdc_load_date_ODS_DM.sql
+      default_args:
+        v_cdc_sales_ods_overlap: 0.02083333333
+        v_cdc_load_table_name: STG_SODS_ESF
+      tasks:
+        - name: LOAD_SALES_ODS_ESF_PRC 
+          description: load LOAD_SALES_ODS_ESF_PRC subpackage
+          type: oracle_sql
+          script_location: dags/sql/LOAD_SALES_ODS_ESF_PKG/LOAD_SALES_ODS_ESF_PRC.sql
+
+        - name: LOAD_SALES_ODS_ESF_PKG 
+          description: load LOAD_SALES_ODS_ESF_PKG package
+          type: oracle_sql
+          script_location: dags/sql/LOAD_SALES_ODS_ESF_PKG/LOAD_SALES_ODS_ESF_PKG.sql  
+
+        - name: UPDATE_EVENT_FROM_ESF_SUMMARY_PRC 
+          description: load UPDATE_EVENT_FROM_ESF_SUMMARY_PRC subpackage
+          type: oracle_sql
+          script_location: dags/sql/LOAD_SALES_ODS_ESF_PKG/UPDATE_EVENT_FROM_ESF_SUMMARY_PRC.sql
+
+        - name: UPDATE_CDC_LOAD_STATUS_PRC 
+          description: UPDATE_CDC_LOAD_STATUS_PRC step
+          type: oracle_sql
+          script_location: dags/sql/LOAD_SALES_ODS_ESF_PKG/UPDATE_CDC_LOAD_STATUS_PRC.sql    

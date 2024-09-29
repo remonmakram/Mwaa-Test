@@ -1,0 +1,57 @@
+---
+
+pipeline:
+  name: lt_07_ogp_dag
+  description: 07 ogp pipeline
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - ogp
+  task_groups:
+    - name: OGP_Ingestion
+      description: extract and load part
+      ingestion_script: ingestion_script.py
+      data_sources:
+          - type: mysql
+            name: ogp
+            default_args:
+                src_prefix: OGP_AF
+                dest_prefix: OGP
+                src_schema: OGP_OWN
+                dest_schema: RAX_APP_USER
+                stage_schema: ODS_STAGE
+                watermark_interval: 30
+                watermark_column: modified_date
+                excluded_columns :   "'ODS_CREATE_DATE', 'ODS_MODIFY_DATE'"
+                insert_date_columns: "ODS_CREATE_DATE, ODS_MODIFY_DATE"
+                update_date_columns: "ODS_MODIFY_DATE"
+                unique_keys: "ID"
+                merge_required: True
+            entities:
+                - src_table: order
+                  excluded_columns: "'ODS_CREATE_DATE', 'ODS_MODIFY_DATE', 'CANCELLED', 'EVENT_OID', 'ORDER_TYPE'"
+                  watermark_column: audit_modify_date
+                - src_table: request
+                  watermark_column: audit_create_date
+                
+                  
+
+
+    - name: OGP_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks:
+        - description: load ogp order subpackage
+          type: oracle_sql
+          script_location: dags/sql/07_LOAD_OGP_PKG/LOAD_OGP_ORDER_PKG.sql
+          args:
+            v_cdc_load_table_name: OGP_ORDER
+        - description: load ogp order subpackage
+          type: oracle_sql
+          script_location: dags/sql/07_LOAD_OGP_PKG/LOAD_YB_OGP_ORDER_E2EV_PKG.sql
+          args:
+            v_cdc_load_table_name: YB_OGP_ORDER_E2EV
+        

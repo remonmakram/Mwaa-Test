@@ -1,0 +1,45 @@
+---
+
+pipeline:
+  name: lt_LOAD_STATISTICS_DETAIL_PKG_dag
+  description: Statistics detail package
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - statistics_detail
+  task_groups:
+    - name: STATISTICS_DETAIL_Ingestion
+      description: extract and load part
+      ingestion_script: ingestion_script.py
+      data_sources:
+          - type: oracle
+            name: OMS3
+            default_args:
+              dest_schema: RAX_APP_USER
+              merge_required: False
+            entities:
+              - dest_table: "C$_0OMS3_ST_DTL_STG"
+                v_cdc_load_table_name: OMS3_STATISTICS_DETAIL_STG
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: 'LOAD_STATISTICS_DETAIL_PKG/tmp_create_statistics_detail.sql'
+                extract_query: 'LOAD_STATISTICS_DETAIL_PKG/extract_query_statistics_detail.sql'
+                src_table: YFS_STATISTICS_DETAIL
+
+              
+
+            
+    - name: STATISTICS_DETAIL_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks: 
+        - description: LOAD STATISTICS DETAIL package
+          type: oracle_sql
+          script_location: dags/sql/LOAD_STATISTICS_DETAIL_PKG/LOAD_STATISTICS_DETAIL_PKG.sql
+          args:
+            v_cdc_load_table_name: OMS3_STATISTICS_DETAIL_STG
+            v_cdc_oms_overlap: 0.02083333333
+
+        

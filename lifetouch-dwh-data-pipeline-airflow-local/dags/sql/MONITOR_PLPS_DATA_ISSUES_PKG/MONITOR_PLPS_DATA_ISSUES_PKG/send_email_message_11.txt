@@ -1,0 +1,12 @@
+Data Center - :v_US_data_center
+
+PLPS Data Error in the last 24 hours:
+
+STD_NO         MGR_NO                             STD_ORG                                                           UPDATE_DATE
+
+--#v_std_org_load_incorrect_updates
+
+The source for this package is in:
+ODS_Project -> LPS_Folder -> MONITOR_PLPS_DATA_ISSUES_PKG
+
+Please feel free to enhance, improve, or refine as you see fit.

@@ -1,0 +1,72 @@
+---
+
+pipeline:
+  name: lt_process_x1wo_woms_issues_pkg_dag
+  description: process_x1wo_woms_issues_pkg package
+  schedule: 0 18 * * *
+  tags:
+    - lifetouch
+    - process_x1wo_woms_issues_pkg
+  task_groups:
+  
+    - name: process_x1wo_woms_issues_pkg_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_data_center: dags/sql/pre_sql/v_data_center.sql
+        v_cdc_load_date_ODS_DM : dags/sql/pre_sql/v_cdc_load_date_ODS_DM.sql
+        v_error_email_to: dags/sql/pre_sql/v_error_email_to.sql
+        v_noerror_email_to: dags/sql/pre_sql/v_noerror_email_to.sql
+        
+
+
+      default_args:
+        v_package_name: PROCESS_X1WO_WOMS_ISSUES_PKG
+        v_cdc_overlap: 0.02083333333
+        
+      tasks: 
+        - description: Fixing_Data_issues_pkg batch package
+          type: oracle_sql
+          script_location: dags/sql/process_x1wo_woms_issues_pkg/FIXING_DATA_ISSUES_INCREMENTAL_PRC.sql
+          args:
+            v_cdc_load_table_name: PROCESS_X1WO_WOMS_ISSUES
+
+        - description: Copy , Move, Transact Records package
+          type: oracle_sql
+          script_location: dags/sql/process_x1wo_woms_issues_pkg/Copy_Move_Transact_records.sql
+          args:
+            v_cdc_load_table_name: PROCESS_X1WO_WOMS_ISSUES
+
+        - description: Updating CDC
+          type: oracle_sql
+          script_location: dags/sql/process_x1wo_woms_issues_pkg/UPDATE_CDC.sql
+          args:
+            v_cdc_load_table_name: PROCESS_X1WO_WOMS_ISSUES        
+            
+        - description: process_x1wo_woms_issues_pkg batch package
+          type: oracle_sql
+          script_location: dags/sql/process_x1wo_woms_issues_pkg/PROCESS_CLASS_PIC_EXCEPTION_TO_SHIPPED_PKG.sql
+          args:
+            v_cdc_load_table_name: PROC_CLASSPIC_EXC_TO_SHIPPED
+          
+    - name: SEND_EMAIL_SUCCESS
+      email_configurations:
+            subject: Process X1 WO WOMS Issues Package Completed Successfully
+            message: dags/sql/messages/process_x1wo_woms_issues_pkg/success.txt
+            message_args: 
+              v_data_center:
+                path: dags/sql/pre_sql/v_data_center.sql
+            email_recipient_query: pre_sql/v_noerror_email_to.sql
+            email_recipient_query_args:
+              v_package_name: 'PROCESS_X1WO_WOMS_ISSUES_PKG'
+      trigger_rule: all_success
+
+    - name: SEND_EMAIL_FAIL
+      email_configurations:
+          subject: Process X1 WO WOMS Issues Package Failed
+          message: dags/sql/messages/process_x1wo_woms_issues_pkg/failure.txt
+          v_data_center:
+                path: dags/sql/pre_sql/v_data_center.sql
+          email_recipient_query: pre_sql/v_error_email_to.sql
+          email_recipient_query_args:
+            v_package_name: 'PROCESS_X1WO_WOMS_ISSUES_PKG'  
+      trigger_rule: one_failed

@@ -1,0 +1,24 @@
+---
+
+pipeline:
+  name: lt_99_PYC_TERRITORY_REPORT_dag
+  description: 99_PYC_TERRITORY_REPORT pipeline
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - 99_PYC_TERRITORY_REPORT
+  task_groups:
+    - name: IRS_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql/pre_v_cdc_ld_date.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks:
+        - description: pyc territory report subpackage
+          type: oracle
+          script_location: dags/sql/99_PYC_TERRITORY_REPORT_PKG/99_PYC_TERRITORY_REPORT_PKG.sql
+          args:
+            v_cdc_load_table_name: PYC_TERRITORY
+            
+        

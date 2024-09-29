@@ -1,0 +1,64 @@
+---
+
+pipeline:
+  name: lt_LOAD_YBPAY_PKG_dag
+  description: LOAD YBPAY package
+  schedule: "10 * * * *"
+  tags:
+    - lifetouch
+    - LOAD_YBPAY_PKG
+  task_groups:
+    - name: LOAD_YBPAY_Ingestion
+      description: extract and load part
+      ingestion_script: ingestion_script.py
+      data_sources:
+          - type: mssql
+            name: yb_pay
+            default_args:
+              dest_schema: RAX_APP_USER
+              merge_required: False
+            entities:
+              - dest_table: "C$_0YBPY_BILLINGINFORMATION"
+                v_cdc_load_table_name: LOAD_YBPAY
+                tmp_create: 'mssql_sqls/LOAD_YBPAY_PKG/create_temp_ods_etl_owner.c$_0ybpy_billinginformation.sql'
+                extract_query: 'mssql_sqls/LOAD_YBPAY_PKG/extract_ods_etl_owner.c$_0ybpy_billinginformation.sql'
+                src_table: BillingInformation
+
+              - dest_table: "C$_0YBPY_ORDER"
+                v_cdc_load_table_name: LOAD_YBPAY
+                tmp_create: 'mssql_sqls/LOAD_YBPAY_PKG/create_temp_ods_etl_owner.c$_0ybpy_order.sql'
+                extract_query: 'mssql_sqls/LOAD_YBPAY_PKG/extract_ods_etl_owner.c$_0ybpy_order.sql'  
+                src_table: order
+
+              - dest_table: "C$_0YBPY_ORDERLINE"
+                v_cdc_load_table_name: LOAD_YBPAY
+                tmp_create: 'mssql_sqls/LOAD_YBPAY_PKG/create_temp_ods_etl_owner.c$_0ybpy_orderline.sql'
+                extract_query: 'mssql_sqls/LOAD_YBPAY_PKG/extract_ods_etl_owner.c$_0ybpy_orderline.sql'  
+                src_table: orderline
+                
+              - dest_table: "C$_0YBPY_JOBINFO"
+                v_cdc_load_table_name: LOAD_YBPAY
+                tmp_create: 'mssql_sqls/LOAD_YBPAY_PKG/create_temp_ods_etl_owner.c$_0ybpy_jobinfo.sql'
+                extract_query: 'mssql_sqls/LOAD_YBPAY_PKG/extract_ods_etl_owner.c$_0ybpy_jobinfo.sql'  
+                src_table: jobinfo
+
+              - dest_table: "C$_0YBPY_PAYMENT"
+                v_cdc_load_table_name: LOAD_YBPAY
+                tmp_create: 'mssql_sqls/LOAD_YBPAY_PKG/create_temp_ods_etl_owner.c$_0ybpy_payment.sql'
+                extract_query: 'mssql_sqls/LOAD_YBPAY_PKG/extract_ods_etl_owner.c$_0ybpy_payment.sql'  
+                src_table: payment
+
+    - name: LOAD_YBPAY_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql/v_cdc_load_date_ODS_DM.sql
+      default_args:
+        v_cdc_ods_overlap: 0.0104166666666666666666666666666666666667
+      tasks:
+        - description: LOAD_YBPAY_PKG subpackage
+          type: oracle
+          script_location: dags/sql/LOAD_YBPAY_PKG/LOAD_YBPAY_PKG.sql
+          args:
+            v_cdc_load_table_name: LOAD_YBPAY
+            
+        

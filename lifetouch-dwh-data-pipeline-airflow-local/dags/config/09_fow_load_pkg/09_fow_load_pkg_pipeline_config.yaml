@@ -1,0 +1,160 @@
+pipeline:
+  name: lt_09_FOW_LOAD_PKG_dag
+  description: 09 FOW LOAD package
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - FOW
+  task_groups:
+    - name: 09_FOW_LOAD_PKG_Ingestion
+      description: extract and load part
+      ingestion_script: ingestion_script.py
+      data_sources:
+          - type: oracle
+            name: fow
+            default_args:
+              dest_schema: RAX_APP_USER
+              merge_required: False
+            entities:
+              - dest_table: "fow_event_hold_stg"
+                v_cdc_load_table_name: FOW_EVENT_HOLD_HISTORY_STG
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: 'fow/create_temp_LOAD_FOW_EVENT_HOLD_HISTORY_STG_PKG.sql'
+                extract_query: 'fow/extract_LOAD_FOW_EVENT_HOLD_HISTORY_STG_PKG.sql'
+                src_table: event_hold_history
+
+              - dest_table: "C$_0FOW_REFERENCE_STG"
+                v_cdc_load_table_name: FOW_REFERENCE
+                v_cdc_overlap: 0.02083333333
+                tmp_create: 'fow/create_temp_LOAD_FOW_REFERENCE_PKG.sql'
+                extract_query: 'fow/extract_LOAD_FOW_REFERENCE_PKG.sql'
+                src_table: REFERENCE
+
+              - dest_table: "C$_0FOW_AUTO_ORDER_LINE_STG"
+                v_cdc_load_table_name: FOW_AUTO_ORDER_LINE
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: 'fow/create_temp_LOAD_FOW_AUTO_ORDER_LINE_PKG.sql'
+                extract_query: 'fow/extract_LOAD_FOW_AUTO_ORDER_LINE_PKG.sql'
+                src_table: AUTO_ORDER_LINE
+              
+              - dest_table: "C$_0FOW_FRNG_STG"
+                v_cdc_load_table_name: FOW_OFFERING
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: 'fow/create_temp_LOAD_FOW_OFFERING_PKG.sql'
+                extract_query: 'fow/extract_LOAD_FOW_OFFERING_PKG.sql'
+                src_table: OFFERING
+
+              - dest_table: "C$_0FOW_FRNG_MDL_STG"
+                v_cdc_load_table_name: FOW_OFFERING_MODEL
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: 'fow/create_temp_LOAD_FOW_OFFERING_MODEL_PKG.sql'
+                extract_query: 'fow/extract_LOAD_FOW_OFFERING_MODEL_PKG.sql'
+                src_table: OFFERING_MODEL
+
+              - dest_table: "C$_0FOW_TASK_STG"
+                v_cdc_load_table_name: FOW_TASK_TABLES
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: 'fow/create_temp_LOAD_FOW_TASK_PKG.sql'
+                extract_query: 'fow/extract_LOAD_FOW_TASK_PKG.sql'
+                src_table: TASK
+              
+              - dest_table: "C$_0FOW_EVENT_STG"
+                v_cdc_load_table_name: FOW_EVENT
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: 'fow/create_temp_LOAD_FOW_EVENT_PKG.sql'
+                extract_query: 'fow/extract_LOAD_FOW_EVENT_PKG.sql'
+                src_table: EVENT
+
+              - dest_table: "C$_0STG_FOW_APO"
+                v_cdc_load_table_name: FOW_APO
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: 'fow/create_temp_LOAD_FOW_APO_PKG.sql'
+                extract_query: 'fow/extract_LOAD_FOW_APO_PKG.sql'
+                src_table: APO
+
+              - dest_table: "C$_0FOW_RCRD_CHG_AUD"
+                v_cdc_load_table_name: FOW_RECORD_CHANGE_AUDIT
+                v_cdc_overlap: 0.02083333333
+                tmp_create: 'fow/create_temp_LOAD_FOW_RECORD_CHANGE_AUDIT_PKG.sql'
+                extract_query: 'fow/extract_LOAD_FOW_RECORD_CHANGE_AUDIT_PKG.sql'
+                src_table: RECORD_CHANGE_AUDIT
+            
+
+
+    - name: 09_FOW_LOAD_PKG_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+        v_cdc_ld_date: dags/sql/pre_sql/pre_v_cdc_ld_date.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks: 
+        - description: load LOAD_FOW_EVENT_HOLD_HISTORY_STG_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/09_FOW_LOAD_PKG/LOAD_FOW_EVENT_HOLD_HISTORY_STG_PKG.sql
+          args:
+            v_cdc_load_table_name: FOW_EVENT_HOLD_HISTORY_STG
+            v_cdc_overlap: 0.02083333333
+
+        - description: load LOAD_FOW_REFERENCE_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/09_FOW_LOAD_PKG/LOAD_FOW_REFERENCE_PKG.sql
+          args:
+            v_cdc_load_table_name: FOW_REFERENCE
+            v_cdc_overlap: 0.02083333333
+
+        - description: load LOAD_FOW_AUTO_ORDER_LINE_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/09_FOW_LOAD_PKG/LOAD_FOW_AUTO_ORDER_LINE_PKG.sql
+          args:
+            v_cdc_load_table_name: FOW_AUTO_ORDER_LINE
+            v_cdc_oms_overlap: 0.02083333333
+        
+        - description: load LOAD_FOW_OFFERING_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/09_FOW_LOAD_PKG/LOAD_FOW_OFFERING_PKG.sql
+          args:
+            v_cdc_load_table_name: FOW_OFFERING
+            v_cdc_oms_overlap: 0.02083333333
+
+        - description: load LOAD_FOW_OFFERING_MODEL_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/09_FOW_LOAD_PKG/LOAD_FOW_OFFERING_MODEL_PKG.sql
+          args:
+            v_cdc_load_table_name: FOW_OFFERING_MODEL
+            v_cdc_oms_overlap: 0.02083333333
+
+        - description: load LOAD_FOW_TASK_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/09_FOW_LOAD_PKG/LOAD_FOW_TASK_PKG.sql
+          args:
+            v_cdc_load_table_name: FOW_TASK_TABLES
+            v_cdc_oms_overlap: 0.02083333333
+
+        - description: load LOAD_FOW_EVENT_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/09_FOW_LOAD_PKG/LOAD_FOW_EVENT_PKG.sql
+          args:
+            v_cdc_load_table_name: FOW_EVENT
+            v_cdc_oms_overlap: 0.02083333333
+
+        - description: load LOAD_FOW_APO_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/09_FOW_LOAD_PKG/LOAD_FOW_APO_PKG.sql
+          args:
+            v_cdc_load_table_name: FOW_APO
+            v_cdc_oms_overlap: 0.02083333333
+
+        - description: load PROCESS_FOW_DELETES_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/09_FOW_LOAD_PKG/PROCESS_FOW_DELETES_PKG.sql
+          args:
+            v_cdc_load_table_name: RECORD_CHANGE_AUDIT
+            v_cdc_oms_overlap: 0.02083333333
+        
+        - description: load LOAD_FOW_RECORD_CHANGE_AUDIT_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/09_FOW_LOAD_PKG/LOAD_FOW_RECORD_CHANGE_AUDIT_PKG.sql
+          args:
+            v_cdc_load_table_name: FOW_RECORD_CHANGE_AUDIT
+            v_cdc_overlap: 0.02083333333

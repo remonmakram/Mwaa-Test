@@ -1,0 +1,1 @@
+select count(*) ct from detail_merch_pos_not_x_orders

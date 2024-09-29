@@ -1,0 +1,22 @@
+---
+
+pipeline:
+  name: lt_LOAD_EVENT_TYPE_PKG_dag
+  description: LOAD_EVENT_TYPE_PKG package
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - LOAD_EVENT_TYPE_PKG
+  task_groups:
+  
+    - name: LOAD_EVENT_TYPE_PKG_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks: 
+        - description: load event type batch package
+          type: oracle_sql
+          script_location: dags/sql/LOAD_EVENT_TYPE_PKG/LOAD_EVENT_TYPE_PKG.sql
+          
+        
+        

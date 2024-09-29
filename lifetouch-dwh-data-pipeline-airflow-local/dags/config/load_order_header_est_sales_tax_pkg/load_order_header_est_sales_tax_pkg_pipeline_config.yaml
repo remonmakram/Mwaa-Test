@@ -1,0 +1,22 @@
+pipeline:
+  name: lt_order_header_est_sales_tax_dag
+  description: Order Header Est Sales Tax Package
+  schedule: "0 */4 * * *"
+  tags:
+    - lifetouch
+    - order_header_est_sales_tax
+  task_groups:
+
+    - name: Order_Header_Est_Sales_Tax_ODI_Transformation
+      description: ODI SQL Transformation Logic for EVENT PAYMENT FACT
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks: 
+        - description: load order_header_est_sales_tax subpackage
+          type: oracle_sql
+          script_location: dags/sql/LOAD_ORDER_HEADER_EST_SALES_TAX_PKG/LOAD_ORDER_HEADER_EST_SALES_TAX_PKG.sql
+          args:
+            v_cdc_load_table_name: ORDER_HEADER_EST_TAX
+            v_cdc_oms_overlap: 0.02083333333

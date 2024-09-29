@@ -1,0 +1,508 @@
+/* TASK No. 1 */
+
+/* NONE or SET VARIABLE STATEMENT FOUND, CHECK ODI TASK NO. 1 */
+
+
+
+
+/*-----------------------------------------------*/
+/* TASK No. 2 */
+
+/* SELECT STATEMENT FOUND, CHECK ODI TASK NO. 2 */
+
+
+
+
+/*-----------------------------------------------*/
+/* TASK No. 3 */
+
+/* SELECT STATEMENT FOUND, CHECK ODI TASK NO. 3 */
+
+
+
+
+/*-----------------------------------------------*/
+/* TASK No. 4 */
+/* Drop work table */
+
+-- drop table RAX_APP_USER.C$_0OMS2_LT_SB_A_TIE_STG purge
+
+-- &
+
+
+-- /*-----------------------------------------------*/
+-- /* TASK No. 5 */
+-- /* Create work table */
+
+-- create table RAX_APP_USER.C$_0OMS2_LT_SB_A_TIE_STG
+-- (
+-- 	C1_SUB_APO_ASSOC_KEY	VARCHAR2(24) NULL,
+-- 	C2_SUBJECT_KEY	VARCHAR2(24) NULL,
+-- 	C3_APO_KEY	VARCHAR2(24) NULL,
+-- 	C4_STATUS	VARCHAR2(15) NULL,
+-- 	C5_CREATETS	DATE NULL,
+-- 	C6_MODIFYTS	DATE NULL,
+-- 	C7_CREATEUSERID	VARCHAR2(40) NULL,
+-- 	C8_MODIFYUSERID	VARCHAR2(40) NULL,
+-- 	C9_CREATEPROGID	VARCHAR2(40) NULL,
+-- 	C10_MODIFYPROGID	VARCHAR2(40) NULL,
+-- 	C11_LOCKID	NUMBER NULL,
+-- 	C12_SUBJECT_APO_SEQUENCE	VARCHAR2(4) NULL
+-- )
+-- NOLOGGING
+
+-- &
+
+
+-- /*-----------------------------------------------*/
+-- /* TASK No. 6 */
+-- /* Load data */
+
+-- /* SOURCE CODE */
+
+
+-- select	
+-- 	trim(LT_SUBJECT_APO_TIE.SUB_APO_ASSOC_KEY)	   C1_SUB_APO_ASSOC_KEY,
+-- 	trim(LT_SUBJECT_APO_TIE.SUBJECT_KEY)	   C2_SUBJECT_KEY,
+-- 	trim(LT_SUBJECT_APO_TIE.APO_KEY)	   C3_APO_KEY,
+-- 	LT_SUBJECT_APO_TIE.STATUS	   C4_STATUS,
+-- 	LT_SUBJECT_APO_TIE.CREATETS	   C5_CREATETS,
+-- 	LT_SUBJECT_APO_TIE.MODIFYTS	   C6_MODIFYTS,
+-- 	LT_SUBJECT_APO_TIE.CREATEUSERID	   C7_CREATEUSERID,
+-- 	LT_SUBJECT_APO_TIE.MODIFYUSERID	   C8_MODIFYUSERID,
+-- 	LT_SUBJECT_APO_TIE.CREATEPROGID	   C9_CREATEPROGID,
+-- 	LT_SUBJECT_APO_TIE.MODIFYPROGID	   C10_MODIFYPROGID,
+-- 	LT_SUBJECT_APO_TIE.LOCKID	   C11_LOCKID,
+-- 	LT_SUBJECT_APO_TIE.SUBJECT_APO_SEQUENCE	   C12_SUBJECT_APO_SEQUENCE
+-- from	OMS2_OWN.LT_SUBJECT_APO_TIE   LT_SUBJECT_APO_TIE
+-- where	(1=1)
+-- And (LT_SUBJECT_APO_TIE.MODIFYTS >= TO_DATE(SUBSTR(:v_cdc_load_date, 1, 19), 'YYYY-MM-DD HH24:MI:SS')  -:v_cdc_overlap
+-- )
+--  And (LT_SUBJECT_APO_TIE.SUB_APO_ASSOC_KEY not in (
+-- '202011092051239500410606'
+-- ,'202011100851019501517428'
+-- ,'202011101253339502079330'
+-- ,'202011160903399512988018'
+-- ,'202012151427039568217453'
+-- ))
+
+
+
+
+
+
+
+-- &
+
+-- /* TARGET CODE */
+-- insert /*+ append */ into RAX_APP_USER.C$_0OMS2_LT_SB_A_TIE_STG
+-- (
+-- 	C1_SUB_APO_ASSOC_KEY,
+-- 	C2_SUBJECT_KEY,
+-- 	C3_APO_KEY,
+-- 	C4_STATUS,
+-- 	C5_CREATETS,
+-- 	C6_MODIFYTS,
+-- 	C7_CREATEUSERID,
+-- 	C8_MODIFYUSERID,
+-- 	C9_CREATEPROGID,
+-- 	C10_MODIFYPROGID,
+-- 	C11_LOCKID,
+-- 	C12_SUBJECT_APO_SEQUENCE
+-- )
+-- values
+-- (
+-- 	:C1_SUB_APO_ASSOC_KEY,
+-- 	:C2_SUBJECT_KEY,
+-- 	:C3_APO_KEY,
+-- 	:C4_STATUS,
+-- 	:C5_CREATETS,
+-- 	:C6_MODIFYTS,
+-- 	:C7_CREATEUSERID,
+-- 	:C8_MODIFYUSERID,
+-- 	:C9_CREATEPROGID,
+-- 	:C10_MODIFYPROGID,
+-- 	:C11_LOCKID,
+-- 	:C12_SUBJECT_APO_SEQUENCE
+-- )
+
+-- &
+
+
+/*-----------------------------------------------*/
+/* TASK No. 7 */
+/* Analyze work table */
+
+
+
+BEGIN
+DBMS_STATS.GATHER_TABLE_STATS (
+    ownname =>	'RAX_APP_USER',
+    tabname =>	'C$_0OMS2_LT_SB_A_TIE_STG',
+    estimate_percent =>	DBMS_STATS.AUTO_SAMPLE_SIZE
+);
+END;
+
+
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 9 */
+/* Set vID */
+
+/* NONE or SET VARIABLE STATEMENT FOUND, CHECK ODI TASK NO. 9 */
+
+
+
+
+/*-----------------------------------------------*/
+/* TASK No. 10 */
+/* Drop flow table */
+
+-- drop table RAX_APP_USER.I$_OMS2_LT_SB_A_TIE_STG1998001 
+
+BEGIN
+    EXECUTE IMMEDIATE 'drop table RAX_APP_USER.I$_OMS2_LT_SB_A_TIE_STG1998001';
+    EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        END IF;
+    END;
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 11 */
+/* Create flow table I$ */
+
+create table RAX_APP_USER.I$_OMS2_LT_SB_A_TIE_STG1998001
+(
+	SUB_APO_ASSOC_KEY	VARCHAR2(24) NULL,
+	SUBJECT_KEY	VARCHAR2(24) NULL,
+	APO_KEY	VARCHAR2(24) NULL,
+	STATUS	VARCHAR2(15) NULL,
+	CREATETS	DATE NULL,
+	MODIFYTS	DATE NULL,
+	CREATEUSERID	VARCHAR2(40) NULL,
+	MODIFYUSERID	VARCHAR2(40) NULL,
+	CREATEPROGID	VARCHAR2(40) NULL,
+	MODIFYPROGID	VARCHAR2(40) NULL,
+	LOCKID	NUMBER NULL,
+	SUBJECT_APO_SEQUENCE	VARCHAR2(4) NULL,
+	ODS_CREATE_DATE	DATE NULL,
+	ODS_MODIFY_DATE	DATE NULL
+	,IND_UPDATE		char(1)
+)
+NOLOGGING
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 12 */
+/* Insert flow into I$ table */
+
+/* DETECTION_STRATEGY = NOT_EXISTS */
+ 
+
+
+  
+
+
+insert into	RAX_APP_USER.I$_OMS2_LT_SB_A_TIE_STG1998001
+(
+	SUB_APO_ASSOC_KEY,
+	SUBJECT_KEY,
+	APO_KEY,
+	STATUS,
+	CREATETS,
+	MODIFYTS,
+	CREATEUSERID,
+	MODIFYUSERID,
+	CREATEPROGID,
+	MODIFYPROGID,
+	LOCKID,
+	SUBJECT_APO_SEQUENCE,
+	IND_UPDATE
+)
+select 
+SUB_APO_ASSOC_KEY,
+	SUBJECT_KEY,
+	APO_KEY,
+	STATUS,
+	CREATETS,
+	MODIFYTS,
+	CREATEUSERID,
+	MODIFYUSERID,
+	CREATEPROGID,
+	MODIFYPROGID,
+	LOCKID,
+	SUBJECT_APO_SEQUENCE,
+	IND_UPDATE
+ from (
+
+
+select 	 
+	
+	C1_SUB_APO_ASSOC_KEY SUB_APO_ASSOC_KEY,
+	C2_SUBJECT_KEY SUBJECT_KEY,
+	C3_APO_KEY APO_KEY,
+	C4_STATUS STATUS,
+	C5_CREATETS CREATETS,
+	C6_MODIFYTS MODIFYTS,
+	C7_CREATEUSERID CREATEUSERID,
+	C8_MODIFYUSERID MODIFYUSERID,
+	C9_CREATEPROGID CREATEPROGID,
+	C10_MODIFYPROGID MODIFYPROGID,
+	C11_LOCKID LOCKID,
+	C12_SUBJECT_APO_SEQUENCE SUBJECT_APO_SEQUENCE,
+
+	'I' IND_UPDATE
+
+from	RAX_APP_USER.C$_0OMS2_LT_SB_A_TIE_STG
+where	(1=1)
+
+
+
+
+
+
+) S
+where NOT EXISTS 
+	( select 1 from ODS_STAGE.OMS2_LT_SUBJECT_APO_TIE_STG T
+	where	T.SUB_APO_ASSOC_KEY	= S.SUB_APO_ASSOC_KEY 
+		 and ((T.SUBJECT_KEY = S.SUBJECT_KEY) or (T.SUBJECT_KEY IS NULL and S.SUBJECT_KEY IS NULL)) and
+		((T.APO_KEY = S.APO_KEY) or (T.APO_KEY IS NULL and S.APO_KEY IS NULL)) and
+		((T.STATUS = S.STATUS) or (T.STATUS IS NULL and S.STATUS IS NULL)) and
+		((T.CREATETS = S.CREATETS) or (T.CREATETS IS NULL and S.CREATETS IS NULL)) and
+		((T.MODIFYTS = S.MODIFYTS) or (T.MODIFYTS IS NULL and S.MODIFYTS IS NULL)) and
+		((T.CREATEUSERID = S.CREATEUSERID) or (T.CREATEUSERID IS NULL and S.CREATEUSERID IS NULL)) and
+		((T.MODIFYUSERID = S.MODIFYUSERID) or (T.MODIFYUSERID IS NULL and S.MODIFYUSERID IS NULL)) and
+		((T.CREATEPROGID = S.CREATEPROGID) or (T.CREATEPROGID IS NULL and S.CREATEPROGID IS NULL)) and
+		((T.MODIFYPROGID = S.MODIFYPROGID) or (T.MODIFYPROGID IS NULL and S.MODIFYPROGID IS NULL)) and
+		((T.LOCKID = S.LOCKID) or (T.LOCKID IS NULL and S.LOCKID IS NULL)) and
+		((T.SUBJECT_APO_SEQUENCE = S.SUBJECT_APO_SEQUENCE) or (T.SUBJECT_APO_SEQUENCE IS NULL and S.SUBJECT_APO_SEQUENCE IS NULL))
+        )
+
+  
+  
+
+  
+
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 13 */
+/* Analyze integration table */
+
+
+
+begin
+    dbms_stats.gather_table_stats(
+	ownname => 'RAX_APP_USER',
+	tabname => 'I$_OMS2_LT_SB_A_TIE_STG1998001',
+	estimate_percent => dbms_stats.auto_sample_size
+    );
+end;
+
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 14 */
+/* Create Index on flow table */
+
+-- create index	RAX_APP_USER.I$_OMS2_LT_SB_A_TIE_STG_IDX1998001
+-- on		RAX_APP_USER.I$_OMS2_LT_SB_A_TIE_STG1998001 (SUB_APO_ASSOC_KEY)
+-- NOLOGGING
+
+BEGIN
+    EXECUTE IMMEDIATE 'create index	RAX_APP_USER.I$_OMS2_LT_SB_A_TIE_STG_IDX1998001
+on		RAX_APP_USER.I$_OMS2_LT_SB_A_TIE_STG1998001 (SUB_APO_ASSOC_KEY)
+NOLOGGING';
+    EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -972 AND SQLCODE != -1418 AND SQLCODE != -1408 AND SQLCODE != -955 THEN
+            RAISE;
+        END IF;
+    END;
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 15 */
+/* Merge Rows */
+
+merge into	ODS_STAGE.OMS2_LT_SUBJECT_APO_TIE_STG T
+using	RAX_APP_USER.I$_OMS2_LT_SB_A_TIE_STG1998001 S
+on	(
+		T.SUB_APO_ASSOC_KEY=S.SUB_APO_ASSOC_KEY
+	)
+when matched
+then update set
+	T.SUBJECT_KEY	= S.SUBJECT_KEY,
+	T.APO_KEY	= S.APO_KEY,
+	T.STATUS	= S.STATUS,
+	T.CREATETS	= S.CREATETS,
+	T.MODIFYTS	= S.MODIFYTS,
+	T.CREATEUSERID	= S.CREATEUSERID,
+	T.MODIFYUSERID	= S.MODIFYUSERID,
+	T.CREATEPROGID	= S.CREATEPROGID,
+	T.MODIFYPROGID	= S.MODIFYPROGID,
+	T.LOCKID	= S.LOCKID,
+	T.SUBJECT_APO_SEQUENCE	= S.SUBJECT_APO_SEQUENCE
+	,           T.ODS_MODIFY_DATE	= sysdate
+when not matched
+then insert
+	(
+	T.SUB_APO_ASSOC_KEY,
+	T.SUBJECT_KEY,
+	T.APO_KEY,
+	T.STATUS,
+	T.CREATETS,
+	T.MODIFYTS,
+	T.CREATEUSERID,
+	T.MODIFYUSERID,
+	T.CREATEPROGID,
+	T.MODIFYPROGID,
+	T.LOCKID,
+	T.SUBJECT_APO_SEQUENCE
+	,            T.ODS_CREATE_DATE,
+	T.ODS_MODIFY_DATE
+	)
+values
+	(
+	S.SUB_APO_ASSOC_KEY,
+	S.SUBJECT_KEY,
+	S.APO_KEY,
+	S.STATUS,
+	S.CREATETS,
+	S.MODIFYTS,
+	S.CREATEUSERID,
+	S.MODIFYUSERID,
+	S.CREATEPROGID,
+	S.MODIFYPROGID,
+	S.LOCKID,
+	S.SUBJECT_APO_SEQUENCE
+	,            sysdate,
+	sysdate
+	)
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 16 */
+/* Commit transaction */
+
+/*commit*/
+
+
+/*-----------------------------------------------*/
+/* TASK No. 17 */
+/* Drop flow table */
+
+drop table RAX_APP_USER.I$_OMS2_LT_SB_A_TIE_STG1998001 
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 1000008 */
+/* Drop work table */
+
+drop table RAX_APP_USER.C$_0OMS2_LT_SB_A_TIE_STG purge
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 18 */
+/* Update CDC Load Status */
+
+UPDATE ODS_OWN.ODS_CDC_LOAD_STATUS
+SET LAST_CDC_COMPLETION_DATE=TO_DATE(
+             SUBSTR(:v_sess_beg, 1, 19), 'RRRR-MM-DD HH24:MI:SS')
++ nvl((TIMEZONE_OFFSET/24), 0) 
+WHERE ODS_TABLE_NAME=:v_cdc_load_table_name
+AND CONTEXT_NAME = :v_env
+
+/*
+UPDATE ODS_OWN.ODS_CDC_LOAD_STATUS
+SET LAST_CDC_COMPLETION_DATE=TO_DATE(
+             SUBSTR(:v_sess_beg, 1, 19), 'RRRR-MM-DD HH24:MI:SS')
+WHERE ODS_TABLE_NAME=:v_cdc_load_table_name
+AND CONTEXT_NAME = :v_env
+*/
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 19 */
+/* Insert CDC Audit Record */
+
+INSERT INTO RAX_APP_USER.ODS_CDC_LOAD_STATUS_AUDIT
+(TABLE_NAME,
+SESS_NO,                      
+SESS_NAME,                    
+SCEN_VERSION,                 
+SESS_BEG,                     
+ORIG_LAST_CDC_COMPLETION_DATE,
+OVERLAP,
+CREATE_DATE,
+CONTEXT_NAME,
+TIMEZONE_OFFSET              
+)
+select 
+:v_cdc_load_table_name
+,:v_sess_no
+,'LOAD_OMS2_STAGING_TABLES_PKG'
+,'005'
+,TO_DATE(SUBSTR(:v_sess_beg, 1, 19), 'RRRR-MM-DD HH24:MI:SS')
+,TO_DATE (SUBSTR(:v_cdc_load_date, 1, 19),'YYYY-MM-DD HH24:MI:SS')
+,:v_cdc_overlap
+,SYSDATE
+,:v_env
+,TIMEZONE_OFFSET
+from 
+ODS_OWN.ODS_CDC_LOAD_STATUS
+WHERE ODS_TABLE_NAME=:v_cdc_load_table_name
+AND CONTEXT_NAME = :v_env
+
+/*
+INSERT INTO RAX_APP_USER.ODS_CDC_LOAD_STATUS_AUDIT
+(TABLE_NAME,
+SESS_NO,                      
+SESS_NAME,                    
+SCEN_VERSION,                 
+SESS_BEG,                     
+ORIG_LAST_CDC_COMPLETION_DATE,
+OVERLAP,
+CREATE_DATE,
+CONTEXT_NAME              
+)
+values (
+:v_cdc_load_table_name,
+:v_sess_no,
+'LOAD_OMS2_STAGING_TABLES_PKG',
+'005',
+TO_DATE(
+             SUBSTR(:v_sess_beg, 1, 19), 'RRRR-MM-DD HH24:MI:SS'),
+TO_DATE (SUBSTR (:v_cdc_load_date, 1, 19),
+                           'YYYY-MM-DD HH24:MI:SS'
+                          )
+,:v_cdc_overlap,
+SYSDATE,
+ :v_env)
+*/
+

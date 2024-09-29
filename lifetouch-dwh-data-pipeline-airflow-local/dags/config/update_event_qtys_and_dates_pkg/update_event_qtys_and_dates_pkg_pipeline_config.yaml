@@ -1,0 +1,46 @@
+---
+
+pipeline:
+  name: lt_update_event_qtys_and_dates_pkg_dag
+  description: update_event_qtys_and_dates_pkg package
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - update_event_qtys_and_dates_pkg
+  task_groups:
+  
+    - name: update_event_qtys_and_dates_pkg_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      default_args:
+        v_cdc_oms_overlap: 0.02083333333
+        v_cdc_overlap: 0.02083333333
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql/pre_v_cdc_ld_date.sql
+      tasks: 
+        - description: update_event_qtys_and_dates_pkg batch package
+          type: oracle_sql
+          script_location: dags/sql/update_event_qtys_and_dates_pkg/UPDATE_EVENT_CAPTURE_SESSION_QTY_PKG.sql
+          args:
+            v_cdc_load_table_name: EVENT_CAPTURE_SESSION_LOAD
+
+        - description: update_event_qtys_and_dates_pkg batch package
+          type: oracle_sql
+          script_location: dags/sql/update_event_qtys_and_dates_pkg/UPDATE_EVENT_CLICK_QTY_PKG.sql
+          args:
+            v_cdc_load_table_name: EVENT_CLICK_QTY_LOAD
+        
+
+        - description: update_event_qtys_and_dates_pkg batch package
+          type: oracle_sql
+          script_location: dags/sql/update_event_qtys_and_dates_pkg/UPDATE_EVENT_STAFF_CAPPSESS_QTY_PKG.sql
+          args:
+            v_cdc_load_table_name: EVENT_STAFF_CAPSESS_LOAD
+
+        - description: update_event_qtys_and_dates_pkg batch package
+          type: oracle_sql
+          script_location: dags/sql/update_event_qtys_and_dates_pkg/UPDATE_EVENT_PLANT_RECEIPT_DATE_PKG.sql
+          args:
+            v_cdc_load_table_name: EVENT_PLANT_RECEIPT_DATE_LOAD
+
+        
+        

@@ -1,0 +1,11 @@
+Data Center - :v_US_data_center
+
+PLPS Data Error in the last 24 hours:
+
+STD_ID         HOST_NO         STD_STATUS                  TRAN_NO                             POS_ID                                            POS_SIT_NO                                    TRAN_DATE                                             ORDER_TYPE                              SIT_CNT                        TOT_SALES                    ASSOC_DISC                NBR_RCDS                   MERCH_SALES                     PC_SALES                        PORT_SALES                  DISC               SHIP_SALES                  SPEC_SALES         SALES_DIFF
+--#v_detail_post_adds_up_updates
+
+The source for this package is in:
+ODS_Project -> LPS_Folder -> MONITOR_PLPS_DATA_ISSUES_PKG
+
+Please feel free to enhance, improve, or refine as you see fit.

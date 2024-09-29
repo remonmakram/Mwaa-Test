@@ -1,0 +1,1 @@
+select :v_freight_dump_ctr + :v_ep_dump_file_max from dual 

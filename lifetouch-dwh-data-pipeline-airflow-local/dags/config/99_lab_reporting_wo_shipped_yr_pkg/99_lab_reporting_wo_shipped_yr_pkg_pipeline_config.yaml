@@ -1,0 +1,20 @@
+---
+
+pipeline:
+  name: 99_lab_reporting_wo_shipped_yr_pkg_PKG_dag
+  description: 99_lab_reporting_wo_shipped_yr_pkgpackage
+  schedule: "@daily"
+  tags:
+    - lifetouch
+    - 99_lab_reporting_wo_shipped_yr_pkg
+  
+  task_groups:
+    - name: 99_lab_reporting_wo_shipped_yr_pkg_export
+      description: drop and recreate table then extract data and load to s3
+      tasks:
+          - export_files:
+            - extract_query: 99_lab_reporting_wo_shipped_yr_pkg/extract_X1_WO_SHIPPED.sql
+              export_location: Lab_Reports/Minneapolis/X1WOShipped        
+              extract_args:
+                v_data_export_WOMS_NODE_FROM_CONTEXT:
+                  path: dags/sql/pre_sql/v_data_export_WOMS_NODE_FROM_CONTEXT.sql

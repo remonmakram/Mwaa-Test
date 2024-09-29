@@ -1,0 +1,23 @@
+---
+
+pipeline:
+  name: lt_LOAD_MLT_PAYMENT_ORDER_LINE_PKG_dag
+  description: LOAD_MLT_PAYMENT_ORDER_LINE package
+  schedule: "@daily"
+  tags:
+    - lifetouch
+    - lt_LOAD_MLT_PAYMENT_ORDER_LINE_PKG
+  task_groups:
+    - name: LOAD_MLT_PAYMENT_ORDER_LINE_PKG_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+        v_cdc_oms_overlap: 0.02083333333
+      tasks: 
+        - description: load yearbook fact subpackage
+          type: oracle_sql
+          script_location: dags/sql/LOAD_MLT_PAYMENT_ORDER_LINE/LOAD_MLT_PAYMENT_ORDER_LINE.sql
+          args:
+            v_cdc_load_table_name: MLT_PAYMENT_ORDER_LINE

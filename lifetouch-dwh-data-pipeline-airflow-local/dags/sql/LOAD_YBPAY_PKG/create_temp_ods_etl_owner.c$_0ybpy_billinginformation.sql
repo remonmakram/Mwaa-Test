@@ -1,0 +1,27 @@
+
+            DECLARE create_query CLOB;  
+            BEGIN  
+                BEGIN  
+                    EXECUTE IMMEDIATE 'DROP TABLE RAX_APP_USER.c$_0ybpy_billinginformation';  
+                EXCEPTION  
+                    WHEN OTHERS THEN NULL;  
+                END;  
+                create_query := 'create table RAX_APP_USER.C$_0YBPY_BILLINGINFORMATION
+(
+	C1_ORDERID	NUMBER NULL,
+	C2_CUSTOMEREMAIL	VARCHAR2(256) NULL,
+	C3_FIRSTNAME	VARCHAR2(64) NULL,
+	C4_LASTNAME	VARCHAR2(64) NULL,
+	C5_ADDRESS1	VARCHAR2(35) NULL,
+	C6_ADDRESS2	VARCHAR2(35) NULL,
+	C7_COUNTRYCODE	VARCHAR2(2) NULL,
+	C8_CITY	VARCHAR2(20) NULL,
+	C9_STATE	VARCHAR2(2) NULL,
+	C10_POSTALCODE	VARCHAR2(10) NULL,
+	C11_CREATEDATE	DATE NULL,
+	C12_LASTCHANGEDATE	DATE NULL
+)
+NOLOGGING';
+                EXECUTE IMMEDIATE create_query;
+            END;  
+            

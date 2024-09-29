@@ -1,0 +1,24 @@
+---
+
+pipeline:
+  name: lt_work_order_fact_dag
+  description: lifetouch WORK_ORDER_BATCH_FACT_PKG package
+  schedule: "0 7-23/4 * * *"
+  tags:
+    - lifetouch
+    - WORK_ORDER_BATCH_FACT_PKG
+  task_groups:
+    - name: WORK_ORDER_BATCH_FACT_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date_ODS_DM: dags/sql/pre_sql/v_cdc_load_date_ODS_DM.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks: 
+        - name: WORK_ORDER_BATCH_FACT_PKG
+          description: load order tracking package
+          type: oracle_sql
+          script_location: dags/sql/WORK_ORDER_BATCH_FACT_PKG/WORK_ORDER_BATCH_FACT_PKG.sql
+          args:
+            v_cdc_load_table_name: WORK_ORDER_BATCH_FACT
+

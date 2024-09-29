@@ -1,0 +1,69 @@
+---
+
+pipeline:
+  name: lt_LOAD_ITEM_MASTER_dag
+  description: ITEM MASTER package
+  schedule: "0 */4 * * *"
+  tags:
+    - lifetouch
+    - ITEM MASTER
+  task_groups:
+    - name: ITEM_MASTER_Ingestion
+      description: extract and load part
+      ingestion_script: ingestion_script.py
+      data_sources:
+          - type: oracle
+            name: itemmaster
+            default_args:
+              dest_schema: RAX_APP_USER
+              merge_required: False
+            entities:
+              - dest_table: "C$_0IM_SELECTION_FIELD_CHOICE_"
+                v_cdc_load_table_name: SELECTION_FIELD_CHOICE
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: 'item_master/create_temp_selection_field_choice.sql'
+                extract_query: 'item_master/extract_selection_field_choice.sql'
+                src_table: SELECTION_FIELD_CHOICE
+
+              - dest_table: "C$_0IM_SELECTION_FIELD_STG"
+                v_cdc_load_table_name: SELECTION_FIELD
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: 'item_master/create_temp_selection_field.sql'
+                extract_query: 'item_master/extract_selection_field.sql'
+                src_table: SELECTION_FIELD
+
+              - dest_table: "C$_0IM_RECORD_CHANGE_AUDIT_STG"
+                v_cdc_load_table_name: RECORD_CHANGE_AUDIT
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: 'item_master/create_temp_record_change_audit.sql'
+                extract_query: 'item_master/extract_record_change_audit.sql'
+                src_table: RECORD_CHANGE_AUDIT
+            
+
+    - name: ITEM_MASTER_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks: 
+        - description: load IM_SELECTION_FIELD_CHOICE subpackage
+          type: oracle_sql
+          script_location: dags/sql/LOAD_ITEM_MASTER_PKG/1-LOAD_IM_SELECTION_FIELD_CHOICE_PKG.sql
+          args:
+            v_cdc_load_table_name: SELECTION_FIELD_CHOICE
+            v_cdc_oms_overlap: 0.02083333333
+
+        - description: load IM_SELECTION_FIELD subpackage
+          type: oracle_sql
+          script_location: dags/sql/LOAD_ITEM_MASTER_PKG/2-LOAD_IM_SELECTION_FIELD_PKG.sql
+          args:
+            v_cdc_load_table_name: SELECTION_FIELD
+            v_cdc_oms_overlap: 0.02083333333
+
+        - description: load IM_RECORD_CHANGE_AUDIT subpackage
+          type: oracle_sql
+          script_location: dags/sql/LOAD_ITEM_MASTER_PKG/3-LOAD_IM_RECORD_CHANGE_AUDIT_PKG.sql
+          args:
+            v_cdc_load_table_name: RECORD_CHANGE_AUDIT
+            v_cdc_oms_overlap: 0.02083333333

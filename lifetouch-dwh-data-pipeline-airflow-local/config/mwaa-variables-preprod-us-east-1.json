@@ -1,0 +1,16 @@
+{
+    "Country": "US",
+    "Environment": "preprod",
+    "AWS_ACCOUNT" : "904425659397",
+    "PDW_CONNECTION_ID": "oracle_rdw/lt_airflow",
+    "LIFETOUCH_LIB_NAME": "lifetouch_lib-0.1.8-py3-none-any.whl",
+    "SSH_CONNECTION": "batch_ingestion",
+    "MWAA_BUCKET": "",
+    "next_execution_time": "2024-03-28T11:02:00",
+    "wait_for_data_pool": "EC2_Pool",
+    "send_mail_pool": "EC2_Pool",
+    "ingestion_pool": "EC2_Pool",
+    "export_pool": "EC2_Pool",
+    "deploy_files_pool": "EC2_Pool",
+    "sns_mwaa_notification_topic_arn": "arn:aws:sns:us-east-1:904425659397:sfly-aws-dwh-lifetouch-prod-mwaa-preprod-dags-sns"
+}

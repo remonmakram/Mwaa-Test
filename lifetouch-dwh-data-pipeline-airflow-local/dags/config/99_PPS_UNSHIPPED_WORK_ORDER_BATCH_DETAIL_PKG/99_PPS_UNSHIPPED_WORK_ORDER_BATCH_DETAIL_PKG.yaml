@@ -1,0 +1,20 @@
+---
+
+pipeline:
+  name: lt_99_PPS_UNSHIPPED_WORK_ORDER_BATCH_DETAIL_PKG
+  description: 99_PPS_UNSHIPPED_WORK_ORDER_BATCH_DETAIL_PKG 
+  schedule: 0 */4 * * *
+  tags:
+    - lifetouch
+    - 99_PPS_UNSHIPPED_WORK_ORDER_BATCH_DETAIL_PKG
+  task_groups:
+            
+    - name: 99_PPS_UNSHIPPED_WORK_ORDER_BATCH_DETAIL_PKG_Transformation
+      description: ODI SQL Transformation Logic
+      tasks: 
+        - description: run lt_99_PPS_UNSHIPPED_WORK_ORDER_BATCH_DETAIL_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/99_PPS_UNSHIPPED_WORK_ORDER_BATCH_DETAIL_PKG/99_PPS_UNSHIPPED_WORK_ORDER_BATCH_DETAIL_PKG.sql
+
+        
+        

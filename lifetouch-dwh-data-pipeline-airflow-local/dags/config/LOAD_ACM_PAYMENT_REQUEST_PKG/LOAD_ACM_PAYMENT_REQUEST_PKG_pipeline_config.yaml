@@ -1,0 +1,23 @@
+---
+
+pipeline:
+  name: lt_LOAD_ACM_PAYMENT_REQUEST_PKG_dag
+  description: LOAD_ACM_PAYMENT_REQUEST_PKG_PKG package
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - lt_LOAD_ACM_PAYMENT_REQUEST_PKG
+  task_groups:
+    - name: LOAD_ACM_PAYMENT_REQUEST_PKG_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+        v_cdc_oms_overlap: 0.02083333333
+      tasks: 
+        - description: LOAD_ACM_PAYMENT_REQUEST subpackage
+          type: oracle_sql
+          script_location: dags/sql/LOAD_ACM_PAYMENT_REQUEST_PKG/LOAD_ACM_PAYMENT_REQUEST_PKG.sql
+          args:
+            v_cdc_load_table_name: ACM_PAYMENT_REQUEST

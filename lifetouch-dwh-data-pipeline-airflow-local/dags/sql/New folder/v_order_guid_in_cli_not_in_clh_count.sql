@@ -1,0 +1,1 @@
+select count(*) ct from order_guid_in_cli_not_in_clh

@@ -1,0 +1,389 @@
+
+BEGIN
+DBMS_STATS.GATHER_TABLE_STATS (
+    ownname =>	'RAX_APP_USER',
+    tabname =>	'C$_0STG_VM_PRICING_CONTEXT',
+    estimate_percent =>	DBMS_STATS.AUTO_SAMPLE_SIZE
+);
+END;
+
+&& /*-----------------------------------------------*/
+/* TASK No. 6 */
+/* Create target table  */
+
+
+
+
+
+BEGIN  
+   EXECUTE IMMEDIATE 'create table RAX_APP_USER.STG_VM_PRICING_CONTEXT
+(
+	CREATETS	DATE NULL,
+	CREATEUSERID	VARCHAR2(40) NULL,
+	MODIFYPROGID	VARCHAR2(40) NULL,
+	PRICING_CONTEXT_REF	VARCHAR2(60) NULL,
+	VISUAL_MERCH_KEY	VARCHAR2(24) NULL,
+	CREATEPROGID	VARCHAR2(40) NULL,
+	PRICING_CONTEXT_ID	VARCHAR2(40) NULL,
+	PRICING_CONTEXT_TYPE	VARCHAR2(40) NULL,
+	LOCKID	NUMBER(5) NULL,
+	VM_PRICING_CONTEXT_KEY	CHAR(24) NULL,
+	MODIFYTS	DATE NULL,
+	MODIFYUSERID	VARCHAR2(40) NULL
+)';  
+EXCEPTION  
+   WHEN OTHERS THEN  
+      NULL;
+END;
+
+&& /*-----------------------------------------------*/
+/* TASK No. 7 */
+/* Truncate target table */
+
+
+
+truncate table RAX_APP_USER.STG_VM_PRICING_CONTEXT
+
+&& /*-----------------------------------------------*/
+/* TASK No. 8 */
+/* Insert new rows */
+
+
+
+insert into	RAX_APP_USER.STG_VM_PRICING_CONTEXT 
+( 
+	CREATETS,
+	CREATEUSERID,
+	MODIFYPROGID,
+	PRICING_CONTEXT_REF,
+	VISUAL_MERCH_KEY,
+	CREATEPROGID,
+	PRICING_CONTEXT_ID,
+	PRICING_CONTEXT_TYPE,
+	LOCKID,
+	VM_PRICING_CONTEXT_KEY,
+	MODIFYTS,
+	MODIFYUSERID 
+	 
+) 
+
+select
+    CREATETS,
+	CREATEUSERID,
+	MODIFYPROGID,
+	PRICING_CONTEXT_REF,
+	VISUAL_MERCH_KEY,
+	CREATEPROGID,
+	PRICING_CONTEXT_ID,
+	PRICING_CONTEXT_TYPE,
+	LOCKID,
+	VM_PRICING_CONTEXT_KEY,
+	MODIFYTS,
+	MODIFYUSERID   
+   
+FROM (	
+
+
+select 	
+	C1_CREATETS CREATETS,
+	C2_CREATEUSERID CREATEUSERID,
+	C3_MODIFYPROGID MODIFYPROGID,
+	C4_PRICING_CONTEXT_REF PRICING_CONTEXT_REF,
+	C5_VISUAL_MERCH_KEY VISUAL_MERCH_KEY,
+	C6_CREATEPROGID CREATEPROGID,
+	C7_PRICING_CONTEXT_ID PRICING_CONTEXT_ID,
+	C8_PRICING_CONTEXT_TYPE PRICING_CONTEXT_TYPE,
+	C9_LOCKID LOCKID,
+	C10_VM_PRICING_CONTEXT_KEY VM_PRICING_CONTEXT_KEY,
+	C11_MODIFYTS MODIFYTS,
+	C12_MODIFYUSERID MODIFYUSERID 
+from	RAX_APP_USER.C$_0STG_VM_PRICING_CONTEXT
+where		(1=1)	
+
+
+
+
+
+
+)    ODI_GET_FROM
+
+&& /*-----------------------------------------------*/
+/* TASK No. 9 */
+/* Commit transaction */
+/* commit */
+/*-----------------------------------------------*/
+/* TASK No. 1000005 */
+/* Drop work table */
+
+
+ /* drop table RAX_APP_USER.C$_0STG_VM_PRICING_CONTEXT */ 
+
+
+BEGIN
+    EXECUTE IMMEDIATE 'drop table RAX_APP_USER.C$_0STG_VM_PRICING_CONTEXT';
+    EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        END IF;
+    END;
+    
+
+&& /*-----------------------------------------------*/
+/* TASK No. 10 */
+/* Insert new rows */
+
+
+
+insert into	ODS_STAGE.OMS_VM_PRICING_CONTEXT_XR 
+( 
+	VM_PRICING_CONTEXT_KEY,
+	PRICE_PROGRAM_NAME 
+	,VM_PRICING_CONTEXT_OID 
+) 
+
+select
+    VM_PRICING_CONTEXT_KEY,
+	PRICE_PROGRAM_NAME   
+  ,ODS_STAGE.VM_PRICING_CONTEXT_OID_SEQ.nextval 
+FROM (	
+
+
+select 	DISTINCT
+	TRIM(PC.VM_PRICING_CONTEXT_KEY) VM_PRICING_CONTEXT_KEY,
+	case when trim(PC.PRICING_CONTEXT_TYPE)='SterlingPriceProgram' then TRIM(PC.PRICING_CONTEXT_REF) else null end PRICE_PROGRAM_NAME 
+from	RAX_APP_USER.STG_VM_PRICING_CONTEXT   PC, ODS_STAGE.OMS_VM_PRICING_CONTEXT_XR   OMS_VM_PRICING_CONTEXT_XR
+where		(1=1)	
+ And (TRIM(PC.VM_PRICING_CONTEXT_KEY)=OMS_VM_PRICING_CONTEXT_XR.VM_PRICING_CONTEXT_KEY (+)
+AND OMS_VM_PRICING_CONTEXT_XR.VM_PRICING_CONTEXT_KEY IS NULL)
+
+
+
+
+
+)    ODI_GET_FROM
+
+&& /*-----------------------------------------------*/
+/* TASK No. 11 */
+/* Commit transaction */
+/* commit */
+/*-----------------------------------------------*/
+/* TASK No. 12 */
+/* Set vID */
+/* NONE or SET VARIABLE STATEMENT FOUND, CHECK ODI TASK NO. 12 */
+/*-----------------------------------------------*/
+/* TASK No. 13 */
+/* Drop flow table */
+
+
+ /* drop table RAX_APP_USER.I$_VM_PRICING_CONTEXT52001 */ 
+
+
+BEGIN
+    EXECUTE IMMEDIATE 'drop table RAX_APP_USER.I$_VM_PRICING_CONTEXT52001';
+    EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        END IF;
+    END;
+    
+
+&& /*-----------------------------------------------*/
+/* TASK No. 14 */
+/* Create flow table I$ */
+
+
+
+create table RAX_APP_USER.I$_VM_PRICING_CONTEXT52001
+(
+	VM_PRICING_CONTEXT_OID	NUMBER NULL,
+	VM_PRICING_CONTEXT_ID	VARCHAR2(40) NULL,
+	VM_PRICING_CONTEXT_TYPE	VARCHAR2(40) NULL,
+	VM_PRICING_CONTEXT_REF	VARCHAR2(60) NULL,
+	VISUAL_MERCH_OID	NUMBER NULL,
+	ODS_CREATE_DATE	DATE NULL,
+	ODS_MODIFY_DATE	DATE NULL,
+	SOURCE_SYSTEM_OID	NUMBER NULL,
+	PRICE_PROGRAM_OID	NUMBER NULL
+	,IND_UPDATE		char(1)
+)
+ 
+
+&& /*-----------------------------------------------*/
+/* TASK No. 15 */
+/* Insert flow into I$ table */
+/* DETECTION_STRATEGY = NOT_EXISTS */
+
+
+
+insert into	RAX_APP_USER.I$_VM_PRICING_CONTEXT52001
+(
+	VM_PRICING_CONTEXT_OID,
+	VM_PRICING_CONTEXT_ID,
+	VM_PRICING_CONTEXT_TYPE,
+	VM_PRICING_CONTEXT_REF,
+	VISUAL_MERCH_OID,
+	SOURCE_SYSTEM_OID,
+	PRICE_PROGRAM_OID,
+	IND_UPDATE
+)
+select 
+VM_PRICING_CONTEXT_OID,
+	VM_PRICING_CONTEXT_ID,
+	VM_PRICING_CONTEXT_TYPE,
+	VM_PRICING_CONTEXT_REF,
+	VISUAL_MERCH_OID,
+	SOURCE_SYSTEM_OID,
+	PRICE_PROGRAM_OID,
+	IND_UPDATE
+ from (
+
+
+select 	 
+	
+	OMS_VM_PRICING_CONTEXT_XR.VM_PRICING_CONTEXT_OID VM_PRICING_CONTEXT_OID,
+	PC.PRICING_CONTEXT_ID VM_PRICING_CONTEXT_ID,
+	PC.PRICING_CONTEXT_TYPE VM_PRICING_CONTEXT_TYPE,
+	PC.PRICING_CONTEXT_REF VM_PRICING_CONTEXT_REF,
+	NVL(OMS_VISUAL_MERCH_XR.VISUAL_MERCH_OID, -1) VISUAL_MERCH_OID,
+	SOURCE_SYSTEM.SOURCE_SYSTEM_OID SOURCE_SYSTEM_OID,
+	CASE WHEN PC.PRICING_CONTEXT_TYPE='SterlingPriceProgram' then PRICE_PROGRAM.PRICE_PROGRAM_OID else null end PRICE_PROGRAM_OID,
+
+	'I' IND_UPDATE
+
+from	RAX_APP_USER.STG_VM_PRICING_CONTEXT   PC, ODS_STAGE.OMS_VM_PRICING_CONTEXT_XR   OMS_VM_PRICING_CONTEXT_XR, ODS_STAGE.OMS_VISUAL_MERCH_XR   OMS_VISUAL_MERCH_XR, ODS_OWN.SOURCE_SYSTEM   SOURCE_SYSTEM, ODS_OWN.PRICE_PROGRAM   PRICE_PROGRAM
+where	(1=1)
+ And (TRIM(PC.VM_PRICING_CONTEXT_KEY)=OMS_VM_PRICING_CONTEXT_XR.VM_PRICING_CONTEXT_KEY (+))
+AND (TRIM(PC.VISUAL_MERCH_KEY)=OMS_VISUAL_MERCH_XR.VISUAL_MERCH_KEY (+))
+AND (PC.PRICING_CONTEXT_REF=PRICE_PROGRAM.PRICE_PROGRAM_NAME (+))
+And (SOURCE_SYSTEM.SOURCE_SYSTEM_SHORT_NAME='OMS')
+
+
+
+
+) S
+where NOT EXISTS 
+	( select 1 from ODS_OWN.VM_PRICING_CONTEXT T
+	where	T.VM_PRICING_CONTEXT_OID	= S.VM_PRICING_CONTEXT_OID 
+		 and ((T.VM_PRICING_CONTEXT_ID = S.VM_PRICING_CONTEXT_ID) or (T.VM_PRICING_CONTEXT_ID IS NULL and S.VM_PRICING_CONTEXT_ID IS NULL)) and
+		((T.VM_PRICING_CONTEXT_TYPE = S.VM_PRICING_CONTEXT_TYPE) or (T.VM_PRICING_CONTEXT_TYPE IS NULL and S.VM_PRICING_CONTEXT_TYPE IS NULL)) and
+		((T.VM_PRICING_CONTEXT_REF = S.VM_PRICING_CONTEXT_REF) or (T.VM_PRICING_CONTEXT_REF IS NULL and S.VM_PRICING_CONTEXT_REF IS NULL)) and
+		((T.VISUAL_MERCH_OID = S.VISUAL_MERCH_OID) or (T.VISUAL_MERCH_OID IS NULL and S.VISUAL_MERCH_OID IS NULL)) and
+		((T.SOURCE_SYSTEM_OID = S.SOURCE_SYSTEM_OID) or (T.SOURCE_SYSTEM_OID IS NULL and S.SOURCE_SYSTEM_OID IS NULL)) and
+		((T.PRICE_PROGRAM_OID = S.PRICE_PROGRAM_OID) or (T.PRICE_PROGRAM_OID IS NULL and S.PRICE_PROGRAM_OID IS NULL))
+        )
+
+&& /*-----------------------------------------------*/
+/* TASK No. 16 */
+/* Analyze integration table */
+
+
+
+begin
+    dbms_stats.gather_table_stats(
+	ownname => 'RAX_APP_USER',
+	tabname => 'I$_VM_PRICING_CONTEXT52001',
+	estimate_percent => dbms_stats.auto_sample_size
+    );
+end;
+
+&& /*-----------------------------------------------*/
+/* TASK No. 17 */
+/* Create Index on flow table */
+
+
+
+create index	RAX_APP_USER.I$_VM_PRICING_CONTEXT_IDX52001
+on		RAX_APP_USER.I$_VM_PRICING_CONTEXT52001 (VM_PRICING_CONTEXT_OID)
+ 
+
+&& /*-----------------------------------------------*/
+/* TASK No. 18 */
+/* Merge Rows */
+
+
+
+merge into	ODS_OWN.VM_PRICING_CONTEXT T
+using	RAX_APP_USER.I$_VM_PRICING_CONTEXT52001 S
+on	(
+		T.VM_PRICING_CONTEXT_OID=S.VM_PRICING_CONTEXT_OID
+	)
+when matched
+then update set
+	T.VM_PRICING_CONTEXT_ID	= S.VM_PRICING_CONTEXT_ID,
+	T.VM_PRICING_CONTEXT_TYPE	= S.VM_PRICING_CONTEXT_TYPE,
+	T.VM_PRICING_CONTEXT_REF	= S.VM_PRICING_CONTEXT_REF,
+	T.VISUAL_MERCH_OID	= S.VISUAL_MERCH_OID,
+	T.SOURCE_SYSTEM_OID	= S.SOURCE_SYSTEM_OID,
+	T.PRICE_PROGRAM_OID	= S.PRICE_PROGRAM_OID
+	,      T.ODS_MODIFY_DATE	= SYSDATE
+when not matched
+then insert
+	(
+	T.VM_PRICING_CONTEXT_OID,
+	T.VM_PRICING_CONTEXT_ID,
+	T.VM_PRICING_CONTEXT_TYPE,
+	T.VM_PRICING_CONTEXT_REF,
+	T.VISUAL_MERCH_OID,
+	T.SOURCE_SYSTEM_OID,
+	T.PRICE_PROGRAM_OID
+	,       T.ODS_CREATE_DATE,
+	T.ODS_MODIFY_DATE
+	)
+values
+	(
+	S.VM_PRICING_CONTEXT_OID,
+	S.VM_PRICING_CONTEXT_ID,
+	S.VM_PRICING_CONTEXT_TYPE,
+	S.VM_PRICING_CONTEXT_REF,
+	S.VISUAL_MERCH_OID,
+	S.SOURCE_SYSTEM_OID,
+	S.PRICE_PROGRAM_OID
+	,       SYSDATE,
+	SYSDATE
+	)
+
+&& /*-----------------------------------------------*/
+/* TASK No. 19 */
+/* Commit transaction */
+/*commit*/
+/*-----------------------------------------------*/
+/* TASK No. 20 */
+/* Drop flow table */
+
+
+ /* drop table RAX_APP_USER.I$_VM_PRICING_CONTEXT52001 */ 
+
+
+BEGIN
+    EXECUTE IMMEDIATE 'drop table RAX_APP_USER.I$_VM_PRICING_CONTEXT52001';
+    EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        END IF;
+    END;
+    
+
+&& /*-----------------------------------------------*/
+/* TASK No. 21 */
+/* Command 0 */
+
+
+
+DELETE FROM ods_own.vm_pricing_context vpc
+      WHERE NOT EXISTS (
+               SELECT xr.vm_pricing_context_oid
+                 FROM rax_app_user.stg_vm_pricing_context stg,
+                      ods_stage.oms_vm_pricing_context_xr xr
+                WHERE TRIM(stg.vm_pricing_context_key) = xr.vm_pricing_context_key
+                  AND xr.vm_pricing_context_oid = vpc.vm_pricing_context_oid)
+
+&& /*-----------------------------------------------*/
+
+
+
+
+
+&&

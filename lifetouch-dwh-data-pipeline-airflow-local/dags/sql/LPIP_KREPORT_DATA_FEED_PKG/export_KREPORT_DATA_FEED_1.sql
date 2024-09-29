@@ -1,0 +1,15 @@
+select 	
+	substr(KDF.BANKCODE,1,8)	   BANKCODE,
+	substr(KDF.SRMENABLED,1,3)	   SRMENABLED,
+	substr(KDF.COUNTRY,1,3)	   COUNTRY,
+	substr(rpad(KDF.SCHOOLNAME,30,' '),1,30)	   SCHOOLNAME,
+	substr(lpad(KDF.YBJOBNUMBER,10,' '),1,10)	   YBJOBNUMBER,
+	to_char(KDF.AMOUNT,'999999999.99')	   AMOUNT,
+	upper(substr(lpad(KDF.USERID,8,' '),1,8))	   USERID,
+	to_char(KDF.DEPOSITDATE,'YYYY/MM/DD')	   DEPOSITDATE,
+	to_char(KDF.POSTEDDATE,'YYYY/MM/DD')	   POSTEDDATE,
+	substr(lpad(KDF.LID,10,'0'),1,10)	   LID
+from	RAX_APP_USER.KREPORT_DATA_FEED   KDF
+where	
+	(1=1)	
+And (KDF.TRANSMIT_DATE is null)

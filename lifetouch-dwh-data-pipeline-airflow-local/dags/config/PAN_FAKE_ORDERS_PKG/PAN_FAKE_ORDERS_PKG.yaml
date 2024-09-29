@@ -1,0 +1,25 @@
+---
+
+pipeline:
+  name: lt_PAN_FAKE_ORDERS_PKG_dag
+  description: lifetouch order_tracking package
+  schedule: "@daily"
+  tags:
+    - lifetouch
+    - PAN_FAKE_ORDERS_PKG
+  
+  task_groups:
+    - name: PAN_FAKE_ORDERS_PKG_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      # pre_sql:
+      #   v_cdc_load_date: dags/sql/pre_sql.sql
+      # default_args:
+      #   v_cdc_overlap: 0.02083333333
+      tasks: 
+        - name: PAN_FAKE_ORDERS_PKG
+          description: load order tracking package
+          type: oracle_sql
+          script_location: dags/sql/PAN_FAKE_ORDERS_PKG/PAN_FAKE_ORDERS_PKG.sql
+          # args:
+          #   v_cdc_load_table_name: ORDER_TRACKING
+

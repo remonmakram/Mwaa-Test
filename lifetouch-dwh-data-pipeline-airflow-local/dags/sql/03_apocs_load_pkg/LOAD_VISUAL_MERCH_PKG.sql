@@ -1,0 +1,445 @@
+
+BEGIN
+DBMS_STATS.GATHER_TABLE_STATS (
+    ownname =>	'RAX_APP_USER',
+    tabname =>	'C$_0STG_VISUAL_MERCH',
+    estimate_percent =>	DBMS_STATS.AUTO_SAMPLE_SIZE
+);
+END;
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 9 */
+/* Create target table  */
+
+
+BEGIN  
+   EXECUTE IMMEDIATE 'create table RAX_APP_USER.STG_VISUAL_MERCH
+(
+	REVISION_NO	NUMBER(5) NULL,
+	VISUAL_MERCH_KEY	CHAR(24) NULL,
+	VISUAL_MERCH_NAME	VARCHAR2(128) NULL,
+	VISUAL_MERCH_PAYMENT_MODE	VARCHAR2(31) NULL,
+	STATUS	CHAR(15) NULL,
+	MODIFYTS	DATE NULL,
+	MODIFYUSERID	VARCHAR2(40) NULL,
+	CREATETS	DATE NULL,
+	CREATEUSERID	VARCHAR2(40) NULL,
+	MODIFYPROGID	VARCHAR2(40) NULL,
+	VISUAL_MERCH_DESCRIPTION	VARCHAR2(128) NULL,
+	CREATEPROGID	VARCHAR2(40) NULL,
+	VISUAL_MERCH_ID	CHAR(24) NULL,
+	LOCKID	NUMBER(5) NULL
+)';  
+EXCEPTION  
+   WHEN OTHERS THEN  
+      NULL;
+END;
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 10 */
+/* Truncate target table */
+
+truncate table RAX_APP_USER.STG_VISUAL_MERCH
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 11 */
+/* Insert new rows */
+
+ 
+insert into	RAX_APP_USER.STG_VISUAL_MERCH 
+( 
+	REVISION_NO,
+	VISUAL_MERCH_KEY,
+	VISUAL_MERCH_NAME,
+	VISUAL_MERCH_PAYMENT_MODE,
+	STATUS,
+	MODIFYTS,
+	MODIFYUSERID,
+	CREATETS,
+	CREATEUSERID,
+	MODIFYPROGID,
+	VISUAL_MERCH_DESCRIPTION,
+	CREATEPROGID,
+	VISUAL_MERCH_ID,
+	LOCKID 
+	 
+) 
+
+select
+    REVISION_NO,
+	VISUAL_MERCH_KEY,
+	VISUAL_MERCH_NAME,
+	VISUAL_MERCH_PAYMENT_MODE,
+	STATUS,
+	MODIFYTS,
+	MODIFYUSERID,
+	CREATETS,
+	CREATEUSERID,
+	MODIFYPROGID,
+	VISUAL_MERCH_DESCRIPTION,
+	CREATEPROGID,
+	VISUAL_MERCH_ID,
+	LOCKID   
+   
+FROM (	
+
+
+select 	
+	C1_REVISION_NO REVISION_NO,
+	C2_VISUAL_MERCH_KEY VISUAL_MERCH_KEY,
+	C3_VISUAL_MERCH_NAME VISUAL_MERCH_NAME,
+	C4_VISUAL_MERCH_PAYMENT_MODE VISUAL_MERCH_PAYMENT_MODE,
+	C5_STATUS STATUS,
+	C6_MODIFYTS MODIFYTS,
+	C7_MODIFYUSERID MODIFYUSERID,
+	C8_CREATETS CREATETS,
+	C9_CREATEUSERID CREATEUSERID,
+	C10_MODIFYPROGID MODIFYPROGID,
+	C11_VISUAL_MERCH_DESCRIPTION VISUAL_MERCH_DESCRIPTION,
+	C12_CREATEPROGID CREATEPROGID,
+	C13_VISUAL_MERCH_ID VISUAL_MERCH_ID,
+	C14_LOCKID LOCKID 
+from	RAX_APP_USER.C$_0STG_VISUAL_MERCH
+where		(1=1)	
+
+
+
+
+
+
+)    ODI_GET_FROM
+
+
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 12 */
+/* Commit transaction */
+
+/* commit */
+
+
+/*-----------------------------------------------*/
+/* TASK No. 1000008 */
+/* Drop work table */
+
+drop table RAX_APP_USER.C$_0STG_VISUAL_MERCH 
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 13 */
+/* Insert new rows */
+
+ 
+insert into	ODS_STAGE.OMS_VISUAL_MERCH_XR 
+( 
+	VISUAL_MERCH_KEY 
+	,VISUAL_MERCH_OID 
+) 
+
+select
+    VISUAL_MERCH_KEY   
+  ,ODS_STAGE.VISUAL_MERCH_OID_SEQ.nextval 
+FROM (	
+
+
+select 	DISTINCT
+	TRIM(VM.VISUAL_MERCH_KEY) VISUAL_MERCH_KEY 
+from	RAX_APP_USER.STG_VISUAL_MERCH   VM, ODS_STAGE.OMS_VISUAL_MERCH_XR   OMS_VISUAL_MERCH_XR
+where		(1=1)	
+ And (TRIM(VM.VISUAL_MERCH_KEY)=OMS_VISUAL_MERCH_XR.VISUAL_MERCH_KEY (+)
+AND OMS_VISUAL_MERCH_XR.VISUAL_MERCH_KEY IS NULL)
+
+
+
+
+
+)    ODI_GET_FROM
+
+
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 14 */
+/* Commit transaction */
+
+/* commit */
+
+
+/*-----------------------------------------------*/
+/* TASK No. 15 */
+/* Set vID */
+
+/* NONE or SET VARIABLE STATEMENT FOUND, CHECK ODI TASK NO. 15 */
+
+
+
+
+/*-----------------------------------------------*/
+/* TASK No. 16 */
+/* Drop flow table */
+
+
+BEGIN
+    EXECUTE IMMEDIATE 'drop table RAX_APP_USER.I$_VISUAL_MERCH53001';
+    EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        END IF;
+    END;
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 17 */
+/* Create flow table I$ */
+
+create table RAX_APP_USER.I$_VISUAL_MERCH53001
+(
+	VISUAL_MERCH_OID	NUMBER NULL,
+	VISUAL_MERCH_ID	VARCHAR2(25) NULL,
+	VISUAL_MERCH_DESCRIPTION	VARCHAR2(128) NULL,
+	VISUAL_MERCH_NAME	VARCHAR2(128) NULL,
+	SELLING_METHOD	VARCHAR2(128) NULL,
+	ODS_CREATE_DATE	DATE NULL,
+	ODS_MODIFY_DATE	DATE NULL,
+	SOURCE_SYSTEM_OID	NUMBER NULL
+	,IND_UPDATE		char(1)
+)
+ 
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 18 */
+/* Insert flow into I$ table */
+
+/* DETECTION_STRATEGY = NOT_EXISTS */
+ 
+
+
+  
+
+
+insert into	RAX_APP_USER.I$_VISUAL_MERCH53001
+(
+	VISUAL_MERCH_OID,
+	VISUAL_MERCH_ID,
+	VISUAL_MERCH_DESCRIPTION,
+	VISUAL_MERCH_NAME,
+	SELLING_METHOD,
+	SOURCE_SYSTEM_OID,
+	IND_UPDATE
+)
+select 
+VISUAL_MERCH_OID,
+	VISUAL_MERCH_ID,
+	VISUAL_MERCH_DESCRIPTION,
+	VISUAL_MERCH_NAME,
+	SELLING_METHOD,
+	SOURCE_SYSTEM_OID,
+	IND_UPDATE
+ from (
+
+
+select 	 
+	
+	OMS_VISUAL_MERCH_XR.VISUAL_MERCH_OID VISUAL_MERCH_OID,
+	TRIM(VM.VISUAL_MERCH_ID) VISUAL_MERCH_ID,
+	VM.VISUAL_MERCH_DESCRIPTION VISUAL_MERCH_DESCRIPTION,
+	VM.VISUAL_MERCH_NAME VISUAL_MERCH_NAME,
+	VM.VISUAL_MERCH_PAYMENT_MODE SELLING_METHOD,
+	SOURCE_SYSTEM.SOURCE_SYSTEM_OID SOURCE_SYSTEM_OID,
+
+	'I' IND_UPDATE
+
+from	RAX_APP_USER.STG_VISUAL_MERCH   VM, ODS_STAGE.OMS_VISUAL_MERCH_XR   OMS_VISUAL_MERCH_XR, ODS_OWN.SOURCE_SYSTEM   SOURCE_SYSTEM
+where	(1=1)
+ And (TRIM(VM.VISUAL_MERCH_KEY)=OMS_VISUAL_MERCH_XR.VISUAL_MERCH_KEY)
+And (SOURCE_SYSTEM.SOURCE_SYSTEM_SHORT_NAME='OMS')
+
+
+
+
+) S
+where NOT EXISTS 
+	( select 1 from ODS_OWN.VISUAL_MERCH T
+	where	T.VISUAL_MERCH_OID	= S.VISUAL_MERCH_OID 
+		 and ((T.VISUAL_MERCH_ID = S.VISUAL_MERCH_ID) or (T.VISUAL_MERCH_ID IS NULL and S.VISUAL_MERCH_ID IS NULL)) and
+		((T.VISUAL_MERCH_DESCRIPTION = S.VISUAL_MERCH_DESCRIPTION) or (T.VISUAL_MERCH_DESCRIPTION IS NULL and S.VISUAL_MERCH_DESCRIPTION IS NULL)) and
+		((T.VISUAL_MERCH_NAME = S.VISUAL_MERCH_NAME) or (T.VISUAL_MERCH_NAME IS NULL and S.VISUAL_MERCH_NAME IS NULL)) and
+		((T.SELLING_METHOD = S.SELLING_METHOD) or (T.SELLING_METHOD IS NULL and S.SELLING_METHOD IS NULL)) and
+		((T.SOURCE_SYSTEM_OID = S.SOURCE_SYSTEM_OID) or (T.SOURCE_SYSTEM_OID IS NULL and S.SOURCE_SYSTEM_OID IS NULL))
+        )
+
+  
+  
+
+  
+
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 19 */
+/* Analyze integration table */
+
+
+
+begin
+    dbms_stats.gather_table_stats(
+	ownname => 'RAX_APP_USER',
+	tabname => 'I$_VISUAL_MERCH53001',
+	estimate_percent => dbms_stats.auto_sample_size
+    );
+end;
+
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 20 */
+/* Create Index on flow table */
+
+create index	RAX_APP_USER.I$_VISUAL_MERCH_IDX53001
+on		RAX_APP_USER.I$_VISUAL_MERCH53001 (VISUAL_MERCH_OID)
+ 
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 21 */
+/* Merge Rows */
+
+merge into	ODS_OWN.VISUAL_MERCH T
+using	RAX_APP_USER.I$_VISUAL_MERCH53001 S
+on	(
+		T.VISUAL_MERCH_OID=S.VISUAL_MERCH_OID
+	)
+when matched
+then update set
+	T.VISUAL_MERCH_ID	= S.VISUAL_MERCH_ID,
+	T.VISUAL_MERCH_DESCRIPTION	= S.VISUAL_MERCH_DESCRIPTION,
+	T.VISUAL_MERCH_NAME	= S.VISUAL_MERCH_NAME,
+	T.SELLING_METHOD	= S.SELLING_METHOD,
+	T.SOURCE_SYSTEM_OID	= S.SOURCE_SYSTEM_OID
+	,     T.ODS_MODIFY_DATE	= SYSDATE
+when not matched
+then insert
+	(
+	T.VISUAL_MERCH_OID,
+	T.VISUAL_MERCH_ID,
+	T.VISUAL_MERCH_DESCRIPTION,
+	T.VISUAL_MERCH_NAME,
+	T.SELLING_METHOD,
+	T.SOURCE_SYSTEM_OID
+	,      T.ODS_CREATE_DATE,
+	T.ODS_MODIFY_DATE
+	)
+values
+	(
+	S.VISUAL_MERCH_OID,
+	S.VISUAL_MERCH_ID,
+	S.VISUAL_MERCH_DESCRIPTION,
+	S.VISUAL_MERCH_NAME,
+	S.SELLING_METHOD,
+	S.SOURCE_SYSTEM_OID
+	,      SYSDATE,
+	SYSDATE
+	)
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 22 */
+/* Commit transaction */
+
+/*commit*/
+
+
+/*-----------------------------------------------*/
+/* TASK No. 23 */
+/* Drop flow table */
+
+BEGIN
+    EXECUTE IMMEDIATE 'drop table RAX_APP_USER.I$_VISUAL_MERCH53001 ';
+    EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        END IF;
+    END;
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 24 */
+/* Update CDC Load Status */
+
+UPDATE ODS_OWN.ODS_CDC_LOAD_STATUS
+SET LAST_CDC_COMPLETION_DATE=TO_DATE(
+             SUBSTR(:v_sess_beg, 1, 19), 'RRRR-MM-DD HH24:MI:SS')
+WHERE ODS_TABLE_NAME=:v_cdc_load_table_name
+AND CONTEXT_NAME = :v_env
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 25 */
+/* Insert CDC Audit Record */
+
+INSERT INTO RAX_APP_USER.ODS_CDC_LOAD_STATUS_AUDIT
+(TABLE_NAME,
+SESS_NO,                      
+SESS_NAME,                    
+SCEN_VERSION,                 
+SESS_BEG,                     
+ORIG_LAST_CDC_COMPLETION_DATE,
+OVERLAP,
+CREATE_DATE,
+CONTEXT_NAME              
+)
+values (
+:v_cdc_load_table_name,
+:v_sess_no,
+'LOAD_VISUAL_MERCH_PKG',
+'005',
+TO_DATE(
+             SUBSTR(:v_sess_beg, 1, 19), 'RRRR-MM-DD HH24:MI:SS'),
+TO_DATE (SUBSTR (:v_cdc_load_date, 1, 19),
+                           'YYYY-MM-DD HH24:MI:SS'
+                          ),
+:v_cdc_overlap,
+SYSDATE,
+ :v_env)
+
+&
+
+
+/*-----------------------------------------------*/

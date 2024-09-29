@@ -1,0 +1,53 @@
+---
+
+pipeline:
+  name: lt_99_A_BOOKING_STATUS_SUMMARY_PKG_dag
+  description: 99_DELAYED_SHIPMENT package
+  schedule: "@daily"
+  tags:
+    - lifetouch
+    - 99_A_BOOKING_STATUS_SUMMARY
+  
+  task_groups:
+    - name: 99_A_BOOKING_STATUS_SUMMARY_wait_for_data
+      description: run ODI wait command
+      schema_name: ODS_STAGE
+      session_name: 99_A_BOOKING_STATUS_SUMMARY_PKG
+      table_name: DATA_EXPORT_TRIGGER
+    
+
+    - name: 99_A_BOOKING_STATUS_SUMMARY_export
+      description: drop and recreate table then extract data and load to s3
+      export_file_name:
+        v_actuate_sysdate: dags/sql/pre_sql/v_actuate_sysdate.sql
+      pre_sql:
+        v_actuate_fiscal_year: dags/sql/pre_sql/v_actuate_fiscal_year.sql
+        v_actuate_sysdate:  dags/sql/pre_sql/v_actuate_sysdate.sql
+      tasks:
+        - script_location: dags/sql/99_A_BOOKING_STATUS_SUMMARY_PKG/bookstatus_summary_create_tmp.sql
+          export_files:
+            - extract_query: '99_A_BOOKING_STATUS_SUMMARY_PKG/bookstatus_summary_terr_export.sql'
+              export_location: finance/a_booking_status_summary/bookstatus_summary_terr
+
+            - extract_query: '99_A_BOOKING_STATUS_SUMMARY_PKG/bookstatus_summary_region_export.sql'
+              export_location: finance/a_booking_status_summary/bookstatus_summary_region
+
+            - extract_query: '99_A_BOOKING_STATUS_SUMMARY_PKG/bookstatus_summary_company_export.sql'
+              export_location: finance/a_booking_status_summary/bookstatus_summary_company
+
+
+
+        
+        
+    - name: 99_A_BOOKING_STATUS_SUMMARY_PKG_ODI_Update
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_data_export_trigger_table_id: dags/sql/pre_sql/v_data_export_trigger_table_id.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks: 
+        - description: run_pkg
+          type: oracle_sql
+          script_location: dags/sql/99_A_BOOKING_STATUS_SUMMARY_PKG/99_A_BOOKING_STATUS_SUMMARY_PKG.sql
+          args:
+            v_session_name: 99_A_BOOKING_STATUS_SUMMARY_PKG

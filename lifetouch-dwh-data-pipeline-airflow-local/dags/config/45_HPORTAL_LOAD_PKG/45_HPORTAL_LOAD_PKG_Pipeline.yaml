@@ -1,0 +1,57 @@
+---
+
+pipeline:
+  name: lt_45_HPORTAL_LOAD_PKG_dag
+  description: Hportal package
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - hportal
+  task_groups:
+    - name: HPORTAL_Ingestion
+      description: extract and load part
+      ingestion_script: ingestion_script.py
+      
+      data_sources:
+          - type: oracle
+            name: hostportal
+            default_args:
+              dest_schema: RAX_APP_USER
+              merge_required: False
+            entities:
+              - dest_table: "C$_0STG_APP_AUDIT"
+                v_cdc_load_table_name: APP_AUDIT
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: '45_hportal/tmp_create_app_audit.sql'
+                extract_query: '45_hportal/extract_query_app_audit.sql'
+                src_table: APP_AUDIT
+
+              - dest_table: "C$_0HP_IMAGESTREAM_STG"
+                v_cdc_load_table_name: HP_IMAGESTREAM
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: '45_hportal/tmp_create_imagestream.sql'
+                extract_query: '45_hportal/extract_query_imagestream.sql'  
+                src_table: IMAGESTREAM
+
+            
+    - name: HPORTAL_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks: 
+        - description: load hportal app_audit batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/45_HPORTAL_LOAD_PKG/LOAD_APP_AUDIT_PKG.sql
+          args:
+            v_cdc_load_table_name: APP_AUDIT
+            v_cdc_oms_overlap: 0.02083333333
+        - description: load Hportal image_stream subpackage
+          type: oracle_sql
+          script_location: dags/sql/45_HPORTAL_LOAD_PKG/LOAD_IMAGESTREAM_PKG.sql
+          args:
+            v_cdc_load_table_name: HP_IMAGESTREAM
+            v_cdc_oms_overlap: 0.02083333333
+        
+        

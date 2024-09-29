@@ -1,0 +1,21 @@
+---
+
+pipeline:
+  name: PKG_NAME_dag
+  description: PKG_NAME package
+  schedule: PUT_YOUR_SCHEDULE 
+  tags:
+    - lifetouch
+    - PKG_NAME
+  task_groups:
+  
+    - name: PKG_NAME_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks: 
+        - description: PKG_NAME batch package
+          type: oracle_sql
+          script_location: dags/sql/PKG_NAME/{YOUR_SUB_PKG_file_name}.sql
+          
+        

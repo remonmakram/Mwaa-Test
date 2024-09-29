@@ -1,0 +1,54 @@
+---
+
+pipeline:
+  name: lt_67_lims_load_dag
+  description: lifetouch 67_LIMS_LOAD_PKG package
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - 67_LIMS_LOAD_PKG
+  task_groups:
+    - name: lims_Ingestion
+      description: extract and load part
+      ingestion_script: ingestion_script.py
+      data_sources:
+          - type: oracle
+            name: lims
+            default_args:
+              dest_schema: RAX_APP_USER
+              merge_required: False
+              v_cdc_oms_overlap: 0.02083333333
+            entities:
+              - dest_table: "layout_theme"
+                v_cdc_load_table_name: LM_LAYOUT_THEME_STG
+                tmp_create: '67_LIMS_LOAD_PKG/tmp_create_layout_theme.sql'
+                extract_query: '67_LIMS_LOAD_PKG/extract_query_layout_theme.sql'
+                src_table: LAYOUT_THEME
+
+              - dest_table: "layout"
+                v_cdc_load_table_name: LM_LAYOUT_STG
+                tmp_create: '67_LIMS_LOAD_PKG/tmp_create_layout.sql'
+                extract_query: '67_LIMS_LOAD_PKG/extract_query_layout.sql'
+                src_table: LAYOUT  
+
+            
+    - name: LIMS_LOAD_PKG_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks:
+        - name: LOAD_LIMS_LAYOUT_THEME_PKG 
+          description: load layout theme subpackage
+          type: oracle_sql
+          script_location: dags/sql/67_LIMS_LOAD_PKG/01-LOAD_LIMS_LAYOUT_THEME_PKG.sql
+          args:
+            v_cdc_load_table_name: LM_LAYOUT_THEME_STG
+
+        - name: LOAD_LIMS_LAYOUT_PKG 
+          description: load layout subpackage
+          type: oracle_sql
+          script_location: dags/sql/67_LIMS_LOAD_PKG/02-LOAD_LIMS_LAYOUT_PKG.sql
+          args:
+            v_cdc_load_table_name: LM_LAYOUT_STG

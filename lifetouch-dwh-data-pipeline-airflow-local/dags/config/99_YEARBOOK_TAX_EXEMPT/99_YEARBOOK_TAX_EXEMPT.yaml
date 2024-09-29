@@ -1,0 +1,25 @@
+---
+
+pipeline:
+  name: lt_99_YEARBOOK_TAX_EXEMPT_dag
+  description: 99_YEARBOOK_TAX_EXEMPT package
+  schedule: "00 14 * * *"
+  tags:
+    - lifetouch
+    - 99_YEARBOOK_TAX_EXEMPT
+  
+  task_groups:
+    
+
+    - name: 99_YEARBOOK_TAX_EXEMPT_export
+      description: drop and recreate table then extract data and load to s3
+      export_file_name:
+        v_data_export_run_date: dags/sql/pre_sql/v_data_export_run_date.sql
+      pre_sql:
+        v_actuate_fiscal_year: dags/sql/pre_sql/99_YEARBOOK_TAX_EXEMPT/v_actuate_fiscal_year.sql
+        v_actuate_sysdate:  dags/sql/pre_sql/v_actuate_sysdate.sql
+      tasks:
+        - script_location: dags/sql/99_YEARBOOK_TAX_EXEMPT/YEARBOOK_TAX_EXEMPT_create_tmp.sql
+          export_files:
+            - extract_query: '99_YEARBOOK_TAX_EXEMPT/YEARBOOK_TAX_EXEMPT_export.sql'
+              export_location: finance/yearbook_sales/YB_TAX_EXEMPT

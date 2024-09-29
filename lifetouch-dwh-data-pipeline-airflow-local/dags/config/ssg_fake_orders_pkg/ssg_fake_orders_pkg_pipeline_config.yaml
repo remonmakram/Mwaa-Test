@@ -1,0 +1,21 @@
+pipeline:
+  name: lt_ssg_fake_orders_pkg_dag
+  description: Event Payment Fact Package
+  schedule: "@daily"
+  tags:
+    - lifetouch
+    - ssg_fake_orders_pkg
+  task_groups:
+
+    - name: SSG_FAKE_ORDERS_PKG_ODI_Transformation
+      description: ODI SQL Transformation Logic for SSG FAKE ORDERS PKG
+      pre_sql:
+        v_data_center_tz: dags/sql/pre_sql/pre_v_data_center_tz.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks: 
+        - description: load event_payment_fact subpackage
+          type: oracle_sql
+          script_location: dags/sql/SSG_FAKE_ORDERS_PKG/SSG_FAKE_ORDERS_PRC.sql
+          args:
+            v_cdc_oms_overlap: 0.02083333333

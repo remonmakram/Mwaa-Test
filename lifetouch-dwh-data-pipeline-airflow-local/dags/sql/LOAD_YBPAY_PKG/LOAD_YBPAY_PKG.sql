@@ -1,0 +1,2190 @@
+/* TASK No. 1 */
+/* NONE or SET VARIABLE STATEMENT FOUND, CHECK ODI TASK NO. 1 */
+/*-----------------------------------------------*/
+/* TASK No. 2 */
+/* SELECT STATEMENT FOUND, CHECK ODI TASK NO. 2 */
+/*-----------------------------------------------*/
+/* TASK No. 3 */
+/* SELECT STATEMENT FOUND, CHECK ODI TASK NO. 3 */
+/*-----------------------------------------------*/
+/* TASK No. 4 */
+/* Drop work table */
+
+
+ /* drop table RAX_APP_USER.C$_0YBPY_BILLINGINFORMATION */ 
+
+
+-- BEGIN
+--     EXECUTE IMMEDIATE 'drop table RAX_APP_USER.C$_0YBPY_BILLINGINFORMATION';
+--     EXCEPTION
+--     WHEN OTHERS THEN
+--         IF SQLCODE != -942 THEN
+--             RAISE;
+--         END IF;
+--     END;
+    
+
+-- &
+
+
+ /* create table RAX_APP_USER.C$_0YBPY_BILLINGINFORMATION
+(
+	C1_ORDERID	NUMBER NULL,
+	C2_CUSTOMEREMAIL	VARCHAR2(256) NULL,
+	C3_FIRSTNAME	VARCHAR2(64) NULL,
+	C4_LASTNAME	VARCHAR2(64) NULL,
+	C5_ADDRESS1	VARCHAR2(35) NULL,
+	C6_ADDRESS2	VARCHAR2(35) NULL,
+	C7_COUNTRYCODE	VARCHAR2(2) NULL,
+	C8_CITY	VARCHAR2(20) NULL,
+	C9_STATE	VARCHAR2(2) NULL,
+	C10_POSTALCODE	VARCHAR2(10) NULL,
+	C11_CREATEDATE	DATE NULL,
+	C12_LASTCHANGEDATE	DATE NULL
+)
+NOLOGGING */ 
+
+
+
+ /* select	
+	BILLINGINFORMATION.OrderId	 as  C1_ORDERID,
+	BILLINGINFORMATION.CustomerEmail	 as  C2_CUSTOMEREMAIL,
+	BILLINGINFORMATION.FirstName	 as  C3_FIRSTNAME,
+	BILLINGINFORMATION.LastName	 as  C4_LASTNAME,
+	BILLINGINFORMATION.Address1	 as  C5_ADDRESS1,
+	BILLINGINFORMATION.Address2	 as  C6_ADDRESS2,
+	BILLINGINFORMATION.CountryCode	 as  C7_COUNTRYCODE,
+	BILLINGINFORMATION.City	 as  C8_CITY,
+	BILLINGINFORMATION.State	 as  C9_STATE,
+	BILLINGINFORMATION.PostalCode	 as  C10_POSTALCODE,
+	BILLINGINFORMATION.CreateDate	 as  C11_CREATEDATE,
+	BILLINGINFORMATION.LastChangeDate	 as  C12_LASTCHANGEDATE
+from	YBPayProd.dbo.BillingInformation as BILLINGINFORMATION
+where	(1=1)
+And (BILLINGINFORMATION.LastChangeDate >= convert(datetime,SUBSTRING('#WAREHOUSE_PROJECT.v_cdc_load_date', 1, 19),120) - 7.0) */ 
+
+
+
+ /* insert into RAX_APP_USER.C$_0YBPY_BILLINGINFORMATION
+(
+	C1_ORDERID,
+	C2_CUSTOMEREMAIL,
+	C3_FIRSTNAME,
+	C4_LASTNAME,
+	C5_ADDRESS1,
+	C6_ADDRESS2,
+	C7_COUNTRYCODE,
+	C8_CITY,
+	C9_STATE,
+	C10_POSTALCODE,
+	C11_CREATEDATE,
+	C12_LASTCHANGEDATE
+)
+values
+(
+	:C1_ORDERID,
+	:C2_CUSTOMEREMAIL,
+	:C3_FIRSTNAME,
+	:C4_LASTNAME,
+	:C5_ADDRESS1,
+	:C6_ADDRESS2,
+	:C7_COUNTRYCODE,
+	:C8_CITY,
+	:C9_STATE,
+	:C10_POSTALCODE,
+	:C11_CREATEDATE,
+	:C12_LASTCHANGEDATE
+) */ 
+
+
+/*-----------------------------------------------*/
+/* TASK No. 7 */
+/* Analyze work table */
+
+
+
+BEGIN
+DBMS_STATS.GATHER_TABLE_STATS (
+    ownname =>	'RAX_APP_USER',
+    tabname =>	'C$_0YBPY_BILLINGINFORMATION',
+    estimate_percent =>	DBMS_STATS.AUTO_SAMPLE_SIZE
+);
+END;
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 9 */
+/* Drop flow table */
+
+
+ /* drop table RAX_APP_USER.I$_YBPY_BILLINGINFORMATION */ 
+
+
+BEGIN
+    EXECUTE IMMEDIATE 'drop table RAX_APP_USER.I$_YBPY_BILLINGINFORMATION';
+    EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        END IF;
+    END;
+    
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 10 */
+/* Create flow table I$ */
+
+
+
+create table RAX_APP_USER.I$_YBPY_BILLINGINFORMATION
+(
+	ORDERID		NUMBER NULL,
+	CUSTOMEREMAIL		VARCHAR2(256) NULL,
+	FIRSTNAME		VARCHAR2(64) NULL,
+	LASTNAME		VARCHAR2(64) NULL,
+	ADDRESS1		VARCHAR2(35) NULL,
+	ADDRESS2		VARCHAR2(35) NULL,
+	COUNTRYCODE		VARCHAR2(2) NULL,
+	CITY		VARCHAR2(20) NULL,
+	STATE		VARCHAR2(2) NULL,
+	POSTALCODE		VARCHAR2(10) NULL,
+	CREATEDATE		DATE NULL,
+	LASTCHANGEDATE		DATE NULL,
+	EFFECTIVE_DATE		DATE NULL,
+	ACTIVE_IND		VARCHAR2(5) NULL,
+	LOAD_ID		NUMBER NULL,
+	DW_CREATE_DATE		DATE NULL,
+	IND_UPDATE		CHAR(1)
+)
+NOLOGGING
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 11 */
+/* Insert flow into I$ table */
+/* DETECTION_STRATEGY = NOT_EXISTS */
+
+
+
+insert into	RAX_APP_USER.I$_YBPY_BILLINGINFORMATION
+(
+	ORDERID,
+	CUSTOMEREMAIL,
+	FIRSTNAME,
+	LASTNAME,
+	ADDRESS1,
+	ADDRESS2,
+	COUNTRYCODE,
+	CITY,
+	STATE,
+	POSTALCODE,
+	CREATEDATE,
+	LASTCHANGEDATE,
+	IND_UPDATE
+)
+select 
+ORDERID,
+	CUSTOMEREMAIL,
+	FIRSTNAME,
+	LASTNAME,
+	ADDRESS1,
+	ADDRESS2,
+	COUNTRYCODE,
+	CITY,
+	STATE,
+	POSTALCODE,
+	CREATEDATE,
+	LASTCHANGEDATE,
+	IND_UPDATE
+ from (
+
+
+select 	 
+	
+	C1_ORDERID ORDERID,
+	C2_CUSTOMEREMAIL CUSTOMEREMAIL,
+	C3_FIRSTNAME FIRSTNAME,
+	C4_LASTNAME LASTNAME,
+	C5_ADDRESS1 ADDRESS1,
+	C6_ADDRESS2 ADDRESS2,
+	C7_COUNTRYCODE COUNTRYCODE,
+	C8_CITY CITY,
+	C9_STATE STATE,
+	C10_POSTALCODE POSTALCODE,
+	C11_CREATEDATE CREATEDATE,
+	C12_LASTCHANGEDATE LASTCHANGEDATE,
+
+	'I' IND_UPDATE
+
+from	RAX_APP_USER.C$_0YBPY_BILLINGINFORMATION
+where	(1=1)
+
+
+
+
+
+
+) S
+where NOT EXISTS 
+	( select 1 from ODS.YBPY_BILLINGINFORMATION T
+	where	T.ORDERID	= S.ORDERID 
+		 and ((T.CUSTOMEREMAIL = S.CUSTOMEREMAIL) or (T.CUSTOMEREMAIL IS NULL and S.CUSTOMEREMAIL IS NULL)) and
+		((T.FIRSTNAME = S.FIRSTNAME) or (T.FIRSTNAME IS NULL and S.FIRSTNAME IS NULL)) and
+		((T.LASTNAME = S.LASTNAME) or (T.LASTNAME IS NULL and S.LASTNAME IS NULL)) and
+		((T.ADDRESS1 = S.ADDRESS1) or (T.ADDRESS1 IS NULL and S.ADDRESS1 IS NULL)) and
+		((T.ADDRESS2 = S.ADDRESS2) or (T.ADDRESS2 IS NULL and S.ADDRESS2 IS NULL)) and
+		((T.COUNTRYCODE = S.COUNTRYCODE) or (T.COUNTRYCODE IS NULL and S.COUNTRYCODE IS NULL)) and
+		((T.CITY = S.CITY) or (T.CITY IS NULL and S.CITY IS NULL)) and
+		((T.STATE = S.STATE) or (T.STATE IS NULL and S.STATE IS NULL)) and
+		((T.POSTALCODE = S.POSTALCODE) or (T.POSTALCODE IS NULL and S.POSTALCODE IS NULL)) and
+		((T.CREATEDATE = S.CREATEDATE) or (T.CREATEDATE IS NULL and S.CREATEDATE IS NULL)) and
+		((T.LASTCHANGEDATE = S.LASTCHANGEDATE) or (T.LASTCHANGEDATE IS NULL and S.LASTCHANGEDATE IS NULL))
+        )
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 12 */
+/* Create Index on flow table */
+
+
+
+create index	RAX_APP_USER.I$_YBPY_BILLINGINFORMATION_IDX
+on		RAX_APP_USER.I$_YBPY_BILLINGINFORMATION (ORDERID)
+NOLOGGING
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 13 */
+/* Analyze integration table */
+
+
+
+begin
+    dbms_stats.gather_table_stats(
+	ownname => 'RAX_APP_USER',
+	tabname => 'I$_YBPY_BILLINGINFORMATION',
+	estimate_percent => dbms_stats.auto_sample_size
+    );
+end;
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 14 */
+/* Flag rows for update */
+/* DETECTION_STRATEGY = NOT_EXISTS */
+
+
+
+update	RAX_APP_USER.I$_YBPY_BILLINGINFORMATION
+set	IND_UPDATE = 'U'
+where	(ORDERID)
+	in	(
+		select	ORDERID
+		from	ODS.YBPY_BILLINGINFORMATION
+		)
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 15 */
+/* Flag useless rows */
+/* DETECTION_STRATEGY = NOT_EXISTS */
+/* Command skipped due to chosen DETECTION_STRATEGY */
+/*-----------------------------------------------*/
+/* TASK No. 16 */
+/* Update existing rows */
+/* DETECTION_STRATEGY = NOT_EXISTS */
+
+
+
+update	ODS.YBPY_BILLINGINFORMATION T
+set 	
+	(
+	T.CUSTOMEREMAIL,
+	T.FIRSTNAME,
+	T.LASTNAME,
+	T.ADDRESS1,
+	T.ADDRESS2,
+	T.COUNTRYCODE,
+	T.CITY,
+	T.STATE,
+	T.POSTALCODE,
+	T.CREATEDATE,
+	T.LASTCHANGEDATE
+	) =
+		(
+		select	S.CUSTOMEREMAIL,
+			S.FIRSTNAME,
+			S.LASTNAME,
+			S.ADDRESS1,
+			S.ADDRESS2,
+			S.COUNTRYCODE,
+			S.CITY,
+			S.STATE,
+			S.POSTALCODE,
+			S.CREATEDATE,
+			S.LASTCHANGEDATE
+		from	RAX_APP_USER.I$_YBPY_BILLINGINFORMATION S
+		where	T.ORDERID	=S.ORDERID
+	    	 )
+	,           T.EFFECTIVE_DATE = sysdate,
+	T.ACTIVE_IND = 'A',
+	T.LOAD_ID = 1
+
+where	(ORDERID)
+	in	(
+		select	ORDERID
+		from	RAX_APP_USER.I$_YBPY_BILLINGINFORMATION
+		where	IND_UPDATE = 'U'
+		)
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 17 */
+/* Insert new rows */
+/* DETECTION_STRATEGY = NOT_EXISTS */
+
+
+
+insert into 	ODS.YBPY_BILLINGINFORMATION T
+	(
+	ORDERID,
+	CUSTOMEREMAIL,
+	FIRSTNAME,
+	LASTNAME,
+	ADDRESS1,
+	ADDRESS2,
+	COUNTRYCODE,
+	CITY,
+	STATE,
+	POSTALCODE,
+	CREATEDATE,
+	LASTCHANGEDATE
+	,            EFFECTIVE_DATE,
+	ACTIVE_IND,
+	LOAD_ID,
+	DW_CREATE_DATE
+	)
+select 	ORDERID,
+	CUSTOMEREMAIL,
+	FIRSTNAME,
+	LASTNAME,
+	ADDRESS1,
+	ADDRESS2,
+	COUNTRYCODE,
+	CITY,
+	STATE,
+	POSTALCODE,
+	CREATEDATE,
+	LASTCHANGEDATE
+	,            sysdate,
+	'A',
+	1,
+	sysdate
+from	RAX_APP_USER.I$_YBPY_BILLINGINFORMATION S
+
+
+
+where	IND_UPDATE = 'I'
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 18 */
+/* Commit transaction */
+/*commit*/
+/*-----------------------------------------------*/
+/* TASK No. 19 */
+/* Drop flow table */
+
+
+ /* drop table RAX_APP_USER.I$_YBPY_BILLINGINFORMATION */ 
+
+
+BEGIN
+    EXECUTE IMMEDIATE 'drop table RAX_APP_USER.I$_YBPY_BILLINGINFORMATION';
+    EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        END IF;
+    END;
+    
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 1000008 */
+/* Drop work table */
+
+
+ /* drop table RAX_APP_USER.C$_0YBPY_BILLINGINFORMATION */ 
+
+
+BEGIN
+    EXECUTE IMMEDIATE 'drop table RAX_APP_USER.C$_0YBPY_BILLINGINFORMATION';
+    EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        END IF;
+    END;
+    
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 20 */
+/* Drop work table */
+
+
+ /* drop table RAX_APP_USER.C$_0YBPY_ORDER */ 
+
+
+-- BEGIN
+--     EXECUTE IMMEDIATE 'drop table RAX_APP_USER.C$_0YBPY_ORDER';
+--     EXCEPTION
+--     WHEN OTHERS THEN
+--         IF SQLCODE != -942 THEN
+--             RAISE;
+--         END IF;
+--     END;
+    
+
+-- &
+
+
+ /* create table RAX_APP_USER.C$_0YBPY_ORDER
+(
+	C1_ID	NUMBER NULL,
+	C2_ORDERDATE	DATE NULL,
+	C3_TRANSACTIONDATE	DATE NULL,
+	C4_TRANSACTIONID	VARCHAR2(50) NULL,
+	C5_JOBNUMBER	NUMBER NULL,
+	C6_SCHOOLNAME	VARCHAR2(35) NULL,
+	C7_SCHOOLCOUNTRY	VARCHAR2(2) NULL,
+	C8_TOTALAMOUNT	NUMBER NULL,
+	C9_TAXAMOUNT	NUMBER NULL,
+	C10_TAXEXEMPTIND	NUMBER NULL,
+	C11_CREATEDATE	DATE NULL,
+	C12_LASTCHANGEDATE	DATE NULL,
+	C13_ISSUBMITTEDTONEXTTOOLS	NUMBER NULL
+)
+NOLOGGING */ 
+
+
+
+ /* select	
+	ORDERS.Id	 as  C1_ID,
+	ORDERS.OrderDate	 as  C2_ORDERDATE,
+	ORDERS.TransactionDate	 as  C3_TRANSACTIONDATE,
+	ORDERS.TransactionId	 as  C4_TRANSACTIONID,
+	ORDERS.JobNumber	 as  C5_JOBNUMBER,
+	ORDERS.SchoolName	 as  C6_SCHOOLNAME,
+	ORDERS.SchoolCountry	 as  C7_SCHOOLCOUNTRY,
+	ORDERS.TotalAmount	 as  C8_TOTALAMOUNT,
+	ORDERS.TaxAmount	 as  C9_TAXAMOUNT,
+	ORDERS.TaxExemptInd	 as  C10_TAXEXEMPTIND,
+	ORDERS.CreateDate	 as  C11_CREATEDATE,
+	ORDERS.LastChangeDate	 as  C12_LASTCHANGEDATE,
+	ORDERS.IsSubmittedToNextTools	 as  C13_ISSUBMITTEDTONEXTTOOLS
+from	YBPayProd.dbo.[Order] as ORDERS
+where	(1=1)
+And (ORDERS.LastChangeDate >= convert(datetime,SUBSTRING('#WAREHOUSE_PROJECT.v_cdc_load_date', 1, 19),120) - 7.0) */ 
+
+
+
+ /* insert into RAX_APP_USER.C$_0YBPY_ORDER
+(
+	C1_ID,
+	C2_ORDERDATE,
+	C3_TRANSACTIONDATE,
+	C4_TRANSACTIONID,
+	C5_JOBNUMBER,
+	C6_SCHOOLNAME,
+	C7_SCHOOLCOUNTRY,
+	C8_TOTALAMOUNT,
+	C9_TAXAMOUNT,
+	C10_TAXEXEMPTIND,
+	C11_CREATEDATE,
+	C12_LASTCHANGEDATE,
+	C13_ISSUBMITTEDTONEXTTOOLS
+)
+values
+(
+	:C1_ID,
+	:C2_ORDERDATE,
+	:C3_TRANSACTIONDATE,
+	:C4_TRANSACTIONID,
+	:C5_JOBNUMBER,
+	:C6_SCHOOLNAME,
+	:C7_SCHOOLCOUNTRY,
+	:C8_TOTALAMOUNT,
+	:C9_TAXAMOUNT,
+	:C10_TAXEXEMPTIND,
+	:C11_CREATEDATE,
+	:C12_LASTCHANGEDATE,
+	:C13_ISSUBMITTEDTONEXTTOOLS
+) */ 
+
+
+/*-----------------------------------------------*/
+/* TASK No. 23 */
+/* Analyze work table */
+
+
+
+BEGIN
+DBMS_STATS.GATHER_TABLE_STATS (
+    ownname =>	'RAX_APP_USER',
+    tabname =>	'C$_0YBPY_ORDER',
+    estimate_percent =>	DBMS_STATS.AUTO_SAMPLE_SIZE
+);
+END;
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 25 */
+/* Drop flow table */
+
+
+ /* drop table RAX_APP_USER.I$_YBPY_ORDER */ 
+
+
+BEGIN
+    EXECUTE IMMEDIATE 'drop table RAX_APP_USER.I$_YBPY_ORDER';
+    EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        END IF;
+    END;
+    
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 26 */
+/* Create flow table I$ */
+
+
+
+create table RAX_APP_USER.I$_YBPY_ORDER
+(
+	ID		NUMBER NULL,
+	ORDERDATE		DATE NULL,
+	TRANSACTIONDATE		DATE NULL,
+	TRANSACTIONID		VARCHAR2(50) NULL,
+	JOBNUMBER		NUMBER NULL,
+	SCHOOLNAME		VARCHAR2(35) NULL,
+	SCHOOLCOUNTRY		VARCHAR2(2) NULL,
+	TOTALAMOUNT		NUMBER NULL,
+	TAXAMOUNT		NUMBER NULL,
+	TAXEXEMPTIND		NUMBER NULL,
+	CREATEDATE		DATE NULL,
+	LASTCHANGEDATE		DATE NULL,
+	ISSUBMITTEDTONEXTTOOLS		NUMBER NULL,
+	EFFECTIVE_DATE		DATE NULL,
+	ACTIVE_IND		VARCHAR2(5) NULL,
+	LOAD_ID		NUMBER NULL,
+	DW_CREATE_DATE		DATE NULL,
+	IND_UPDATE		CHAR(1)
+)
+NOLOGGING
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 27 */
+/* Insert flow into I$ table */
+/* DETECTION_STRATEGY = NOT_EXISTS */
+
+
+
+insert into	RAX_APP_USER.I$_YBPY_ORDER
+(
+	ID,
+	ORDERDATE,
+	TRANSACTIONDATE,
+	TRANSACTIONID,
+	JOBNUMBER,
+	SCHOOLNAME,
+	SCHOOLCOUNTRY,
+	TOTALAMOUNT,
+	TAXAMOUNT,
+	TAXEXEMPTIND,
+	CREATEDATE,
+	LASTCHANGEDATE,
+	ISSUBMITTEDTONEXTTOOLS,
+	IND_UPDATE
+)
+select 
+ID,
+	ORDERDATE,
+	TRANSACTIONDATE,
+	TRANSACTIONID,
+	JOBNUMBER,
+	SCHOOLNAME,
+	SCHOOLCOUNTRY,
+	TOTALAMOUNT,
+	TAXAMOUNT,
+	TAXEXEMPTIND,
+	CREATEDATE,
+	LASTCHANGEDATE,
+	ISSUBMITTEDTONEXTTOOLS,
+	IND_UPDATE
+ from (
+
+
+select 	 
+	
+	C1_ID ID,
+	C2_ORDERDATE ORDERDATE,
+	C3_TRANSACTIONDATE TRANSACTIONDATE,
+	C4_TRANSACTIONID TRANSACTIONID,
+	C5_JOBNUMBER JOBNUMBER,
+	C6_SCHOOLNAME SCHOOLNAME,
+	C7_SCHOOLCOUNTRY SCHOOLCOUNTRY,
+	C8_TOTALAMOUNT TOTALAMOUNT,
+	C9_TAXAMOUNT TAXAMOUNT,
+	C10_TAXEXEMPTIND TAXEXEMPTIND,
+	C11_CREATEDATE CREATEDATE,
+	C12_LASTCHANGEDATE LASTCHANGEDATE,
+	C13_ISSUBMITTEDTONEXTTOOLS ISSUBMITTEDTONEXTTOOLS,
+
+	'I' IND_UPDATE
+
+from	RAX_APP_USER.C$_0YBPY_ORDER
+where	(1=1)
+
+
+
+
+
+
+) S
+where NOT EXISTS 
+	( select 1 from ODS.YBPY_ORDER T
+	where	T.ID	= S.ID 
+		 and ((T.ORDERDATE = S.ORDERDATE) or (T.ORDERDATE IS NULL and S.ORDERDATE IS NULL)) and
+		((T.TRANSACTIONDATE = S.TRANSACTIONDATE) or (T.TRANSACTIONDATE IS NULL and S.TRANSACTIONDATE IS NULL)) and
+		((T.TRANSACTIONID = S.TRANSACTIONID) or (T.TRANSACTIONID IS NULL and S.TRANSACTIONID IS NULL)) and
+		((T.JOBNUMBER = S.JOBNUMBER) or (T.JOBNUMBER IS NULL and S.JOBNUMBER IS NULL)) and
+		((T.SCHOOLNAME = S.SCHOOLNAME) or (T.SCHOOLNAME IS NULL and S.SCHOOLNAME IS NULL)) and
+		((T.SCHOOLCOUNTRY = S.SCHOOLCOUNTRY) or (T.SCHOOLCOUNTRY IS NULL and S.SCHOOLCOUNTRY IS NULL)) and
+		((T.TOTALAMOUNT = S.TOTALAMOUNT) or (T.TOTALAMOUNT IS NULL and S.TOTALAMOUNT IS NULL)) and
+		((T.TAXAMOUNT = S.TAXAMOUNT) or (T.TAXAMOUNT IS NULL and S.TAXAMOUNT IS NULL)) and
+		((T.TAXEXEMPTIND = S.TAXEXEMPTIND) or (T.TAXEXEMPTIND IS NULL and S.TAXEXEMPTIND IS NULL)) and
+		((T.CREATEDATE = S.CREATEDATE) or (T.CREATEDATE IS NULL and S.CREATEDATE IS NULL)) and
+		((T.LASTCHANGEDATE = S.LASTCHANGEDATE) or (T.LASTCHANGEDATE IS NULL and S.LASTCHANGEDATE IS NULL)) and
+		((T.ISSUBMITTEDTONEXTTOOLS = S.ISSUBMITTEDTONEXTTOOLS) or (T.ISSUBMITTEDTONEXTTOOLS IS NULL and S.ISSUBMITTEDTONEXTTOOLS IS NULL))
+        )
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 28 */
+/* Create Index on flow table */
+
+
+
+create index	RAX_APP_USER.I$_YBPY_ORDER_IDX
+on		RAX_APP_USER.I$_YBPY_ORDER (ID)
+NOLOGGING
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 29 */
+/* Analyze integration table */
+
+
+
+begin
+    dbms_stats.gather_table_stats(
+	ownname => 'RAX_APP_USER',
+	tabname => 'I$_YBPY_ORDER',
+	estimate_percent => dbms_stats.auto_sample_size
+    );
+end;
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 30 */
+/* Flag rows for update */
+/* DETECTION_STRATEGY = NOT_EXISTS */
+
+
+
+update	RAX_APP_USER.I$_YBPY_ORDER
+set	IND_UPDATE = 'U'
+where	(ID)
+	in	(
+		select	ID
+		from	ODS.YBPY_ORDER
+		)
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 31 */
+/* Flag useless rows */
+/* DETECTION_STRATEGY = NOT_EXISTS */
+/* Command skipped due to chosen DETECTION_STRATEGY */
+/*-----------------------------------------------*/
+/* TASK No. 32 */
+/* Update existing rows */
+/* DETECTION_STRATEGY = NOT_EXISTS */
+
+
+
+update	ODS.YBPY_ORDER T
+set 	
+	(
+	T.ORDERDATE,
+	T.TRANSACTIONDATE,
+	T.TRANSACTIONID,
+	T.JOBNUMBER,
+	T.SCHOOLNAME,
+	T.SCHOOLCOUNTRY,
+	T.TOTALAMOUNT,
+	T.TAXAMOUNT,
+	T.TAXEXEMPTIND,
+	T.CREATEDATE,
+	T.LASTCHANGEDATE,
+	T.ISSUBMITTEDTONEXTTOOLS
+	) =
+		(
+		select	S.ORDERDATE,
+			S.TRANSACTIONDATE,
+			S.TRANSACTIONID,
+			S.JOBNUMBER,
+			S.SCHOOLNAME,
+			S.SCHOOLCOUNTRY,
+			S.TOTALAMOUNT,
+			S.TAXAMOUNT,
+			S.TAXEXEMPTIND,
+			S.CREATEDATE,
+			S.LASTCHANGEDATE,
+			S.ISSUBMITTEDTONEXTTOOLS
+		from	RAX_APP_USER.I$_YBPY_ORDER S
+		where	T.ID	=S.ID
+	    	 )
+	,            T.EFFECTIVE_DATE = sysdate,
+	T.ACTIVE_IND = 'A',
+	T.LOAD_ID = 1
+
+where	(ID)
+	in	(
+		select	ID
+		from	RAX_APP_USER.I$_YBPY_ORDER
+		where	IND_UPDATE = 'U'
+		)
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 33 */
+/* Insert new rows */
+/* DETECTION_STRATEGY = NOT_EXISTS */
+
+
+
+insert into 	ODS.YBPY_ORDER T
+	(
+	ID,
+	ORDERDATE,
+	TRANSACTIONDATE,
+	TRANSACTIONID,
+	JOBNUMBER,
+	SCHOOLNAME,
+	SCHOOLCOUNTRY,
+	TOTALAMOUNT,
+	TAXAMOUNT,
+	TAXEXEMPTIND,
+	CREATEDATE,
+	LASTCHANGEDATE,
+	ISSUBMITTEDTONEXTTOOLS
+	,             EFFECTIVE_DATE,
+	ACTIVE_IND,
+	LOAD_ID,
+	DW_CREATE_DATE
+	)
+select 	ID,
+	ORDERDATE,
+	TRANSACTIONDATE,
+	TRANSACTIONID,
+	JOBNUMBER,
+	SCHOOLNAME,
+	SCHOOLCOUNTRY,
+	TOTALAMOUNT,
+	TAXAMOUNT,
+	TAXEXEMPTIND,
+	CREATEDATE,
+	LASTCHANGEDATE,
+	ISSUBMITTEDTONEXTTOOLS
+	,             sysdate,
+	'A',
+	1,
+	sysdate
+from	RAX_APP_USER.I$_YBPY_ORDER S
+
+
+
+where	IND_UPDATE = 'I'
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 34 */
+/* Commit transaction */
+/*commit*/
+/*-----------------------------------------------*/
+/* TASK No. 35 */
+/* Drop flow table */
+
+
+ /* drop table RAX_APP_USER.I$_YBPY_ORDER */ 
+
+
+BEGIN
+    EXECUTE IMMEDIATE 'drop table RAX_APP_USER.I$_YBPY_ORDER';
+    EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        END IF;
+    END;
+    
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 1000024 */
+/* Drop work table */
+
+
+ /* drop table RAX_APP_USER.C$_0YBPY_ORDER */ 
+
+
+BEGIN
+    EXECUTE IMMEDIATE 'drop table RAX_APP_USER.C$_0YBPY_ORDER';
+    EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        END IF;
+    END;
+    
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 36 */
+/* Drop work table */
+
+
+ /* drop table RAX_APP_USER.C$_0YBPY_ORDERLINE */ 
+
+
+-- BEGIN
+--     EXECUTE IMMEDIATE 'drop table RAX_APP_USER.C$_0YBPY_ORDERLINE';
+--     EXCEPTION
+--     WHEN OTHERS THEN
+--         IF SQLCODE != -942 THEN
+--             RAISE;
+--         END IF;
+--     END;
+    
+
+-- &
+
+
+ /* create table RAX_APP_USER.C$_0YBPY_ORDERLINE
+(
+	C1_ID	NUMBER NULL,
+	C2_ORDERID	NUMBER NULL,
+	C3_STUDENTID	NUMBER NULL,
+	C4_FIRSTNAME	VARCHAR2(80) NULL,
+	C5_LASTNAME	VARCHAR2(80) NULL,
+	C6_GRADEID	NUMBER NULL,
+	C7_GRADEDESCRIPTION	VARCHAR2(50) NULL,
+	C8_PACKAGESCHOOLPRICINGID	NUMBER NULL,
+	C9_PACKAGENAME	VARCHAR2(200) NULL,
+	C10_QUANTITY	NUMBER NULL,
+	C11_YEARBOOKPRICE	NUMBER NULL,
+	C12_YEARBOOKTAX	NUMBER NULL,
+	C13_DONATIONAMOUNT	NUMBER NULL,
+	C14_TOTALAMOUNT	NUMBER NULL,
+	C15_TOTALTAX	NUMBER NULL,
+	C16_CREATEDATE	DATE NULL,
+	C17_LASTCHANGEDATE	DATE NULL,
+	C18_INCLUDEDLINE	NUMBER NULL,
+	C19_INCLUDEDICON	NUMBER NULL
+)
+NOLOGGING */ 
+
+
+
+ /* select	
+	ORDERLINE.Id	 as  C1_ID,
+	ORDERLINE.OrderId	 as  C2_ORDERID,
+	ORDERLINE.StudentId	 as  C3_STUDENTID,
+	ORDERLINE.FirstName	 as  C4_FIRSTNAME,
+	ORDERLINE.LastName	 as  C5_LASTNAME,
+	ORDERLINE.GradeId	 as  C6_GRADEID,
+	ORDERLINE.GradeDescription	 as  C7_GRADEDESCRIPTION,
+	ORDERLINE.PackageSchoolPricingId	 as  C8_PACKAGESCHOOLPRICINGID,
+	ORDERLINE.PackageName	 as  C9_PACKAGENAME,
+	ORDERLINE.Quantity	 as  C10_QUANTITY,
+	ORDERLINE.YearbookPrice	 as  C11_YEARBOOKPRICE,
+	ORDERLINE.YearbookTax	 as  C12_YEARBOOKTAX,
+	ORDERLINE.DonationAmount	 as  C13_DONATIONAMOUNT,
+	ORDERLINE.TotalAmount	 as  C14_TOTALAMOUNT,
+	ORDERLINE.TotalTax	 as  C15_TOTALTAX,
+	ORDERLINE.CreateDate	 as  C16_CREATEDATE,
+	ORDERLINE.LastChangeDate	 as  C17_LASTCHANGEDATE,
+	ORDERLINE.IncludedLine	 as  C18_INCLUDEDLINE,
+	ORDERLINE.IncludedIcon	 as  C19_INCLUDEDICON
+from	YBPayProd.dbo.OrderLine as ORDERLINE
+where	(1=1)
+And (ORDERLINE.LastChangeDate >= convert(datetime,SUBSTRING('#WAREHOUSE_PROJECT.v_cdc_load_date', 1, 19),120) - 7.0) */ 
+
+
+
+ /* insert into RAX_APP_USER.C$_0YBPY_ORDERLINE
+(
+	C1_ID,
+	C2_ORDERID,
+	C3_STUDENTID,
+	C4_FIRSTNAME,
+	C5_LASTNAME,
+	C6_GRADEID,
+	C7_GRADEDESCRIPTION,
+	C8_PACKAGESCHOOLPRICINGID,
+	C9_PACKAGENAME,
+	C10_QUANTITY,
+	C11_YEARBOOKPRICE,
+	C12_YEARBOOKTAX,
+	C13_DONATIONAMOUNT,
+	C14_TOTALAMOUNT,
+	C15_TOTALTAX,
+	C16_CREATEDATE,
+	C17_LASTCHANGEDATE,
+	C18_INCLUDEDLINE,
+	C19_INCLUDEDICON
+)
+values
+(
+	:C1_ID,
+	:C2_ORDERID,
+	:C3_STUDENTID,
+	:C4_FIRSTNAME,
+	:C5_LASTNAME,
+	:C6_GRADEID,
+	:C7_GRADEDESCRIPTION,
+	:C8_PACKAGESCHOOLPRICINGID,
+	:C9_PACKAGENAME,
+	:C10_QUANTITY,
+	:C11_YEARBOOKPRICE,
+	:C12_YEARBOOKTAX,
+	:C13_DONATIONAMOUNT,
+	:C14_TOTALAMOUNT,
+	:C15_TOTALTAX,
+	:C16_CREATEDATE,
+	:C17_LASTCHANGEDATE,
+	:C18_INCLUDEDLINE,
+	:C19_INCLUDEDICON
+) */ 
+
+
+/*-----------------------------------------------*/
+/* TASK No. 39 */
+/* Analyze work table */
+
+
+
+BEGIN
+DBMS_STATS.GATHER_TABLE_STATS (
+    ownname =>	'RAX_APP_USER',
+    tabname =>	'C$_0YBPY_ORDERLINE',
+    estimate_percent =>	DBMS_STATS.AUTO_SAMPLE_SIZE
+);
+END;
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 41 */
+/* Drop flow table */
+
+
+ /* drop table RAX_APP_USER.I$_YBPY_ORDERLINE */ 
+
+
+BEGIN
+    EXECUTE IMMEDIATE 'drop table RAX_APP_USER.I$_YBPY_ORDERLINE';
+    EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        END IF;
+    END;
+    
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 42 */
+/* Create flow table I$ */
+
+
+
+create table RAX_APP_USER.I$_YBPY_ORDERLINE
+(
+	ID		NUMBER NULL,
+	ORDERID		NUMBER NULL,
+	STUDENTID		NUMBER NULL,
+	FIRSTNAME		VARCHAR2(80) NULL,
+	LASTNAME		VARCHAR2(80) NULL,
+	GRADEID		NUMBER NULL,
+	GRADEDESCRIPTION		VARCHAR2(50) NULL,
+	PACKAGESCHOOLPRICINGID		NUMBER NULL,
+	PACKAGENAME		VARCHAR2(200) NULL,
+	QUANTITY		NUMBER NULL,
+	YEARBOOKPRICE		NUMBER NULL,
+	YEARBOOKTAX		NUMBER NULL,
+	DONATIONAMOUNT		NUMBER NULL,
+	TOTALAMOUNT		NUMBER NULL,
+	TOTALTAX		NUMBER NULL,
+	CREATEDATE		DATE NULL,
+	LASTCHANGEDATE		DATE NULL,
+	INCLUDEDLINE		NUMBER NULL,
+	INCLUDEDICON		NUMBER NULL,
+	EFFECTIVE_DATE		DATE NULL,
+	ACTIVE_IND		VARCHAR2(5) NULL,
+	LOAD_ID		NUMBER NULL,
+	DW_CREATE_DATE		DATE NULL,
+	IND_UPDATE		CHAR(1)
+)
+NOLOGGING
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 43 */
+/* Insert flow into I$ table */
+/* DETECTION_STRATEGY = NOT_EXISTS */
+
+
+
+insert into	RAX_APP_USER.I$_YBPY_ORDERLINE
+(
+	ID,
+	ORDERID,
+	STUDENTID,
+	FIRSTNAME,
+	LASTNAME,
+	GRADEID,
+	GRADEDESCRIPTION,
+	PACKAGESCHOOLPRICINGID,
+	PACKAGENAME,
+	QUANTITY,
+	YEARBOOKPRICE,
+	YEARBOOKTAX,
+	DONATIONAMOUNT,
+	TOTALAMOUNT,
+	TOTALTAX,
+	CREATEDATE,
+	LASTCHANGEDATE,
+	INCLUDEDLINE,
+	INCLUDEDICON,
+	IND_UPDATE
+)
+select 
+ID,
+	ORDERID,
+	STUDENTID,
+	FIRSTNAME,
+	LASTNAME,
+	GRADEID,
+	GRADEDESCRIPTION,
+	PACKAGESCHOOLPRICINGID,
+	PACKAGENAME,
+	QUANTITY,
+	YEARBOOKPRICE,
+	YEARBOOKTAX,
+	DONATIONAMOUNT,
+	TOTALAMOUNT,
+	TOTALTAX,
+	CREATEDATE,
+	LASTCHANGEDATE,
+	INCLUDEDLINE,
+	INCLUDEDICON,
+	IND_UPDATE
+ from (
+
+
+select 	 
+	
+	C1_ID ID,
+	C2_ORDERID ORDERID,
+	C3_STUDENTID STUDENTID,
+	C4_FIRSTNAME FIRSTNAME,
+	C5_LASTNAME LASTNAME,
+	C6_GRADEID GRADEID,
+	C7_GRADEDESCRIPTION GRADEDESCRIPTION,
+	C8_PACKAGESCHOOLPRICINGID PACKAGESCHOOLPRICINGID,
+	C9_PACKAGENAME PACKAGENAME,
+	C10_QUANTITY QUANTITY,
+	C11_YEARBOOKPRICE YEARBOOKPRICE,
+	C12_YEARBOOKTAX YEARBOOKTAX,
+	C13_DONATIONAMOUNT DONATIONAMOUNT,
+	C14_TOTALAMOUNT TOTALAMOUNT,
+	C15_TOTALTAX TOTALTAX,
+	C16_CREATEDATE CREATEDATE,
+	C17_LASTCHANGEDATE LASTCHANGEDATE,
+	C18_INCLUDEDLINE INCLUDEDLINE,
+	C19_INCLUDEDICON INCLUDEDICON,
+
+	'I' IND_UPDATE
+
+from	RAX_APP_USER.C$_0YBPY_ORDERLINE
+where	(1=1)
+
+
+
+
+
+
+) S
+where NOT EXISTS 
+	( select 1 from ODS.YBPY_ORDERLINE T
+	where	T.ID	= S.ID 
+		 and ((T.ORDERID = S.ORDERID) or (T.ORDERID IS NULL and S.ORDERID IS NULL)) and
+		((T.STUDENTID = S.STUDENTID) or (T.STUDENTID IS NULL and S.STUDENTID IS NULL)) and
+		((T.FIRSTNAME = S.FIRSTNAME) or (T.FIRSTNAME IS NULL and S.FIRSTNAME IS NULL)) and
+		((T.LASTNAME = S.LASTNAME) or (T.LASTNAME IS NULL and S.LASTNAME IS NULL)) and
+		((T.GRADEID = S.GRADEID) or (T.GRADEID IS NULL and S.GRADEID IS NULL)) and
+		((T.GRADEDESCRIPTION = S.GRADEDESCRIPTION) or (T.GRADEDESCRIPTION IS NULL and S.GRADEDESCRIPTION IS NULL)) and
+		((T.PACKAGESCHOOLPRICINGID = S.PACKAGESCHOOLPRICINGID) or (T.PACKAGESCHOOLPRICINGID IS NULL and S.PACKAGESCHOOLPRICINGID IS NULL)) and
+		((T.PACKAGENAME = S.PACKAGENAME) or (T.PACKAGENAME IS NULL and S.PACKAGENAME IS NULL)) and
+		((T.QUANTITY = S.QUANTITY) or (T.QUANTITY IS NULL and S.QUANTITY IS NULL)) and
+		((T.YEARBOOKPRICE = S.YEARBOOKPRICE) or (T.YEARBOOKPRICE IS NULL and S.YEARBOOKPRICE IS NULL)) and
+		((T.YEARBOOKTAX = S.YEARBOOKTAX) or (T.YEARBOOKTAX IS NULL and S.YEARBOOKTAX IS NULL)) and
+		((T.DONATIONAMOUNT = S.DONATIONAMOUNT) or (T.DONATIONAMOUNT IS NULL and S.DONATIONAMOUNT IS NULL)) and
+		((T.TOTALAMOUNT = S.TOTALAMOUNT) or (T.TOTALAMOUNT IS NULL and S.TOTALAMOUNT IS NULL)) and
+		((T.TOTALTAX = S.TOTALTAX) or (T.TOTALTAX IS NULL and S.TOTALTAX IS NULL)) and
+		((T.CREATEDATE = S.CREATEDATE) or (T.CREATEDATE IS NULL and S.CREATEDATE IS NULL)) and
+		((T.LASTCHANGEDATE = S.LASTCHANGEDATE) or (T.LASTCHANGEDATE IS NULL and S.LASTCHANGEDATE IS NULL)) and
+		((T.INCLUDEDLINE = S.INCLUDEDLINE) or (T.INCLUDEDLINE IS NULL and S.INCLUDEDLINE IS NULL)) and
+		((T.INCLUDEDICON = S.INCLUDEDICON) or (T.INCLUDEDICON IS NULL and S.INCLUDEDICON IS NULL))
+        )
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 44 */
+/* Create Index on flow table */
+
+
+
+create index	RAX_APP_USER.I$_YBPY_ORDERLINE_IDX
+on		RAX_APP_USER.I$_YBPY_ORDERLINE (ID)
+NOLOGGING
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 45 */
+/* Analyze integration table */
+
+
+
+begin
+    dbms_stats.gather_table_stats(
+	ownname => 'RAX_APP_USER',
+	tabname => 'I$_YBPY_ORDERLINE',
+	estimate_percent => dbms_stats.auto_sample_size
+    );
+end;
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 46 */
+/* Flag rows for update */
+/* DETECTION_STRATEGY = NOT_EXISTS */
+
+
+
+update	RAX_APP_USER.I$_YBPY_ORDERLINE
+set	IND_UPDATE = 'U'
+where	(ID)
+	in	(
+		select	ID
+		from	ODS.YBPY_ORDERLINE
+		)
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 47 */
+/* Flag useless rows */
+/* DETECTION_STRATEGY = NOT_EXISTS */
+/* Command skipped due to chosen DETECTION_STRATEGY */
+/*-----------------------------------------------*/
+/* TASK No. 48 */
+/* Update existing rows */
+/* DETECTION_STRATEGY = NOT_EXISTS */
+
+
+
+update	ODS.YBPY_ORDERLINE T
+set 	
+	(
+	T.ORDERID,
+	T.STUDENTID,
+	T.FIRSTNAME,
+	T.LASTNAME,
+	T.GRADEID,
+	T.GRADEDESCRIPTION,
+	T.PACKAGESCHOOLPRICINGID,
+	T.PACKAGENAME,
+	T.QUANTITY,
+	T.YEARBOOKPRICE,
+	T.YEARBOOKTAX,
+	T.DONATIONAMOUNT,
+	T.TOTALAMOUNT,
+	T.TOTALTAX,
+	T.CREATEDATE,
+	T.LASTCHANGEDATE,
+	T.INCLUDEDLINE,
+	T.INCLUDEDICON
+	) =
+		(
+		select	S.ORDERID,
+			S.STUDENTID,
+			S.FIRSTNAME,
+			S.LASTNAME,
+			S.GRADEID,
+			S.GRADEDESCRIPTION,
+			S.PACKAGESCHOOLPRICINGID,
+			S.PACKAGENAME,
+			S.QUANTITY,
+			S.YEARBOOKPRICE,
+			S.YEARBOOKTAX,
+			S.DONATIONAMOUNT,
+			S.TOTALAMOUNT,
+			S.TOTALTAX,
+			S.CREATEDATE,
+			S.LASTCHANGEDATE,
+			S.INCLUDEDLINE,
+			S.INCLUDEDICON
+		from	RAX_APP_USER.I$_YBPY_ORDERLINE S
+		where	T.ID	=S.ID
+	    	 )
+	,                  T.EFFECTIVE_DATE = sysdate,
+	T.ACTIVE_IND = 'A',
+	T.LOAD_ID = 1,
+	T.DW_CREATE_DATE = sysdate
+
+where	(ID)
+	in	(
+		select	ID
+		from	RAX_APP_USER.I$_YBPY_ORDERLINE
+		where	IND_UPDATE = 'U'
+		)
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 49 */
+/* Insert new rows */
+/* DETECTION_STRATEGY = NOT_EXISTS */
+
+
+
+insert into 	ODS.YBPY_ORDERLINE T
+	(
+	ID,
+	ORDERID,
+	STUDENTID,
+	FIRSTNAME,
+	LASTNAME,
+	GRADEID,
+	GRADEDESCRIPTION,
+	PACKAGESCHOOLPRICINGID,
+	PACKAGENAME,
+	QUANTITY,
+	YEARBOOKPRICE,
+	YEARBOOKTAX,
+	DONATIONAMOUNT,
+	TOTALAMOUNT,
+	TOTALTAX,
+	CREATEDATE,
+	LASTCHANGEDATE,
+	INCLUDEDLINE,
+	INCLUDEDICON
+	,                   EFFECTIVE_DATE,
+	ACTIVE_IND,
+	LOAD_ID,
+	DW_CREATE_DATE
+	)
+select 	ID,
+	ORDERID,
+	STUDENTID,
+	FIRSTNAME,
+	LASTNAME,
+	GRADEID,
+	GRADEDESCRIPTION,
+	PACKAGESCHOOLPRICINGID,
+	PACKAGENAME,
+	QUANTITY,
+	YEARBOOKPRICE,
+	YEARBOOKTAX,
+	DONATIONAMOUNT,
+	TOTALAMOUNT,
+	TOTALTAX,
+	CREATEDATE,
+	LASTCHANGEDATE,
+	INCLUDEDLINE,
+	INCLUDEDICON
+	,                   sysdate,
+	'A',
+	1,
+	sysdate
+from	RAX_APP_USER.I$_YBPY_ORDERLINE S
+
+
+
+where	IND_UPDATE = 'I'
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 50 */
+/* Commit transaction */
+/*commit*/
+/*-----------------------------------------------*/
+/* TASK No. 51 */
+/* Drop flow table */
+
+
+ /* drop table RAX_APP_USER.I$_YBPY_ORDERLINE */ 
+
+
+BEGIN
+    EXECUTE IMMEDIATE 'drop table RAX_APP_USER.I$_YBPY_ORDERLINE';
+    EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        END IF;
+    END;
+    
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 1000040 */
+/* Drop work table */
+
+
+ /* drop table RAX_APP_USER.C$_0YBPY_ORDERLINE */ 
+
+
+BEGIN
+    EXECUTE IMMEDIATE 'drop table RAX_APP_USER.C$_0YBPY_ORDERLINE';
+    EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        END IF;
+    END;
+    
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 52 */
+/* Drop work table */
+
+
+ /* drop table RAX_APP_USER.C$_0YBPY_JOBINFO */ 
+
+
+-- BEGIN
+--     EXECUTE IMMEDIATE 'drop table RAX_APP_USER.C$_0YBPY_JOBINFO';
+--     EXCEPTION
+--     WHEN OTHERS THEN
+--         IF SQLCODE != -942 THEN
+--             RAISE;
+--         END IF;
+--     END;
+    
+
+-- &
+
+
+ /* create table RAX_APP_USER.C$_0YBPY_JOBINFO
+(
+	C1_ORDERID	NUMBER NULL,
+	C2_CREATEDATE	DATE NULL,
+	C3_LASTCHANGEDATE	DATE NULL
+)
+NOLOGGING */ 
+
+
+
+ /* select	
+	JOBINFO.OrderId	 as  C1_ORDERID,
+	JOBINFO.CreateDate	 as  C2_CREATEDATE,
+	JOBINFO.LastChangeDate	 as  C3_LASTCHANGEDATE
+from	YBPayProd.dbo.JobInfo as JOBINFO
+where	(1=1)
+And (JOBINFO.LastChangeDate >= convert(datetime,SUBSTRING('#WAREHOUSE_PROJECT.v_cdc_load_date', 1, 19),120) - 7.0) */ 
+
+
+
+ /* insert into RAX_APP_USER.C$_0YBPY_JOBINFO
+(
+	C1_ORDERID,
+	C2_CREATEDATE,
+	C3_LASTCHANGEDATE
+)
+values
+(
+	:C1_ORDERID,
+	:C2_CREATEDATE,
+	:C3_LASTCHANGEDATE
+) */ 
+
+
+/*-----------------------------------------------*/
+/* TASK No. 55 */
+/* Analyze work table */
+
+
+
+BEGIN
+DBMS_STATS.GATHER_TABLE_STATS (
+    ownname =>	'RAX_APP_USER',
+    tabname =>	'C$_0YBPY_JOBINFO',
+    estimate_percent =>	DBMS_STATS.AUTO_SAMPLE_SIZE
+);
+END;
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 57 */
+/* Drop flow table */
+
+
+ /* drop table RAX_APP_USER.I$_YBPY_JOBINFO */ 
+
+
+BEGIN
+    EXECUTE IMMEDIATE 'drop table RAX_APP_USER.I$_YBPY_JOBINFO';
+    EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        END IF;
+    END;
+    
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 58 */
+/* Create flow table I$ */
+
+
+
+create table RAX_APP_USER.I$_YBPY_JOBINFO
+(
+	ORDERID		NUMBER NULL,
+	CREATEDATE		DATE NULL,
+	LASTCHANGEDATE		DATE NULL,
+	EFFECTIVE_DATE		DATE NULL,
+	ACTIVE_IND		VARCHAR2(5) NULL,
+	LOAD_ID		NUMBER NULL,
+	IND_UPDATE		CHAR(1)
+)
+NOLOGGING
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 59 */
+/* Insert flow into I$ table */
+/* DETECTION_STRATEGY = NOT_EXISTS */
+
+
+
+insert into	RAX_APP_USER.I$_YBPY_JOBINFO
+(
+	ORDERID,
+	CREATEDATE,
+	LASTCHANGEDATE,
+	IND_UPDATE
+)
+select 
+ORDERID,
+	CREATEDATE,
+	LASTCHANGEDATE,
+	IND_UPDATE
+ from (
+
+
+select 	 
+	
+	C1_ORDERID ORDERID,
+	C2_CREATEDATE CREATEDATE,
+	C3_LASTCHANGEDATE LASTCHANGEDATE,
+
+	'I' IND_UPDATE
+
+from	RAX_APP_USER.C$_0YBPY_JOBINFO
+where	(1=1)
+
+
+
+
+
+
+) S
+where NOT EXISTS 
+	( select 1 from ODS.YBPY_JOBINFO T
+	where	T.ORDERID	= S.ORDERID 
+		 and ((T.CREATEDATE = S.CREATEDATE) or (T.CREATEDATE IS NULL and S.CREATEDATE IS NULL)) and
+		((T.LASTCHANGEDATE = S.LASTCHANGEDATE) or (T.LASTCHANGEDATE IS NULL and S.LASTCHANGEDATE IS NULL))
+        )
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 60 */
+/* Create Index on flow table */
+
+
+
+create index	RAX_APP_USER.I$_YBPY_JOBINFO_IDX
+on		RAX_APP_USER.I$_YBPY_JOBINFO (ORDERID)
+NOLOGGING
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 61 */
+/* Analyze integration table */
+
+
+
+begin
+    dbms_stats.gather_table_stats(
+	ownname => 'RAX_APP_USER',
+	tabname => 'I$_YBPY_JOBINFO',
+	estimate_percent => dbms_stats.auto_sample_size
+    );
+end;
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 62 */
+/* Flag rows for update */
+/* DETECTION_STRATEGY = NOT_EXISTS */
+
+
+
+update	RAX_APP_USER.I$_YBPY_JOBINFO
+set	IND_UPDATE = 'U'
+where	(ORDERID)
+	in	(
+		select	ORDERID
+		from	ODS.YBPY_JOBINFO
+		)
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 63 */
+/* Flag useless rows */
+/* DETECTION_STRATEGY = NOT_EXISTS */
+/* Command skipped due to chosen DETECTION_STRATEGY */
+/*-----------------------------------------------*/
+/* TASK No. 64 */
+/* Update existing rows */
+/* DETECTION_STRATEGY = NOT_EXISTS */
+
+
+
+update	ODS.YBPY_JOBINFO T
+set 	
+	(
+	T.CREATEDATE,
+	T.LASTCHANGEDATE
+	) =
+		(
+		select	S.CREATEDATE,
+			S.LASTCHANGEDATE
+		from	RAX_APP_USER.I$_YBPY_JOBINFO S
+		where	T.ORDERID	=S.ORDERID
+	    	 )
+	,  T.EFFECTIVE_DATE = SYSDATE,
+	T.ACTIVE_IND = 'A',
+	T.LOAD_ID = 1
+
+where	(ORDERID)
+	in	(
+		select	ORDERID
+		from	RAX_APP_USER.I$_YBPY_JOBINFO
+		where	IND_UPDATE = 'U'
+		)
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 65 */
+/* Insert new rows */
+/* DETECTION_STRATEGY = NOT_EXISTS */
+
+
+
+insert into 	ODS.YBPY_JOBINFO T
+	(
+	ORDERID,
+	CREATEDATE,
+	LASTCHANGEDATE
+	,   EFFECTIVE_DATE,
+	ACTIVE_IND,
+	LOAD_ID
+	)
+select 	ORDERID,
+	CREATEDATE,
+	LASTCHANGEDATE
+	,   SYSDATE,
+	'A',
+	1
+from	RAX_APP_USER.I$_YBPY_JOBINFO S
+
+
+
+where	IND_UPDATE = 'I'
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 66 */
+/* Commit transaction */
+/*commit*/
+/*-----------------------------------------------*/
+/* TASK No. 67 */
+/* Drop flow table */
+
+
+ /* drop table RAX_APP_USER.I$_YBPY_JOBINFO */ 
+
+
+BEGIN
+    EXECUTE IMMEDIATE 'drop table RAX_APP_USER.I$_YBPY_JOBINFO';
+    EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        END IF;
+    END;
+    
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 1000056 */
+/* Drop work table */
+
+
+ /* drop table RAX_APP_USER.C$_0YBPY_JOBINFO */ 
+
+
+BEGIN
+    EXECUTE IMMEDIATE 'drop table RAX_APP_USER.C$_0YBPY_JOBINFO';
+    EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        END IF;
+    END;
+    
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 68 */
+/* Drop work table */
+
+
+ /* drop table RAX_APP_USER.C$_0YBPY_PAYMENT */ 
+
+
+-- BEGIN
+--     EXECUTE IMMEDIATE 'drop table RAX_APP_USER.C$_0YBPY_PAYMENT';
+--     EXCEPTION
+--     WHEN OTHERS THEN
+--         IF SQLCODE != -942 THEN
+--             RAISE;
+--         END IF;
+--     END;
+    
+
+-- &
+
+
+ /* create table RAX_APP_USER.C$_0YBPY_PAYMENT
+(
+	C1_ID	NUMBER NULL,
+	C2_ORDERID	NUMBER NULL,
+	C3_AMOUNT	NUMBER NULL,
+	C4_CREDITCARDTYPECODE	VARCHAR2(4) NULL,
+	C5_MASKEDCARDNUMBER	VARCHAR2(4) NULL,
+	C6_VERIFICATIONRESULTCODE	NUMBER NULL,
+	C7_VERIFICATIONRESULTMESSAGE	VARCHAR2(200) NULL,
+	C8_SALEPNREF	VARCHAR2(50) NULL,
+	C9_CREATEDATE	DATE NULL,
+	C10_LASTCHANGEDATE	DATE NULL
+)
+NOLOGGING */ 
+
+
+
+ /* select	
+	PAYMENT.Id	 as  C1_ID,
+	PAYMENT.OrderId	 as  C2_ORDERID,
+	PAYMENT.Amount	 as  C3_AMOUNT,
+	PAYMENT.CreditCardTypeCode	 as  C4_CREDITCARDTYPECODE,
+	PAYMENT.MaskedCardNumber	 as  C5_MASKEDCARDNUMBER,
+	PAYMENT.VerificationResultCode	 as  C6_VERIFICATIONRESULTCODE,
+	PAYMENT.VerificationResultMessage	 as  C7_VERIFICATIONRESULTMESSAGE,
+	PAYMENT.SalePnRef	 as  C8_SALEPNREF,
+	PAYMENT.CreateDate	 as  C9_CREATEDATE,
+	PAYMENT.LastChangeDate	 as  C10_LASTCHANGEDATE
+from	YBPayProd.dbo.Payment as PAYMENT
+where	(1=1)
+And (PAYMENT.LastChangeDate >= convert(datetime,SUBSTRING('#WAREHOUSE_PROJECT.v_cdc_load_date', 1, 19),120) - 7.0) */ 
+
+
+
+ /* insert into RAX_APP_USER.C$_0YBPY_PAYMENT
+(
+	C1_ID,
+	C2_ORDERID,
+	C3_AMOUNT,
+	C4_CREDITCARDTYPECODE,
+	C5_MASKEDCARDNUMBER,
+	C6_VERIFICATIONRESULTCODE,
+	C7_VERIFICATIONRESULTMESSAGE,
+	C8_SALEPNREF,
+	C9_CREATEDATE,
+	C10_LASTCHANGEDATE
+)
+values
+(
+	:C1_ID,
+	:C2_ORDERID,
+	:C3_AMOUNT,
+	:C4_CREDITCARDTYPECODE,
+	:C5_MASKEDCARDNUMBER,
+	:C6_VERIFICATIONRESULTCODE,
+	:C7_VERIFICATIONRESULTMESSAGE,
+	:C8_SALEPNREF,
+	:C9_CREATEDATE,
+	:C10_LASTCHANGEDATE
+) */ 
+
+
+/*-----------------------------------------------*/
+/* TASK No. 71 */
+/* Analyze work table */
+
+
+
+BEGIN
+DBMS_STATS.GATHER_TABLE_STATS (
+    ownname =>	'RAX_APP_USER',
+    tabname =>	'C$_0YBPY_PAYMENT',
+    estimate_percent =>	DBMS_STATS.AUTO_SAMPLE_SIZE
+);
+END;
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 73 */
+/* Drop flow table */
+
+
+ /* drop table RAX_APP_USER.I$_YBPY_PAYMENT */ 
+
+
+BEGIN
+    EXECUTE IMMEDIATE 'drop table RAX_APP_USER.I$_YBPY_PAYMENT';
+    EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        END IF;
+    END;
+    
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 74 */
+/* Create flow table I$ */
+
+
+
+create table RAX_APP_USER.I$_YBPY_PAYMENT
+(
+	ID		NUMBER NULL,
+	ORDERID		NUMBER NULL,
+	AMOUNT		NUMBER NULL,
+	CREDITCARDTYPECODE		VARCHAR2(4) NULL,
+	MASKEDCARDNUMBER		VARCHAR2(4) NULL,
+	VERIFICATIONRESULTCODE		NUMBER NULL,
+	VERIFICATIONRESULTMESSAGE		VARCHAR2(200) NULL,
+	SALEPNREF		VARCHAR2(50) NULL,
+	CREATEDATE		DATE NULL,
+	LASTCHANGEDATE		DATE NULL,
+	EFFECTIVE_DATE		DATE NULL,
+	ACTIVE_IND		VARCHAR2(5) NULL,
+	LOAD_ID		NUMBER NULL,
+	IND_UPDATE		CHAR(1)
+)
+NOLOGGING
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 75 */
+/* Insert flow into I$ table */
+/* DETECTION_STRATEGY = NOT_EXISTS */
+
+
+
+insert into	RAX_APP_USER.I$_YBPY_PAYMENT
+(
+	ID,
+	ORDERID,
+	AMOUNT,
+	CREDITCARDTYPECODE,
+	MASKEDCARDNUMBER,
+	VERIFICATIONRESULTCODE,
+	VERIFICATIONRESULTMESSAGE,
+	SALEPNREF,
+	CREATEDATE,
+	LASTCHANGEDATE,
+	IND_UPDATE
+)
+select 
+ID,
+	ORDERID,
+	AMOUNT,
+	CREDITCARDTYPECODE,
+	MASKEDCARDNUMBER,
+	VERIFICATIONRESULTCODE,
+	VERIFICATIONRESULTMESSAGE,
+	SALEPNREF,
+	CREATEDATE,
+	LASTCHANGEDATE,
+	IND_UPDATE
+ from (
+
+
+select 	 
+	
+	C1_ID ID,
+	C2_ORDERID ORDERID,
+	C3_AMOUNT AMOUNT,
+	C4_CREDITCARDTYPECODE CREDITCARDTYPECODE,
+	C5_MASKEDCARDNUMBER MASKEDCARDNUMBER,
+	C6_VERIFICATIONRESULTCODE VERIFICATIONRESULTCODE,
+	C7_VERIFICATIONRESULTMESSAGE VERIFICATIONRESULTMESSAGE,
+	C8_SALEPNREF SALEPNREF,
+	C9_CREATEDATE CREATEDATE,
+	C10_LASTCHANGEDATE LASTCHANGEDATE,
+
+	'I' IND_UPDATE
+
+from	RAX_APP_USER.C$_0YBPY_PAYMENT
+where	(1=1)
+
+
+
+
+
+
+) S
+where NOT EXISTS 
+	( select 1 from ODS.YBPY_PAYMENT T
+	where	T.ID	= S.ID 
+		 and ((T.ORDERID = S.ORDERID) or (T.ORDERID IS NULL and S.ORDERID IS NULL)) and
+		((T.AMOUNT = S.AMOUNT) or (T.AMOUNT IS NULL and S.AMOUNT IS NULL)) and
+		((T.CREDITCARDTYPECODE = S.CREDITCARDTYPECODE) or (T.CREDITCARDTYPECODE IS NULL and S.CREDITCARDTYPECODE IS NULL)) and
+		((T.MASKEDCARDNUMBER = S.MASKEDCARDNUMBER) or (T.MASKEDCARDNUMBER IS NULL and S.MASKEDCARDNUMBER IS NULL)) and
+		((T.VERIFICATIONRESULTCODE = S.VERIFICATIONRESULTCODE) or (T.VERIFICATIONRESULTCODE IS NULL and S.VERIFICATIONRESULTCODE IS NULL)) and
+		((T.VERIFICATIONRESULTMESSAGE = S.VERIFICATIONRESULTMESSAGE) or (T.VERIFICATIONRESULTMESSAGE IS NULL and S.VERIFICATIONRESULTMESSAGE IS NULL)) and
+		((T.SALEPNREF = S.SALEPNREF) or (T.SALEPNREF IS NULL and S.SALEPNREF IS NULL)) and
+		((T.CREATEDATE = S.CREATEDATE) or (T.CREATEDATE IS NULL and S.CREATEDATE IS NULL)) and
+		((T.LASTCHANGEDATE = S.LASTCHANGEDATE) or (T.LASTCHANGEDATE IS NULL and S.LASTCHANGEDATE IS NULL))
+        )
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 76 */
+/* Create Index on flow table */
+
+
+
+create index	RAX_APP_USER.I$_YBPY_PAYMENT_IDX
+on		RAX_APP_USER.I$_YBPY_PAYMENT (ID)
+NOLOGGING
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 77 */
+/* Analyze integration table */
+
+
+
+begin
+    dbms_stats.gather_table_stats(
+	ownname => 'RAX_APP_USER',
+	tabname => 'I$_YBPY_PAYMENT',
+	estimate_percent => dbms_stats.auto_sample_size
+    );
+end;
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 78 */
+/* Flag rows for update */
+/* DETECTION_STRATEGY = NOT_EXISTS */
+
+
+
+update	RAX_APP_USER.I$_YBPY_PAYMENT
+set	IND_UPDATE = 'U'
+where	(ID)
+	in	(
+		select	ID
+		from	ODS.YBPY_PAYMENT
+		)
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 79 */
+/* Flag useless rows */
+/* DETECTION_STRATEGY = NOT_EXISTS */
+/* Command skipped due to chosen DETECTION_STRATEGY */
+/*-----------------------------------------------*/
+/* TASK No. 80 */
+/* Update existing rows */
+/* DETECTION_STRATEGY = NOT_EXISTS */
+
+
+
+update	ODS.YBPY_PAYMENT T
+set 	
+	(
+	T.ORDERID,
+	T.AMOUNT,
+	T.CREDITCARDTYPECODE,
+	T.MASKEDCARDNUMBER,
+	T.VERIFICATIONRESULTCODE,
+	T.VERIFICATIONRESULTMESSAGE,
+	T.SALEPNREF,
+	T.CREATEDATE,
+	T.LASTCHANGEDATE
+	) =
+		(
+		select	S.ORDERID,
+			S.AMOUNT,
+			S.CREDITCARDTYPECODE,
+			S.MASKEDCARDNUMBER,
+			S.VERIFICATIONRESULTCODE,
+			S.VERIFICATIONRESULTMESSAGE,
+			S.SALEPNREF,
+			S.CREATEDATE,
+			S.LASTCHANGEDATE
+		from	RAX_APP_USER.I$_YBPY_PAYMENT S
+		where	T.ID	=S.ID
+	    	 )
+	,         T.EFFECTIVE_DATE = SYSDATE,
+	T.ACTIVE_IND = 'A',
+	T.LOAD_ID = 1
+
+where	(ID)
+	in	(
+		select	ID
+		from	RAX_APP_USER.I$_YBPY_PAYMENT
+		where	IND_UPDATE = 'U'
+		)
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 81 */
+/* Insert new rows */
+/* DETECTION_STRATEGY = NOT_EXISTS */
+
+
+
+insert into 	ODS.YBPY_PAYMENT T
+	(
+	ID,
+	ORDERID,
+	AMOUNT,
+	CREDITCARDTYPECODE,
+	MASKEDCARDNUMBER,
+	VERIFICATIONRESULTCODE,
+	VERIFICATIONRESULTMESSAGE,
+	SALEPNREF,
+	CREATEDATE,
+	LASTCHANGEDATE
+	,          EFFECTIVE_DATE,
+	ACTIVE_IND,
+	LOAD_ID
+	)
+select 	ID,
+	ORDERID,
+	AMOUNT,
+	CREDITCARDTYPECODE,
+	MASKEDCARDNUMBER,
+	VERIFICATIONRESULTCODE,
+	VERIFICATIONRESULTMESSAGE,
+	SALEPNREF,
+	CREATEDATE,
+	LASTCHANGEDATE
+	,          SYSDATE,
+	'A',
+	1
+from	RAX_APP_USER.I$_YBPY_PAYMENT S
+
+
+
+where	IND_UPDATE = 'I'
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 82 */
+/* Commit transaction */
+/*commit*/
+/*-----------------------------------------------*/
+/* TASK No. 83 */
+/* Drop flow table */
+
+
+ /* drop table RAX_APP_USER.I$_YBPY_PAYMENT */ 
+
+
+BEGIN
+    EXECUTE IMMEDIATE 'drop table RAX_APP_USER.I$_YBPY_PAYMENT';
+    EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        END IF;
+    END;
+    
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 1000072 */
+/* Drop work table */
+
+
+ /* drop table RAX_APP_USER.C$_0YBPY_PAYMENT */ 
+
+
+BEGIN
+    EXECUTE IMMEDIATE 'drop table RAX_APP_USER.C$_0YBPY_PAYMENT';
+    EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        END IF;
+    END;
+    
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 84 */
+/* Update CDC Load Status */
+
+
+
+UPDATE ODS.DW_CDC_LOAD_STATUS
+SET LAST_CDC_COMPLETION_DATE=TO_DATE(
+             SUBSTR(:v_sess_beg, 1, 19), 'RRRR-MM-DD HH24:MI:SS')
+WHERE DW_TABLE_NAME=:v_cdc_load_table_name
+
+&
+
+/*-----------------------------------------------*/
+/* TASK No. 85 */
+/* Insert Audit Record */
+
+
+
+INSERT INTO RAX_APP_USER.DW_CDC_LOAD_STATUS_AUDIT
+(TABLE_NAME,
+SESS_NO,                      
+SESS_NAME,                    
+SCEN_VERSION,                 
+SESS_BEG,                     
+ORIG_LAST_CDC_COMPLETION_DATE,
+OVERLAP,
+CREATE_DATE              
+)
+values (
+:v_cdc_load_table_name,
+:v_sess_no,
+'LOAD_YBPAY_PKG',
+'003',
+TO_DATE(
+             SUBSTR(:v_sess_beg, 1, 19), 'RRRR-MM-DD HH24:MI:SS'),
+TO_DATE (SUBSTR (:v_cdc_load_date, 1, 19),
+                           'YYYY-MM-DD HH24:MI:SS'
+                          ),
+:v_cdc_ods_overlap,
+SYSDATE)
+
+&
+
+/*-----------------------------------------------*/
+
+
+
+
+
+&

@@ -1,0 +1,38 @@
+---
+
+pipeline:
+  name: lt_99_nss_code_pkg_dag
+  description: 99_nss_code_pkgpackage
+  schedule: 0 6 1 * * #runs 1st day of each month at 6 AM
+  tags:
+    - lifetouch
+    - 99_nss_code_pkg
+  
+  task_groups:
+
+
+    - name: 99_nss_code_pkg_export
+      description: drop and recreate table then extract data and load to s3
+      export_file_name:
+        v_data_export_run_date : dags/sql/pre_sql/v_data_export_run_date.sql
+      pre_sql:
+        
+        v_data_export_last_month_end_date : dags/sql/pre_sql/v_data_export_last_month_end_date.sql
+        v_data_export_last_month_begin_date : dags/sql/pre_sql/v_data_export_last_month_begin_date.sql
+        
+
+      tasks:
+        - script_location: dags/sql/99_nss_code_pkg/NSS_CODE_create_tmp.sql
+          export_files:
+            - extract_query: 99_nss_code_pkg/NSS_CODE_export.sql
+              export_location: finance/nss_code/NSSCodeDataFeed
+
+        - script_location: dags/sql/99_nss_code_pkg/NON_NSS_CODE_create_tmp.sql
+          export_files:
+            - extract_query: 99_nss_code_pkg/NON_NSS_CODE_export.sql
+              export_location: finance/nss_code/NON_NSSCodeDataFeed
+
+    
+
+        
+        

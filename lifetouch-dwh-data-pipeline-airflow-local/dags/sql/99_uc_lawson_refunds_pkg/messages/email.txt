@@ -1,0 +1,7 @@
+Data Center - :v_US_data_center
+Monthly Underclass Lawson Refunds files created on the below:
+
+US Path : \\sgsphnas02\lnss_dw_export\PROD\finance\Audit\UC_Lawson_Refunds
+CA Path : \\torhnas01\lnss_dw_export\PROD\finance\Audit\UC_Lawson_Refunds
+
+To discontinue receiving this email, please submit a ticket to the Data Warehouse team.

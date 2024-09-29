@@ -1,0 +1,72 @@
+---
+
+pipeline:
+  name: 99_freight_analysis_dump_pkg_PKG_dag
+  description: 99_freight_analysis_dump_pkgpackage
+  schedule: "@daily"
+  tags:
+    - lifetouch
+    - 99_freight_analysis_dump_pkg
+  
+  task_groups:
+
+    - name: 99_freight_analysis_dump_pkg_ODI
+      description: ODI SQL Transformation Logic
+      tasks: 
+        - description: run_pkg
+          type: oracle_sql
+          script_location: dags/sql/99_freight_analysis_dump_pkg/99_FREIGHT_ANALYSIS_DUMP_PKG.sql
+
+    - name: 99_freight_analysis_dump_pkg_evaluate
+      description: 99_freight_analysis_dump_pkg evaluate v_record_count_monthly_freight_analysis
+      condition_script: dags/sql/pre_sql/99_freight_analysis_dump_pkg/v_record_count_monthly_freight_analysis.sql
+      compared_value: 0
+      operator: '>'                         # '>' '<' '>=' '<=' '=' '!='
+      task_ids: {'true': 99_freight_analysis_dump_pkg_export.deploy_export_files, 'false': end_1}
+
+
+    - name: 99_freight_analysis_dump_pkg_export
+      description: drop and recreate table then extract data and load to s3
+      pre_sql:
+        v_freight_dump_ctr: dags/sql/pre_sql/99_freight_analysis_dump_pkg/v_freight_dump_ctr.sql
+        v_ep_dump_file_max : dags/sql/pre_sql/99_freight_analysis_dump_pkg/v_ep_dump_file_max.sql
+      tasks:
+        - script_location: dags/sql/99_freight_analysis_dump_pkg/create_temp_table.sql
+          export_files:
+            - extract_query: 99_freight_analysis_dump_pkg/extract_csv_file.sql
+              export_location: finance/Freight_Analysis/MONTHLY_FREIGHT_ANALYSIS
+
+    - name: 99_freight_analysis_dump_pkg_evaluate_2
+      description: 99_freight_analysis_dump_pkg evaluate v_freight_dump_evaluate precheck
+      condition_script: dags/sql/pre_sql/99_freight_analysis_dump_pkg/v_freight_dump_evaluate.sql
+      args:
+        v_freight_dump_ctr: dags/sql/pre_sql/99_freight_analysis_dump_pkg/v_freight_dump_ctr.sql
+        v_ep_dump_file_max : dags/sql/pre_sql/99_freight_analysis_dump_pkg/v_ep_dump_file_max.sql
+      compared_value: dags/sql/pre_sql/99_freight_analysis_dump_pkg/v_record_count_monthly_freight_analysis.sql
+      operator: '>'                         # '>' '<' '>=' '<=' '=' '!='
+      task_ids: {'true': 99_freight_analysis_dump_pkg_ODI_Update.update_statement, 'false': end_2}
+
+    - name: 99_freight_analysis_dump_pkg_ODI_Update
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+        
+      tasks: 
+        - description: run_pkg
+          type: oracle_sql
+          script_location: dags/sql/99_freight_analysis_dump_pkg/update_statement.sql
+          args:
+            v_cdc_load_table_name: 'DUMP_MONTHLY_FREIGHT_ANALYSIS'
+
+    - name: 99_freight_analysis_dump_pkg_email
+      description: send email 
+      email_configurations:
+          subject: Monthly Freight Analysis Files Created
+          # The subject of the email found in the odi extraction
+          email_recipient_query: pre_sql/v_error_email_to.sql
+          email_recipient_query_args:
+            v_package_name: '99_FREIGHT_ANALYSIS_DUMP_PKG'
+        
+        

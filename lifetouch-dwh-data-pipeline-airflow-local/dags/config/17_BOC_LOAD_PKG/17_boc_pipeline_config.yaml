@@ -1,0 +1,109 @@
+---
+
+pipeline:
+  name: lt_17_boc_dag
+  description: 17_BOC_LOAD_PKG pipeline
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - boc
+  task_groups:
+    - name: BOC_Ingestion
+      description: extract and load part
+      ingestion_script: ingestion_script.py
+      data_sources:
+          - type: oracle
+            data_source_name: boc
+            name: boc
+            default_args:
+                dest_schema: RAX_APP_USER
+                merge_required: False
+                
+            entities:
+              - src_table: EVENT
+                dest_table: "C$_0BOC_EVENT"
+                tmp_create: '17_boc/tmp_create_event.sql'
+                extract_query: '17_boc/extract_query_event.sql'
+                insert_query: '17_boc/insert_query_event.sql'
+                v_cdc_oms_overlap: 0.02083333333
+                v_cdc_load_table_name: BOC_ORDERS
+              - src_table: DRAFT_ORDER
+                dest_table: "C$_0BOC_DRAFT_ORD_STG"
+                tmp_create: '17_boc/tmp_create_draft_order.sql'
+                extract_query: '17_boc/extract_query_draft_order.sql'
+                insert_query: '17_boc/insert_query_draft_order.sql'
+                v_cdc_oms_overlap: 0.02083333333
+                v_cdc_load_table_name: BOC_ORDERS
+              - src_table: ORDER_BATCH
+                dest_table: "C$_0BOC_ORDER_BATCH_STAGE"
+                tmp_create: '17_boc/tmp_create_order_batch.sql'
+                extract_query: '17_boc/extract_query_order_batch.sql'
+                insert_query: '17_boc/insert_query_order_batch.sql'
+                v_cdc_oms_overlap: 0.02083333333
+                v_cdc_load_table_name: BOC_ORDERS
+              - src_table: ACCOUNT_PROGRAM_OCCURENCE              
+                dest_table: "C$_0BOC_ACC_PRG_OCCR_STG"
+                tmp_create: '17_boc/tmp_create_account_program_occurence.sql'
+                extract_query: '17_boc/extract_query_account_program_occurence.sql'
+                insert_query: '17_boc/insert_query_account_program_occurence.sql'
+                v_cdc_oms_overlap: 0.02083333333
+                v_cdc_load_table_name: BOC_ORDERS
+
+
+          - type: oracle
+            data_source_name: oms3
+            name: oms3
+            default_args:
+                dest_schema: RAX_APP_USER
+                merge_required: False
+            entities:
+              - src_table: LT_BATCH_SHIP_PROP
+                dest_table: "C$_0OMS_LT_SHIP_PROP_STG"
+                tmp_create: '17_boc/tmp_create_lt_batch_ship_prop.sql'
+                extract_query: '17_boc/extract_query_lt_batch_ship_prop.sql'
+                insert_query: '17_boc/insert_query_lt_batch_ship_prop.sql'
+                v_cdc_oms_overlap: 0.02083333333
+                v_cdc_load_table_name: BOC_ORDERS
+
+
+    - name: BOC_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_ld_date: dags/sql/pre_sql.sql
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+        v_cdc_oms_overlap: 0.02083333333
+        v_cdc_load_table_name: BOC_ORDERS
+      tasks:
+        - description: load BOC EVENT INT subpackage
+          type: oracle_sql
+          script_location: dags/sql/17_BOC_LOAD_PKG/LOAD_BOC_EVENT_INT.sql
+          error_handling: "drop table"
+        - description: LOAD_DW_SHIP_PROP_INT subpackage
+          type: oracle_sql
+          script_location: dags/sql/17_BOC_LOAD_PKG/LOAD_DW_SHIP_PROP_INT.sql 
+        - description: LOAD_DW_ORDER_DRAFT_INT subpackage
+          type: oracle_sql
+          script_location: dags/sql/17_BOC_LOAD_PKG/LOAD_DW_ORDER_DRAFT_INT.sql
+        - description: LOAD_DW_ORDER_BATCH_INT subpackage
+          type: oracle_sql
+          script_location: dags/sql/17_BOC_LOAD_PKG/LOAD_DW_ORDER_BATCH_INT.sql
+        - description: LOAD_DW_ACC_PROGRAM_OCCUR_INT
+          type: oracle_sql
+          script_location: dags/sql/17_BOC_LOAD_PKG/LOAD_DW_ACC_PROGRAM_OCCUR_INT.sql
+        - description: LOAD_WOMS_SHIP_DATE_INTO_WRK_ORD_TABLE
+          type: oracle_sql
+          script_location: dags/sql/17_BOC_LOAD_PKG/LOAD_WOMS_SHIP_DATE_INTO_WRK_ORD_TABLE.sql
+          args:
+            v_cdc_load_table_name: WOMS_SHIPPING_DATE_UPDATE
+        - description: LOAD_EVENT_ORDER_BATCH_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/17_BOC_LOAD_PKG/LOAD_EVENT_ORDER_BATCH_PKG.sql
+          args:
+            v_cdc_load_table_name: EVENT_ORDER_BATCH
+        - description: 26_UPD_ORD_BAT_SHIPPED_BATCHED_QTY
+          type: oracle_sql
+          script_location: dags/sql/17_BOC_LOAD_PKG/26_UPD_ORD_BAT_SHIPPED_BATCHED_QTY.sql
+          args:
+            v_cdc_load_table_name: BATCH_ORD_SHIPPED_BATCHED_QTY

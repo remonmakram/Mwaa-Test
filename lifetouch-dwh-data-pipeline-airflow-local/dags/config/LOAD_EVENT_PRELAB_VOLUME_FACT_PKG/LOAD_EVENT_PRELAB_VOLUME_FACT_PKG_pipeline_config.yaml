@@ -1,0 +1,23 @@
+---
+
+pipeline:
+  name: lt_LOAD_EVENT_PRELAB_VOLUME_FACT_PKG_dag
+  description: LOAD_EVENT_PRELAB_VOLUME_FACT_PKG package
+  schedule: "0 */4 * * *"
+  tags:
+    - lifetouch
+    - lt_LOAD_EVENT_PRELAB_VOLUME_FACT_PKG
+  task_groups:
+    - name: LOAD_EVENT_PRELAB_VOLUME_FACT_PKG_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date_ODS_DM: dags/sql/pre_sql/v_cdc_load_date_ODS_DM.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+        v_cdc_oms_overlap: 0.02083333333
+      tasks: 
+        - description: LOAD_EVENT_PRELAB_VOLUME_FACT_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/LOAD_EVENT_PRELAB_VOLUME_FACT_PKG/LOAD_EVENT_PRELAB_VOLUME_FACT_PKG.sql
+          args:
+            v_cdc_load_table_name: EVENT_PRELAB_VOLUME_FACT

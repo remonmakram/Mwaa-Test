@@ -1,0 +1,221 @@
+---
+
+pipeline:
+  name: 02_ps_load_pkg_dag
+  description: 02_ps_load_pkg package
+  schedule: "@hourly" 
+  tags:
+    - lifetouch
+    - 02_ps_load_pkg
+  task_groups:
+    - name: 02_ps_load_pkg_Ingestion
+      description: extract and load part
+      ingestion_script: ingestion_script.py
+      data_sources:
+          - type: oracle
+            name: ps
+            default_args:
+              dest_schema: RAX_APP_USER
+              merge_required: False
+            entities:
+
+              - dest_table: c$_0ps_package_item_xr
+                v_cdc_load_table_name: PACKAGE_ITEM
+                v_cdc_overlap: 0.02083333333
+                tmp_create: '02_ps_load_pkg/create_temp_ps_package_item_xr.sql'
+                extract_query: '02_ps_load_pkg/extract_ps_package_item_xr.sql'
+                src_table: PACKAGE_ITEM
+
+              - dest_table: c$_0package_item
+                v_cdc_load_table_name: PACKAGE_ITEM
+                v_cdc_overlap: 0.02083333333
+                tmp_create: '02_ps_load_pkg/create_temp_package_item.sql'
+                extract_query: '02_ps_load_pkg/extract_package_item.sql'
+                src_table: PACKAGE_ITEM_2
+
+              - dest_table: c$_0stg_pp_priceset
+                v_cdc_load_table_name: PP_PRICE_SET
+                v_cdc_overlap: 0.02083333333
+                tmp_create: '02_ps_load_pkg/create_temp_stg_pp_priceset.sql'
+                extract_query: '02_ps_load_pkg/extract_stg_pp_priceset.sql'
+                src_table: PP_PRICE_SET
+
+              - dest_table: c$_0stg_price_program
+                v_cdc_load_table_name: PRICE_PROGRAM
+                v_cdc_overlap: 0.02083333333
+                tmp_create: '02_ps_load_pkg/create_temp_stg_price_program.sql'
+                extract_query: '02_ps_load_pkg/extract_stg_price_program.sql'
+                src_table: PRICE_PROGRAM
+
+              - dest_table: c$_0stg_price_set
+                v_cdc_load_table_name: PRICE_SET
+                v_cdc_overlap: 0.02083333333
+                tmp_create: '02_ps_load_pkg/create_temp_stg_price_set.sql'
+                extract_query: '02_ps_load_pkg/extract_stg_price_set.sql'
+                src_table: PRICE_SET
+
+              - dest_table: c$_0stg_price_set_sku
+                v_cdc_load_table_name: PRICE_SET_OVERRIDE
+                v_cdc_overlap: 0.02083333333
+                tmp_create: '02_ps_load_pkg/create_temp_stg_price_set_sku.sql'
+                extract_query: '02_ps_load_pkg/extract_stg_price_set_sku.sql'
+                src_table: PRICE_SET_OVERRIDE
+
+              - dest_table: c$_0ps_promotion_stg
+                v_cdc_load_table_name: PS_PROMOTION
+                v_cdc_overlap: 0.02083333333
+                tmp_create: '02_ps_load_pkg/create_temp_ps_promotion_stg.sql'
+                extract_query: '02_ps_load_pkg/extract_ps_promotion_stg.sql'
+                src_table: PS_PROMOTION
+
+              - dest_table: c$_0ps_sku_ext_ref_stg
+                v_cdc_load_table_name: SKU_EXTERNAL_REFERENCE
+                v_cdc_overlap: 0.02083333333
+                tmp_create: '02_ps_load_pkg/create_temp_ps_sku_ext_ref_stg.sql'
+                extract_query: '02_ps_load_pkg/extract_ps_sku_ext_ref_stg.sql'
+                src_table: SKU_EXTERNAL_REFERENCE
+
+              - dest_table: c$_0ps_stock_keeping_unit_xr
+                v_cdc_load_table_name: stock_keeping_unit
+                v_cdc_overlap: 0.02083333333
+                tmp_create: '02_ps_load_pkg/create_temp_ps_stock_keeping_unit_xr.sql'
+                extract_query: '02_ps_load_pkg/extract_ps_stock_keeping_unit_xr.sql'
+                src_table: stock_keeping_unit
+
+              - dest_table: c$_0stock_keeping_unit
+                v_cdc_load_table_name: stock_keeping_unit
+                v_cdc_overlap: 0.02083333333
+                tmp_create: '02_ps_load_pkg/create_temp_stock_keeping_unit.sql'
+                extract_query: '02_ps_load_pkg/extract_stock_keeping_unit.sql'
+                src_table: stock_keeping_unit_2
+
+              - dest_table: c$_0ps_su_cpn_attr_stg
+                v_cdc_load_table_name: SU_COUPON_ATTRIBUTE
+                v_cdc_overlap: 0.02083333333
+                tmp_create: '02_ps_load_pkg/create_temp_ps_su_cpn_attr_stg.sql'
+                extract_query: '02_ps_load_pkg/extract_ps_su_cpn_attr_stg.sql'
+                src_table: SU_COUPON_ATTRIBUTE
+
+              - dest_table: c$_0ps_su_cpn_btch_stg
+                v_cdc_load_table_name: SU_COUPON_BATCH
+                v_cdc_overlap: 0.02083333333
+                tmp_create: '02_ps_load_pkg/create_temp_ps_su_cpn_btch_stg.sql'
+                extract_query: '02_ps_load_pkg/extract_ps_su_cpn_btch_stg.sql'
+                src_table: SU_COUPON_BATCH
+
+              - dest_table: c$_0ps_su_cpn_promo_stg
+                v_cdc_load_table_name: SU_COUPON_PROMOTION
+                v_cdc_overlap: 0.02083333333
+                tmp_create: '02_ps_load_pkg/create_temp_ps_su_cpn_promo_stg.sql'
+                extract_query: '02_ps_load_pkg/extract_ps_su_cpn_promo_stg.sql'
+                src_table: SU_COUPON_PROMOTION
+
+              - dest_table: c$_0ps_su_digitl_cpn_stg
+                v_cdc_load_table_name: SU_DIGITAL_COUPON
+                v_cdc_overlap: 0.02083333333
+                tmp_create: '02_ps_load_pkg/create_temp_ps_su_digitl_cpn_stg.sql'
+                extract_query: '02_ps_load_pkg/extract_ps_su_digitl_cpn_stg.sql'
+                src_table: SU_DIGITAL_COUPON
+            
+    - name: 02_ps_load_pkg_ODI_Transformation
+      description: ODI SQL Transformation Logic        
+      default_args:
+        v_cdc_overlap: 0.02083333333
+        v_cdc_oms_overlap: 0.02083333333
+      tasks: 
+
+        - description: load 02_ps_load_pkg LOAD_SKU_EXTERNAL_REFERENCE_PKG.sql batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/02_ps_load_pkg/LOAD_SKU_EXTERNAL_REFERENCE_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+          args:
+              v_cdc_load_table_name: SKU_EXTERNAL_REFERENCE
+
+        - description: load 02_ps_load_pkg LOAD_SU_COUPON_ATTRIBUTE_PKG.sql batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/02_ps_load_pkg/LOAD_SU_COUPON_ATTRIBUTE_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+          args:
+              v_cdc_load_table_name: SU_COUPON_ATTRIBUTE
+
+        - description: load 02_ps_load_pkg LOAD_SU_DIGITAL_COUPON_PKG.sql batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/02_ps_load_pkg/LOAD_SU_DIGITAL_COUPON_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+          args:
+              v_cdc_load_table_name: SU_DIGITAL_COUPON
+
+        - description: load 02_ps_load_pkg LOAD_SU_COUPON_PROMOTION_PKG.sql batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/02_ps_load_pkg/LOAD_SU_COUPON_PROMOTION_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+          args:
+              v_cdc_load_table_name: SU_COUPON_PROMOTION
+
+        - description: load 02_ps_load_pkg LOAD_SU_COUPON_BATCH_PKG.sql batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/02_ps_load_pkg/LOAD_SU_COUPON_BATCH_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+          args:
+              v_cdc_load_table_name: SU_COUPON_BATCH
+
+        - description: load 02_ps_load_pkg LOAD_PS_PROMOTION_PKG.sql batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/02_ps_load_pkg/LOAD_PS_PROMOTION_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+          args:
+              v_cdc_load_table_name: PS_PROMOTION
+
+        - description: load 02_ps_load_pkg UPDATE_EVENT_PRICES_TAX_INCLUSIVE.sql batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/02_ps_load_pkg/UPDATE_EVENT_PRICES_TAX_INCLUSIVE.sql
+
+        - description: load 02_ps_load_pkg LOAD_PRICE_SET_SKU_PKG.sql batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/02_ps_load_pkg/LOAD_PRICE_SET_SKU_PKG.sql
+          
+        - description: load 02_ps_load_pkg LOAD_PP_PRICESET_PKG.sql batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/02_ps_load_pkg/LOAD_PP_PRICESET_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+          args:
+              v_cdc_load_table_name: PP_PRICE_SET
+
+        - description: load 02_ps_load_pkg LOAD_PACKAGE_ITEM_PKG.sql batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/02_ps_load_pkg/LOAD_PACKAGE_ITEM_PKG.sql
+
+        - description: load 02_ps_load_pkg LOAD_STOCK_KEEPING_UNIT_PKG.sql batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/02_ps_load_pkg/LOAD_STOCK_KEEPING_UNIT_PKG.sql
+          
+        - description: load 02_ps_load_pkg LOAD_PRICE_SET_PKG.sql batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/02_ps_load_pkg/LOAD_PRICE_SET_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+          args:
+              v_cdc_load_table_name: PRICE_SET
+
+        - description: load 02_ps_load_pkg LOAD_PRICEPROGRAM_PKG.sql batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/02_ps_load_pkg/LOAD_PRICEPROGRAM_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+          args:
+              v_cdc_load_table_name: PRICE_PROGRAM
+
+
+
+
+
+
+
+

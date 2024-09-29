@@ -1,0 +1,41 @@
+---
+
+pipeline:
+  name: lt_99_SENIORS_PROOF_ORDERS_RELEASED_BYLAB_dag
+  description: 99_SENIORS_PROOF_ORDERS_RELEASED_BYLAB package
+  schedule: "@daily"
+  tags:
+    - lifetouch 
+    - 99_SENIORS_PROOF_ORDERS_RELEASED_BYLAB
+  
+  task_groups:
+    - name: 99_SENIORS_PROOF_ORDERS_RELEASED_BYLAB_wait_for_data
+      description: run ODI wait command
+      schema_name: ODS_STAGE
+      session_name: 99_SENIORS_PROOF_ORDERS_RELEASED_BYLAB_PKG
+      table_name: DATA_EXPORT_TRIGGER
+    
+
+    - name: 99_SENIORS_PROOF_ORDERS_RELEASED_BYLAB_export
+      description: drop and recreate table then extract data and load to s3
+      
+      export_file_name:
+        v_data_export_run_date_trigger_table_refresh:  dags/sql/pre_sql/v_data_export_run_date_trigger_table_refresh.sql
+      export_args:
+        v_session_name: 99_SENIORS_PROOF_ORDERS_RELEASED_BYLAB_PKG
+      
+      pre_sql:
+        v_data_export_run_date_trigger_table_refresh:  dags/sql/pre_sql/v_data_export_run_date_trigger_table_refresh.sql
+      
+      tasks:
+        - script_location: dags/sql/99_SENIORS_PROOF_ORDERS_RELEASED_BYLAB_PKG/sensor_proof_orders_create_tmp.sql
+          args: 
+            v_session_name: 99_SENIORS_PROOF_ORDERS_RELEASED_BYLAB_PKG
+          
+          export_files:
+            - extract_query: 99_SENIORS_PROOF_ORDERS_RELEASED_BYLAB_PKG/sensor_proof_orders_export.sql
+              export_location: finance/senir_prf_ord_released_bylab/senir_prf_ord_released_bylab
+
+
+        
+        

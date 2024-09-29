@@ -1,0 +1,56 @@
+---
+
+pipeline:
+  name: lt_99_multi_main_dag
+  description: lifetouch 99_multi_main_yp_orders package
+  schedule: "0 5 1 * *" # 1st day of the month at 5:00 AM
+  tags:
+    - lifetouch
+    - 99_MULTI_MAIN_YB_ORDERS_PKG 
+  
+  task_groups:
+    - name: 99_MULTI_MAIN_CREATE_TEMP
+      description: ODI SQL Logic
+      pre_sql:
+        v_error_email_to: dags/sql/pre_sql/v_US_data_center.sql
+        v_multi_yb_orders: dags/sql/pre_sql/v_multi_yb_orders.sql
+        v_US_data_center: dags/sql/pre_sql/v_US_data_center.sql
+        v_multi_yb_orders_ct: dags/sql/pre_sql/v_multi_yb_orders_ct.sql
+      tasks: 
+        - name: 99_MULTI_MAIN_CREATE_TEMP
+          description: drop and recreate table
+          type: oracle_sql
+          script_location: dags/sql/99_MULTI_MAIN_YB_ORDERS_PKG/multi_yb_orders_create_temp.sql
+      
+      
+    - name: 99_MULTI_MAIN_CHECK_BRANCHING
+      description: go down a certain branch based on the condition
+      condition_script: dags/sql/pre_sql/v_multi_yb_orders_ct.sql
+      compared_value: 0
+      operator: '>'                         # '>' '<' '>=' '<=' '=' '!='
+      task_ids: {'true': SEND_EMAIL_1, 'false': SEND_EMAIL_2}
+
+    - name: SEND_EMAIL_1
+      email_configurations:
+        subject: YB Events with more than 1 Main order
+        message: dags/sql/messages/99_MULTI_MAIN_YB_ORDERS_PKG/send_emai_1_message.txt
+        message_args:
+          v_US_data_center:
+            path: dags/sql/pre_sql/v_US_data_center.sql
+          v_multi_yb_orders:
+            path: dags/sql/pre_sql/v_multi_yb_orders.sql
+        email_recipient_query: pre_sql/v_error_email_to.sql
+        email_recipient_query_args:
+          v_package_name: '99_MULTI_MAIN_YB_ORDERS_PKG'
+            
+
+    - name: SEND_EMAIL_2
+      email_configurations:
+        subject: YB Events with more than 1 Main order
+        message: dags/sql/messages/99_MULTI_MAIN_YB_ORDERS_PKG/send_emai_2_message.txt
+        message_args:
+          v_US_data_center:
+            path: dags/sql/pre_sql/v_US_data_center.sql
+        email_recipient_query: pre_sql/v_error_email_to.sql
+        email_recipient_query_args:
+          v_package_name: '99_MULTI_MAIN_YB_ORDERS_PKG'

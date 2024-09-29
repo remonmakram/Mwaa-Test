@@ -1,0 +1,4 @@
+Data Center  - :v_US_data_center
+Monthly Seniors D42 Payments file created on the below: 
+CA Path : /dw_export/finance/seniors_d42_payments 
+To discontinue receiving this email, please submit a ticket to the Data Warehouse team.

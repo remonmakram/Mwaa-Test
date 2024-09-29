@@ -1,0 +1,827 @@
+/* TASK No. 1 */
+
+/* NONE or SET VARIABLE STATEMENT FOUND, CHECK ODI TASK NO. 1 */
+
+
+
+
+/*-----------------------------------------------*/
+/* TASK No. 2 */
+
+/* SELECT STATEMENT FOUND, CHECK ODI TASK NO. 2 */
+
+
+
+
+/*-----------------------------------------------*/
+/* TASK No. 3 */
+
+/* SELECT STATEMENT FOUND, CHECK ODI TASK NO. 3 */
+
+
+
+
+/*-----------------------------------------------*/
+/* TASK No. 4 */
+/* Drop work table */
+
+-- drop table RAX_APP_USER.C$_0MDP_ITEM_ELIGIBILITY_HIST_ purge
+
+-- &
+
+
+-- /*-----------------------------------------------*/
+-- /* TASK No. 5 */
+-- /* Create work table */
+
+-- create table RAX_APP_USER.C$_0MDP_ITEM_ELIGIBILITY_HIST_
+-- (
+-- 	C1_ITEM_ID	VARCHAR2(64) NULL,
+-- 	C2_SHUTTERFLY_ELIGIBLE	NUMBER(1) NULL,
+-- 	C3_AUDIT_MODIFIED_BY	VARCHAR2(64) NULL,
+-- 	C4_AUDIT_MODIFIED_DATE	DATE NULL,
+-- 	C5_ADMINISTRATIVE_TYPE	VARCHAR2(255) NULL,
+-- 	C6_EXCLUDE_FROM_SHIPMENT_TRIGG	NUMBER(1) NULL,
+-- 	C7_ALL_LOOKS_SHUTTERFLY_ELIGIB	NUMBER(1) NULL
+-- )
+-- NOLOGGING
+
+-- &
+
+
+-- /*-----------------------------------------------*/
+-- /* TASK No. 6 */
+-- /* Load data */
+
+-- /* SOURCE CODE */
+
+
+-- select	
+-- 	ITEM_ELIGIBILITY_HISTORY.ITEM_ID	   C1_ITEM_ID,
+-- 	ITEM_ELIGIBILITY_HISTORY.SHUTTERFLY_ELIGIBLE	   C2_SHUTTERFLY_ELIGIBLE,
+-- 	ITEM_ELIGIBILITY_HISTORY.AUDIT_MODIFIED_BY	   C3_AUDIT_MODIFIED_BY,
+-- 	ITEM_ELIGIBILITY_HISTORY.AUDIT_MODIFIED_DATE	   C4_AUDIT_MODIFIED_DATE,
+-- 	ITEM_ELIGIBILITY_HISTORY.ADMINISTRATIVE_TYPE	   C5_ADMINISTRATIVE_TYPE,
+-- 	ITEM_ELIGIBILITY_HISTORY.EXCLUDE_FROM_SHIPMENT_TRIGGER	   C6_EXCLUDE_FROM_SHIPMENT_TRIGG,
+-- 	ITEM_ELIGIBILITY_HISTORY.ALL_LOOKS_SHUTTERFLY_ELIGIBLE	   C7_ALL_LOOKS_SHUTTERFLY_ELIGIB
+-- from	MDP_OWN.ITEM_ELIGIBILITY_HISTORY   ITEM_ELIGIBILITY_HISTORY
+-- where	(1=1)
+-- And (ITEM_ELIGIBILITY_HISTORY.AUDIT_MODIFIED_DATE >= TO_DATE(SUBSTR(:v_cdc_load_date, 1, 19), 'YYYY-MM-DD HH24:MI:SS')  -:v_cdc_oms_overlap)
+
+
+
+
+
+
+
+-- &
+
+-- /* TARGET CODE */
+-- insert /*+ append */ into RAX_APP_USER.C$_0MDP_ITEM_ELIGIBILITY_HIST_
+-- (
+-- 	C1_ITEM_ID,
+-- 	C2_SHUTTERFLY_ELIGIBLE,
+-- 	C3_AUDIT_MODIFIED_BY,
+-- 	C4_AUDIT_MODIFIED_DATE,
+-- 	C5_ADMINISTRATIVE_TYPE,
+-- 	C6_EXCLUDE_FROM_SHIPMENT_TRIGG,
+-- 	C7_ALL_LOOKS_SHUTTERFLY_ELIGIB
+-- )
+-- values
+-- (
+-- 	:C1_ITEM_ID,
+-- 	:C2_SHUTTERFLY_ELIGIBLE,
+-- 	:C3_AUDIT_MODIFIED_BY,
+-- 	:C4_AUDIT_MODIFIED_DATE,
+-- 	:C5_ADMINISTRATIVE_TYPE,
+-- 	:C6_EXCLUDE_FROM_SHIPMENT_TRIGG,
+-- 	:C7_ALL_LOOKS_SHUTTERFLY_ELIGIB
+-- )
+
+-- &
+
+
+/*-----------------------------------------------*/
+/* TASK No. 7 */
+/* Analyze work table */
+
+
+
+BEGIN
+DBMS_STATS.GATHER_TABLE_STATS (
+    ownname =>	'RAX_APP_USER',
+    tabname =>	'C$_0MDP_ITEM_ELIGIBILITY_HIST_',
+    estimate_percent =>	DBMS_STATS.AUTO_SAMPLE_SIZE
+);
+END;
+
+
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 9 */
+/* Drop flow table */
+
+BEGIN  
+   EXECUTE IMMEDIATE 'drop table RAX_APP_USER.I$_MDP_ITEM_ELIGIBILITY_HIST_S';  
+EXCEPTION  
+   WHEN OTHERS THEN  
+      IF SQLCODE != -942 THEN  
+         RAISE;  
+      END IF;  
+END;
+
+
+&
+
+
+
+
+/*-----------------------------------------------*/
+/* TASK No. 10 */
+/* Create flow table I$ */
+
+create table RAX_APP_USER.I$_MDP_ITEM_ELIGIBILITY_HIST_S
+(
+	ITEM_ID		VARCHAR2(64) NULL,
+	SHUTTERFLY_ELIGIBLE		NUMBER(1) NULL,
+	AUDIT_MODIFIED_BY		VARCHAR2(64) NULL,
+	AUDIT_MODIFIED_DATE		DATE NULL,
+	ADMINISTRATIVE_TYPE		VARCHAR2(255) NULL,
+	EXCLUDE_FROM_SHIPMENT_TRIGGER		NUMBER(1) NULL,
+	ODS_MODIFY_DATE		DATE NULL,
+	ALL_LOOKS_SHUTTERFLY_ELIGIBLE		NUMBER(1) NULL,
+	IND_UPDATE		CHAR(1)
+)
+NOLOGGING
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 11 */
+/* Insert flow into I$ table */
+
+/* DETECTION_STRATEGY = NOT_EXISTS */
+ 
+
+
+  
+
+
+insert into	RAX_APP_USER.I$_MDP_ITEM_ELIGIBILITY_HIST_S
+(
+	ITEM_ID,
+	SHUTTERFLY_ELIGIBLE,
+	AUDIT_MODIFIED_BY,
+	AUDIT_MODIFIED_DATE,
+	ADMINISTRATIVE_TYPE,
+	EXCLUDE_FROM_SHIPMENT_TRIGGER,
+	ALL_LOOKS_SHUTTERFLY_ELIGIBLE,
+	IND_UPDATE
+)
+select 
+ITEM_ID,
+	SHUTTERFLY_ELIGIBLE,
+	AUDIT_MODIFIED_BY,
+	AUDIT_MODIFIED_DATE,
+	ADMINISTRATIVE_TYPE,
+	EXCLUDE_FROM_SHIPMENT_TRIGGER,
+	ALL_LOOKS_SHUTTERFLY_ELIGIBLE,
+	IND_UPDATE
+ from (
+
+
+select 	 
+	
+	C1_ITEM_ID ITEM_ID,
+	C2_SHUTTERFLY_ELIGIBLE SHUTTERFLY_ELIGIBLE,
+	C3_AUDIT_MODIFIED_BY AUDIT_MODIFIED_BY,
+	C4_AUDIT_MODIFIED_DATE AUDIT_MODIFIED_DATE,
+	C5_ADMINISTRATIVE_TYPE ADMINISTRATIVE_TYPE,
+	C6_EXCLUDE_FROM_SHIPMENT_TRIGG EXCLUDE_FROM_SHIPMENT_TRIGGER,
+	C7_ALL_LOOKS_SHUTTERFLY_ELIGIB ALL_LOOKS_SHUTTERFLY_ELIGIBLE,
+
+	'I' IND_UPDATE
+
+from	RAX_APP_USER.C$_0MDP_ITEM_ELIGIBILITY_HIST_
+where	(1=1)
+
+
+
+
+
+
+) S
+where NOT EXISTS 
+	( select 1 from ODS_STAGE.MDP_ITEM_ELIGIBILITY_HIST_STG T
+	where	T.ITEM_ID	= S.ITEM_ID
+	and	T.AUDIT_MODIFIED_DATE	= S.AUDIT_MODIFIED_DATE 
+		 and ((T.SHUTTERFLY_ELIGIBLE = S.SHUTTERFLY_ELIGIBLE) or (T.SHUTTERFLY_ELIGIBLE IS NULL and S.SHUTTERFLY_ELIGIBLE IS NULL)) and
+		((T.AUDIT_MODIFIED_BY = S.AUDIT_MODIFIED_BY) or (T.AUDIT_MODIFIED_BY IS NULL and S.AUDIT_MODIFIED_BY IS NULL)) and
+		((T.ADMINISTRATIVE_TYPE = S.ADMINISTRATIVE_TYPE) or (T.ADMINISTRATIVE_TYPE IS NULL and S.ADMINISTRATIVE_TYPE IS NULL)) and
+		((T.EXCLUDE_FROM_SHIPMENT_TRIGGER = S.EXCLUDE_FROM_SHIPMENT_TRIGGER) or (T.EXCLUDE_FROM_SHIPMENT_TRIGGER IS NULL and S.EXCLUDE_FROM_SHIPMENT_TRIGGER IS NULL)) and
+		((T.ALL_LOOKS_SHUTTERFLY_ELIGIBLE = S.ALL_LOOKS_SHUTTERFLY_ELIGIBLE) or (T.ALL_LOOKS_SHUTTERFLY_ELIGIBLE IS NULL and S.ALL_LOOKS_SHUTTERFLY_ELIGIBLE IS NULL))
+        )
+
+  
+  
+
+  
+
+ 
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 12 */
+/* Create Index on flow table */
+
+BEGIN  
+   EXECUTE IMMEDIATE 'create index	RAX_APP_USER.I$_MDP_ITEM_ELIGIBILITY_HIST_S
+on		RAX_APP_USER.I$_MDP_ITEM_ELIGIBILITY_HIST_S (ITEM_ID, AUDIT_MODIFIED_DATE)';  
+ EXCEPTION  
+    WHEN OTHERS THEN NULL;  
+END;
+
+&
+
+
+
+/*-----------------------------------------------*/
+/* TASK No. 13 */
+/* Analyze integration table */
+
+
+
+begin
+    dbms_stats.gather_table_stats(
+	ownname => 'RAX_APP_USER',
+	tabname => 'I$_MDP_ITEM_ELIGIBILITY_HIST_S',
+	estimate_percent => dbms_stats.auto_sample_size
+    );
+end;
+
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 14 */
+/* create check table */
+
+
+-- create table RAX_APP_USER.SNP_CHECK_TAB
+-- (
+-- 	CATALOG_NAME	VARCHAR2(100 CHAR) NULL ,
+-- 	SCHEMA_NAME	VARCHAR2(100 CHAR) NULL ,
+-- 	RESOURCE_NAME	VARCHAR2(100 CHAR) NULL,
+-- 	FULL_RES_NAME	VARCHAR2(100 CHAR) NULL,
+-- 	ERR_TYPE		VARCHAR2(1 CHAR) NULL,
+-- 	ERR_MESS		VARCHAR2(250 CHAR) NULL ,
+-- 	CHECK_DATE	DATE NULL,
+-- 	ORIGIN		VARCHAR2(100 CHAR) NULL,
+-- 	CONS_NAME	VARCHAR2(35 CHAR) NULL,
+-- 	CONS_TYPE		VARCHAR2(2 CHAR) NULL,
+-- 	ERR_COUNT		NUMBER(10) NULL
+-- )
+	
+
+-- &
+
+
+/*-----------------------------------------------*/
+/* TASK No. 15 */
+/* delete previous check sum */
+
+delete from	RAX_APP_USER.SNP_CHECK_TAB
+where	SCHEMA_NAME	= 'ODS_STAGE'
+and	ORIGIN 		= '(2318001)ODS_Project.LOAD_MDP_ITEM_ELIGIBILITY_HIST_INT'
+and	ERR_TYPE 		= 'F'
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 16 */
+/* create error table */
+
+
+BEGIN
+   EXECUTE IMMEDIATE 
+   'create table RAX_APP_USER.E$_MDP_ITEM_ELIGIBILITY_HIST_S
+(
+	ODI_ROW_ID 		UROWID,
+	ODI_ERR_TYPE		VARCHAR2(1 CHAR) NULL, 
+	ODI_ERR_MESS		VARCHAR2(250 CHAR) NULL,
+	ODI_CHECK_DATE	DATE NULL, 
+	ITEM_ID	VARCHAR2(64) NULL,
+	SHUTTERFLY_ELIGIBLE	NUMBER(1) NULL,
+	AUDIT_MODIFIED_BY	VARCHAR2(64) NULL,
+	AUDIT_MODIFIED_DATE	DATE NULL,
+	ADMINISTRATIVE_TYPE	VARCHAR2(255) NULL,
+	EXCLUDE_FROM_SHIPMENT_TRIGGER	NUMBER(1) NULL,
+	ODS_MODIFY_DATE	DATE NULL,
+	ALL_LOOKS_SHUTTERFLY_ELIGIBLE	NUMBER(1) NULL,
+	ODI_ORIGIN		VARCHAR2(100 CHAR) NULL,
+	ODI_CONS_NAME	VARCHAR2(35 CHAR) NULL,
+	ODI_CONS_TYPE		VARCHAR2(2 CHAR) NULL,
+	ODI_PK			VARCHAR2(32 CHAR) PRIMARY KEY,
+	ODI_SESS_NO		VARCHAR2(19 CHAR)
+)';
+EXCEPTION
+   WHEN OTHERS THEN
+      IF SQLCODE != -955 THEN  -- ORA-00955: name is already used by an existing object
+         RAISE;
+      ELSE
+         DBMS_OUTPUT.PUT_LINE('Table RAX_APP_USER.E$_MDP_ITEM_ELIGIBILITY_HIST_S already exists.');
+      END IF;
+END;
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 17 */
+/* delete previous errors */
+
+delete from 	RAX_APP_USER.E$_MDP_ITEM_ELIGIBILITY_HIST_S
+where	(ODI_ERR_TYPE = 'S'	and 'F' = 'S')
+or	(ODI_ERR_TYPE = 'F'	and ODI_ORIGIN = '(2318001)ODS_Project.LOAD_MDP_ITEM_ELIGIBILITY_HIST_INT')
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 18 */
+/* Create index on PK */
+
+ 
+/* FLOW CONTROL CREATE THE iNDEX ON THE I$TABLE */
+-- create index 	RAX_APP_USER.I$_MDP_ITEM_ELIGIBILITY_HIST_S
+-- on	RAX_APP_USER.I$_MDP_ITEM_ELIGIBILITY_HIST_S (ITEM_ID,
+-- 		AUDIT_MODIFIED_DATE)
+
+
+-- &
+
+
+/*-----------------------------------------------*/
+/* TASK No. 19 */
+/* insert PK errors */
+
+insert into RAX_APP_USER.E$_MDP_ITEM_ELIGIBILITY_HIST_S
+(
+	ODI_PK,
+	ODI_SESS_NO,
+	ODI_ROW_ID,
+	ODI_ERR_TYPE,
+	ODI_ERR_MESS,
+	ODI_ORIGIN,
+	ODI_CHECK_DATE,
+	ODI_CONS_NAME,
+	ODI_CONS_TYPE,
+	ITEM_ID,
+	SHUTTERFLY_ELIGIBLE,
+	AUDIT_MODIFIED_BY,
+	AUDIT_MODIFIED_DATE,
+	ADMINISTRATIVE_TYPE,
+	EXCLUDE_FROM_SHIPMENT_TRIGGER,
+	ODS_MODIFY_DATE,
+	ALL_LOOKS_SHUTTERFLY_ELIGIBLE
+)
+select	SYS_GUID(),
+	:v_sess_no, 
+	rowid,
+	'F', 
+	'ODI-15064: The primary key MDP_ITEM_ELIGIBILITY_HIST_STG_PK is not unique.',
+	'(2318001)ODS_Project.LOAD_MDP_ITEM_ELIGIBILITY_HIST_INT',
+	sysdate,
+	'MDP_ITEM_ELIGIBILITY_HIST_STG_PK',
+	'PK',	
+	MDP_ITEM_ELIGIBILITY_HIST_STG.ITEM_ID,
+	MDP_ITEM_ELIGIBILITY_HIST_STG.SHUTTERFLY_ELIGIBLE,
+	MDP_ITEM_ELIGIBILITY_HIST_STG.AUDIT_MODIFIED_BY,
+	MDP_ITEM_ELIGIBILITY_HIST_STG.AUDIT_MODIFIED_DATE,
+	MDP_ITEM_ELIGIBILITY_HIST_STG.ADMINISTRATIVE_TYPE,
+	MDP_ITEM_ELIGIBILITY_HIST_STG.EXCLUDE_FROM_SHIPMENT_TRIGGER,
+	MDP_ITEM_ELIGIBILITY_HIST_STG.ODS_MODIFY_DATE,
+	MDP_ITEM_ELIGIBILITY_HIST_STG.ALL_LOOKS_SHUTTERFLY_ELIGIBLE
+from	RAX_APP_USER.I$_MDP_ITEM_ELIGIBILITY_HIST_S   MDP_ITEM_ELIGIBILITY_HIST_STG
+where	exists  (
+		select	SUB.ITEM_ID,
+			SUB.AUDIT_MODIFIED_DATE
+		from 	RAX_APP_USER.I$_MDP_ITEM_ELIGIBILITY_HIST_S SUB
+		where 	SUB.ITEM_ID=MDP_ITEM_ELIGIBILITY_HIST_STG.ITEM_ID
+			and SUB.AUDIT_MODIFIED_DATE=MDP_ITEM_ELIGIBILITY_HIST_STG.AUDIT_MODIFIED_DATE
+		group by 	SUB.ITEM_ID,
+			SUB.AUDIT_MODIFIED_DATE
+		having 	count(1) > 1
+		)
+
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 20 */
+/* insert Not Null errors */
+
+insert into RAX_APP_USER.E$_MDP_ITEM_ELIGIBILITY_HIST_S
+(
+	ODI_PK,
+	ODI_SESS_NO,
+	ODI_ROW_ID,
+	ODI_ERR_TYPE,
+	ODI_ERR_MESS,
+	ODI_CHECK_DATE,
+	ODI_ORIGIN,
+	ODI_CONS_NAME,
+	ODI_CONS_TYPE,
+	ITEM_ID,
+	SHUTTERFLY_ELIGIBLE,
+	AUDIT_MODIFIED_BY,
+	AUDIT_MODIFIED_DATE,
+	ADMINISTRATIVE_TYPE,
+	EXCLUDE_FROM_SHIPMENT_TRIGGER,
+	ODS_MODIFY_DATE,
+	ALL_LOOKS_SHUTTERFLY_ELIGIBLE
+)
+select
+	SYS_GUID(),
+	:v_sess_no, 
+	rowid,
+	'F', 
+	'ODI-15066: The column ITEM_ID cannot be null.',
+	sysdate,
+	'(2318001)ODS_Project.LOAD_MDP_ITEM_ELIGIBILITY_HIST_INT',
+	'ITEM_ID',
+	'NN',	
+	ITEM_ID,
+	SHUTTERFLY_ELIGIBLE,
+	AUDIT_MODIFIED_BY,
+	AUDIT_MODIFIED_DATE,
+	ADMINISTRATIVE_TYPE,
+	EXCLUDE_FROM_SHIPMENT_TRIGGER,
+	ODS_MODIFY_DATE,
+	ALL_LOOKS_SHUTTERFLY_ELIGIBLE
+from	RAX_APP_USER.I$_MDP_ITEM_ELIGIBILITY_HIST_S
+where	ITEM_ID is null
+
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 21 */
+/* insert Not Null errors */
+
+insert into RAX_APP_USER.E$_MDP_ITEM_ELIGIBILITY_HIST_S
+(
+	ODI_PK,
+	ODI_SESS_NO,
+	ODI_ROW_ID,
+	ODI_ERR_TYPE,
+	ODI_ERR_MESS,
+	ODI_CHECK_DATE,
+	ODI_ORIGIN,
+	ODI_CONS_NAME,
+	ODI_CONS_TYPE,
+	ITEM_ID,
+	SHUTTERFLY_ELIGIBLE,
+	AUDIT_MODIFIED_BY,
+	AUDIT_MODIFIED_DATE,
+	ADMINISTRATIVE_TYPE,
+	EXCLUDE_FROM_SHIPMENT_TRIGGER,
+	ODS_MODIFY_DATE,
+	ALL_LOOKS_SHUTTERFLY_ELIGIBLE
+)
+select
+	SYS_GUID(),
+	:v_sess_no, 
+	rowid,
+	'F', 
+	'ODI-15066: The column AUDIT_MODIFIED_DATE cannot be null.',
+	sysdate,
+	'(2318001)ODS_Project.LOAD_MDP_ITEM_ELIGIBILITY_HIST_INT',
+	'AUDIT_MODIFIED_DATE',
+	'NN',	
+	ITEM_ID,
+	SHUTTERFLY_ELIGIBLE,
+	AUDIT_MODIFIED_BY,
+	AUDIT_MODIFIED_DATE,
+	ADMINISTRATIVE_TYPE,
+	EXCLUDE_FROM_SHIPMENT_TRIGGER,
+	ODS_MODIFY_DATE,
+	ALL_LOOKS_SHUTTERFLY_ELIGIBLE
+from	RAX_APP_USER.I$_MDP_ITEM_ELIGIBILITY_HIST_S
+where	AUDIT_MODIFIED_DATE is null
+
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 22 */
+/* create index on error table */
+
+ 
+/* FLOW CONTROL CREATE INDEX ON THE E$TABLE */
+
+BEGIN  
+   EXECUTE IMMEDIATE 'create index 	RAX_APP_USER.E$_MDP_ITEM_ELIGIBILITY_HIST_S
+on	RAX_APP_USER.E$_MDP_ITEM_ELIGIBILITY_HIST_S (ODI_ROW_ID)';  
+ EXCEPTION  
+    WHEN OTHERS THEN NULL;  
+END;
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 23 */
+/* delete errors from controlled table */
+
+delete from	RAX_APP_USER.I$_MDP_ITEM_ELIGIBILITY_HIST_S  T
+where	exists 	(
+		select	1
+		from	RAX_APP_USER.E$_MDP_ITEM_ELIGIBILITY_HIST_S E
+		where ODI_SESS_NO = :v_sess_no
+		and T.rowid = E.ODI_ROW_ID
+		)
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 24 */
+/* insert check sum into check table */
+
+insert into RAX_APP_USER.SNP_CHECK_TAB
+(
+	SCHEMA_NAME,
+	RESOURCE_NAME,
+	FULL_RES_NAME,
+	ERR_TYPE,
+	ERR_MESS,
+	CHECK_DATE,
+	ORIGIN,
+	CONS_NAME,
+	CONS_TYPE,
+	ERR_COUNT
+)
+select	
+	'ODS_STAGE',
+	'MDP_ITEM_ELIGIBILITY_HIST_STG',
+	'ODS_STAGE.MDP_ITEM_ELIGIBILITY_HIST_STG',
+	E.ODI_ERR_TYPE,
+	E.ODI_ERR_MESS,
+	E.ODI_CHECK_DATE,
+	E.ODI_ORIGIN,
+	E.ODI_CONS_NAME,
+	E.ODI_CONS_TYPE,
+	count(1) 
+from	RAX_APP_USER.E$_MDP_ITEM_ELIGIBILITY_HIST_S E
+where	E.ODI_ERR_TYPE	= 'F'
+and	E.ODI_ORIGIN 	= '(2318001)ODS_Project.LOAD_MDP_ITEM_ELIGIBILITY_HIST_INT'
+group by	E.ODI_ERR_TYPE,
+	E.ODI_ERR_MESS,
+	E.ODI_CHECK_DATE,
+	E.ODI_ORIGIN,
+	E.ODI_CONS_NAME,
+	E.ODI_CONS_TYPE
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 25 */
+/* Flag rows for update */
+
+/* DETECTION_STRATEGY = NOT_EXISTS */
+
+
+update	RAX_APP_USER.I$_MDP_ITEM_ELIGIBILITY_HIST_S
+set	IND_UPDATE = 'U'
+where	(ITEM_ID, AUDIT_MODIFIED_DATE)
+	in	(
+		select	ITEM_ID,
+			AUDIT_MODIFIED_DATE
+		from	ODS_STAGE.MDP_ITEM_ELIGIBILITY_HIST_STG
+		)
+
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 26 */
+/* Flag useless rows */
+
+/* DETECTION_STRATEGY = NOT_EXISTS */
+
+/* Command skipped due to chosen DETECTION_STRATEGY */
+
+
+
+/*-----------------------------------------------*/
+/* TASK No. 27 */
+/* Update existing rows */
+
+/* DETECTION_STRATEGY = NOT_EXISTS */
+update	ODS_STAGE.MDP_ITEM_ELIGIBILITY_HIST_STG T
+set 	
+	(
+	T.SHUTTERFLY_ELIGIBLE,
+	T.AUDIT_MODIFIED_BY,
+	T.ADMINISTRATIVE_TYPE,
+	T.EXCLUDE_FROM_SHIPMENT_TRIGGER,
+	T.ALL_LOOKS_SHUTTERFLY_ELIGIBLE
+	) =
+		(
+		select	S.SHUTTERFLY_ELIGIBLE,
+			S.AUDIT_MODIFIED_BY,
+			S.ADMINISTRATIVE_TYPE,
+			S.EXCLUDE_FROM_SHIPMENT_TRIGGER,
+			S.ALL_LOOKS_SHUTTERFLY_ELIGIBLE
+		from	RAX_APP_USER.I$_MDP_ITEM_ELIGIBILITY_HIST_S S
+		where	T.ITEM_ID	=S.ITEM_ID
+		and	T.AUDIT_MODIFIED_DATE	=S.AUDIT_MODIFIED_DATE
+	    	 )
+	,     T.ODS_MODIFY_DATE = SYSDATE
+
+where	(ITEM_ID, AUDIT_MODIFIED_DATE)
+	in	(
+		select	ITEM_ID,
+			AUDIT_MODIFIED_DATE
+		from	RAX_APP_USER.I$_MDP_ITEM_ELIGIBILITY_HIST_S
+		where	IND_UPDATE = 'U'
+		)
+
+
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 28 */
+/* Insert new rows */
+
+/* DETECTION_STRATEGY = NOT_EXISTS */
+insert into 	ODS_STAGE.MDP_ITEM_ELIGIBILITY_HIST_STG T
+	(
+	ITEM_ID,
+	SHUTTERFLY_ELIGIBLE,
+	AUDIT_MODIFIED_BY,
+	AUDIT_MODIFIED_DATE,
+	ADMINISTRATIVE_TYPE,
+	EXCLUDE_FROM_SHIPMENT_TRIGGER,
+	ALL_LOOKS_SHUTTERFLY_ELIGIBLE
+	,       ODS_MODIFY_DATE
+	)
+select 	ITEM_ID,
+	SHUTTERFLY_ELIGIBLE,
+	AUDIT_MODIFIED_BY,
+	AUDIT_MODIFIED_DATE,
+	ADMINISTRATIVE_TYPE,
+	EXCLUDE_FROM_SHIPMENT_TRIGGER,
+	ALL_LOOKS_SHUTTERFLY_ELIGIBLE
+	,       SYSDATE
+from	RAX_APP_USER.I$_MDP_ITEM_ELIGIBILITY_HIST_S S
+
+
+
+where	IND_UPDATE = 'I'
+
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 29 */
+/* Commit transaction */
+
+/*commit*/
+
+
+/*-----------------------------------------------*/
+/* TASK No. 30 */
+/* Drop flow table */
+
+drop table RAX_APP_USER.I$_MDP_ITEM_ELIGIBILITY_HIST_S 
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 1000008 */
+/* Drop work table */
+
+drop table RAX_APP_USER.C$_0MDP_ITEM_ELIGIBILITY_HIST_ purge
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 31 */
+/* Update CDC Load Status */
+
+UPDATE ODS_OWN.ODS_CDC_LOAD_STATUS
+SET LAST_CDC_COMPLETION_DATE=TO_DATE(
+             SUBSTR(:v_sess_beg, 1, 19), 'RRRR-MM-DD HH24:MI:SS')
++ nvl((TIMEZONE_OFFSET/24), 0) 
+WHERE ODS_TABLE_NAME=:v_cdc_load_table_name
+AND CONTEXT_NAME = :v_env
+
+/*
+UPDATE ODS_OWN.ODS_CDC_LOAD_STATUS
+SET LAST_CDC_COMPLETION_DATE=TO_DATE(
+             SUBSTR('2024-06-17 13:09:33.0', 1, 19), 'RRRR-MM-DD HH24:MI:SS')
+WHERE ODS_TABLE_NAME=:v_cdc_load_table_name
+AND CONTEXT_NAME = :v_env
+*/
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 32 */
+/* Insert CDC Audit Record */
+
+INSERT INTO RAX_APP_USER.ODS_CDC_LOAD_STATUS_AUDIT
+(TABLE_NAME,
+SESS_NO,                      
+SESS_NAME,                    
+SCEN_VERSION,                 
+SESS_BEG,                     
+ORIG_LAST_CDC_COMPLETION_DATE,
+OVERLAP,
+CREATE_DATE,
+CONTEXT_NAME,
+TIMEZONE_OFFSET              
+)
+select 
+:v_cdc_load_table_name
+,:v_sess_no
+,'LOAD_MDP_ITEM_ELIGIBILITY_HIST_PKG'
+,'005'
+,TO_DATE(SUBSTR(:v_sess_beg, 1, 19), 'RRRR-MM-DD HH24:MI:SS')
+,TO_DATE (SUBSTR(:v_cdc_load_date, 1, 19),'YYYY-MM-DD HH24:MI:SS')
+,:v_cdc_overlap
+,SYSDATE
+,:v_env
+,TIMEZONE_OFFSET
+from 
+ODS_OWN.ODS_CDC_LOAD_STATUS
+WHERE ODS_TABLE_NAME=:v_cdc_load_table_name
+AND CONTEXT_NAME = :v_env
+
+/*
+INSERT INTO RAX_APP_USER.ODS_CDC_LOAD_STATUS_AUDIT
+(TABLE_NAME,
+SESS_NO,                      
+SESS_NAME,                    
+SCEN_VERSION,                 
+SESS_BEG,                     
+ORIG_LAST_CDC_COMPLETION_DATE,
+OVERLAP,
+CREATE_DATE,
+CONTEXT_NAME              
+)
+values (
+:v_cdc_load_table_name,
+:v_sess_no,
+'LOAD_MDP_ITEM_ELIGIBILITY_HIST_PKG',
+'005',
+TO_DATE(
+             SUBSTR('2024-06-17 13:09:33.0', 1, 19), 'RRRR-MM-DD HH24:MI:SS'),
+TO_DATE (SUBSTR (:v_cdc_load_date, 1, 19),
+                           'YYYY-MM-DD HH24:MI:SS'
+                          )
+,:v_cdc_overlap,
+SYSDATE,
+ :v_env)
+*/
+
+
+&
+
+
+/*-----------------------------------------------*/

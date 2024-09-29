@@ -1,0 +1,29 @@
+---
+
+pipeline:
+  name: lt_05A_SMASTER_LOAD_PKG_dag
+  description: 05A_SMASTER_LOAD_PKG pipeline
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - 05A_SMASTER_LOAD_PKG
+  task_groups:
+    - name: 05A_SMASTER_LOAD_PKG_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql/pre_v_cdc_ld_date.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks:
+        - description: LOAD_YEARBOOK_JOB_PKG subpackage
+          type: oracle
+          script_location: dags/sql/05A_SMASTER_LOAD_PKG/LOAD_YEARBOOK_JOB_PKG.sql
+          args:
+            v_cdc_load_table_name: YEARBOOK_JOB
+        - description: LOAD_YEARBOOK_CHOICE_PKG subpackage
+          type: oracle
+          script_location: dags/sql/05A_SMASTER_LOAD_PKG/LOAD_YEARBOOK_CHOICE_PKG.sql
+          args:
+            v_cdc_load_table_name: YEARBOOK_CHOICE
+            
+        

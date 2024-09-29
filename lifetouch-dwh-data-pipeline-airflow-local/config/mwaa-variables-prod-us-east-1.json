@@ -1,0 +1,7 @@
+{
+    "Country": "US",
+    "Environment": "prod",
+    "AWS_ACCOUNT" : "904425659397",
+    "PDW_CONNECTION_ID": "oracle/lt_airflow",
+    "LIFETOUCH_LIB_NAME": "lifetouch_lib-0.1.8-py3-none-any.whl"
+}

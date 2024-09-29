@@ -1,0 +1,47 @@
+---
+
+pipeline:
+  name: lt_child_order_info_dag
+  description: child_order_info pipeline
+  schedule: "0 */4 * * *"
+  tags:
+    - lifetouch
+    - oms3
+  task_groups:
+    - name: Child_Order_Info_Ingestion
+      description: extract and load part
+      ingestion_script: ingestion_script.py
+      data_sources:
+          - type: oracle
+            name: oms3
+            default_args:
+                dest_schema: RAX_APP_USER
+                merge_required: False 
+            entities:
+          
+                - src_table: LT_CHILD_ORDER_INFO
+                  # unique_keys: "ITEM_ID" 
+                  # excluded_columns :   "ODS_MODIFY_DATE"
+                  # insert_date_columns: "ODS_MODIFY_DATE" 
+                  dest_table: C$_0CHILD_ORD_INFO_STG
+                  tmp_create: CHILD_ORDER_INFO/tmp_create_child_order_info.sql
+                  extract_query: CHILD_ORDER_INFO/extract_query_child_order_info.sql
+                  v_cdc_load_table_name: CHILD_ORDER_INFO
+                  v_cdc_oms_overlap: 0.02083333333
+
+
+    - name: Child_Order_Info_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+        v_cdc_oms_overlap: 0.02083333333
+      tasks:
+        - description: load mdp item eligibility history subpackage
+          type: oracle_sql
+          script_location: dags/sql/LOAD_CHILD_ORDER_INFO_PKG/LOAD_CHILD_ORDER_INFO_PKG.sql
+          args:
+            v_cdc_load_table_name: CHILD_ORDER_INFO
+        
+        

@@ -1,0 +1,48 @@
+---
+
+pipeline:
+  name: lt_99_late_recognitions_pkg_dag
+  description: 99_late_recognitions_pkg package
+  schedule: "@monthly"
+  tags:
+    - lifetouch
+    - 99_late_recognitions_pkg
+  
+  task_groups:
+
+    - name: 99_late_recognitions_pkg_export
+      description: drop and recreate table then extract data and load to s3
+      export_file_name:
+        v_US_data_center_replace_space: dags/sql/pre_sql/v_US_data_center_replace_space.sql
+        v_actuate_sysdate: dags/sql/pre_sql/v_actuate_sysdate.sql
+      tasks:
+        - script_location: dags/sql/99_late_recognitions_pkg/late_recognitions_create_tmp.sql
+          export_files:
+            - extract_query: '99_late_recognitions_pkg/late_recognitions_export.sql'
+              export_location: finance/Audit/Late_Recognitions/Late_Recognitions
+          email_configurations:
+          # Some pkgs required sending email after exporting the csv files. if that the case, you will need to add the email configurations
+              subject: Monthly Late Recognitions Files Created
+              # The subject of the email found in the odi extraction
+              email_recipient_query_args:
+                v_package_name: '99_LATE_RECOGNITIONS_PKG' # package name to retrieve the list of users
+              email_recipient_query: pre_sql/v_error_email_to.sql
+              # The list of the emails will be executed as a query for the var v_error_email_to <blocked>
+
+    - name: 99_late_recognitions_pkg_ODI_Update
+      # This task represents the normal oracle task, only need to update a table at the end of the pkg
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks:
+        - description: run_sub_pkg
+          type: oracle_sql
+          script_location: dags/sql/99_late_recognitions_pkg/99_late_recognitions_pkg.sql
+          args:
+            v_cdc_load_table_name: LATE_RECOGNITIONS
+
+
+        
+        

@@ -1,0 +1,23 @@
+---
+
+pipeline:
+  name: lt_99_SRM_CUST_DEPOSITS_PKG_dag
+  description: 99_SRM_CUST_DEPOSITS package
+  schedule: "0 1 * * *"
+  tags:
+    - lifetouch
+    - 99_SRM_CUST_DEPOSITS
+  
+  task_groups:
+
+    - name: 99_SRM_CUST_DEPOSITS_export
+      description: drop and recreate table then extract data and load to s3
+      export_file_name:
+        v_actuate_sysdate: dags/sql/pre_sql/v_actuate_sysdate.sql
+      pre_sql:
+        v_actuate_sysdate:  dags/sql/pre_sql/v_actuate_sysdate.sql
+      tasks:
+        - script_location: dags/sql/99_SRM_CUST_DEPOSITS_PKG/srm_cust_deposits_create_temp.sql
+          export_files:
+            - extract_query: '99_SRM_CUST_DEPOSITS_PKG/srm_cust_deposits_export.sql'
+              export_location: finance/srm/srm_cust_deposits

@@ -1,0 +1,24 @@
+
+            DECLARE create_query CLOB;  
+            BEGIN  
+                BEGIN  
+                    EXECUTE IMMEDIATE 'DROP TABLE rax_app_user.c$_0nxtl_personbookoption';  
+                EXCEPTION  
+                    WHEN OTHERS THEN NULL;  
+                END;  
+                create_query := 'create table RAX_APP_USER.C$_0NXTL_PERSONBOOKOPTION
+(
+	C1_PERSONID	NUMBER NULL,
+	C2_BOOKOPTIONID	NUMBER NULL,
+	C3_DISCOUNTOVERRIDE	NUMBER NULL,
+	C4_REFUNDDATE	DATE NULL,
+	C5_IMPRINTLINE1EFFECTIVEPRICE	NUMBER NULL,
+	C6_IMPRINTLINE2EFFECTIVEPRICE	NUMBER NULL,
+	C7_ICONEFFECTIVEPRICE	NUMBER NULL,
+	C8_EFFECTIVEPRICE	NUMBER NULL,
+	C9_ISPACKAGECOMPONENT	NUMBER NULL
+)
+NOLOGGING';
+                EXECUTE IMMEDIATE create_query;
+            END;  
+            

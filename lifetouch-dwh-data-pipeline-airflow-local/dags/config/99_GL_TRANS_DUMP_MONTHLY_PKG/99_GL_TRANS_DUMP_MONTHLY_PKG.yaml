@@ -1,0 +1,175 @@
+---
+
+pipeline:
+  name: lt_99_GL_TRANS_DUMP_MONTHLY_PKG_dag
+  description: 99_GL_TRANS_DUMP_MONTHLY_PKG package
+  schedule: "@monthly"
+  tags:
+    - lifetouch
+    - 99_GL_TRANS_DUMP_MONTHLY_PKG
+  
+  task_groups:
+
+    - name: 99_GL_TRANS_DUMP_MONTHLY_PKG
+      description: ODI SQL Transformation Logic
+      tasks: 
+        - description: run create tmp table
+          type: oracle_sql
+          script_location: dags/sql/99_GL_TRANS_DUMP_MONTHLY_PKG/gl_trans_dtl_dump_all_create_tmp_1.sql
+
+    - name: 99_GL_TRANS_DUMP_MONTHLY_PKG_evaluate 
+      description: evaluate EP_TRANS_DUMP_PKG_count
+      condition_script: dags/sql/pre_sql/v_record_count.sql 
+      compared_value: 0
+      operator: '>'     # '>' '<' '>=' '<=' '=' '!='
+      task_ids: {'false': SEND_EMAIL_1, 'true': GL_TRANS_DTL_DUMP_ALL_EXPORT.deploy_export_files}
+
+    - name: SEND_EMAIL_1
+      email_configurations:
+        subject: YB Events with more than 1 Main order
+        message: No Records
+        email_recipient_query: pre_sql/v_error_email_to.sql
+        email_recipient_query_args:
+          v_package_name: 'GL_TRANS_DUMP_MONTHLY_PKG'
+
+    - name: GL_TRANS_DTL_DUMP_ALL_EXPORT
+      description: drop and recreate table then extract data and load to s3
+      export_file_name:
+        v_US_data_center_replace_space: dags/sql/pre_sql/v_US_data_center_replace_space.sql
+        v_actuate_sysdate: dags/sql/pre_sql/v_actuate_sysdate.sql
+      tasks:
+      # Tasks represent the number of the subpakages.
+        - script_location: dags/sql/99_GL_TRANS_DUMP_MONTHLY_PKG/gl_trans_dtl_dump_all_create_tmp_2.sql
+        # Script location to create the table
+          export_files:
+          # For each script location or create tmp table, we may need to export one or mutiple files.
+            - extract_query: '99_GL_TRANS_DUMP_MONTHLY_PKG/gl_trans_dtl_dump_all_export.sql'
+              # The extract query is a select statement will be executed on the ec2 as intermediate storage before writing the csv file into s3
+              export_location: finance/General_Ledger_Posting/GL_TRANS_DTL_DUMP
+              # Each pkg as its own may to locate the files in s3, so this path is the path before the file name. 
+              batch_mode: true
+    
+    - name: EP_TRANS_DUMP_PKG_TMP_1
+      description: ODI SQL Transformation Logic
+      tasks: 
+        - description: run create tmp table
+          type: oracle_sql
+          script_location: dags/sql/99_GL_TRANS_DUMP_MONTHLY_PKG/EP_TRANS_DUMP_PKG_create_tmp_1.sql   
+       
+    - name: EP_TRANS_DUMP_PKG_evaluate 
+      description: evaluate EP_TRANS_DUMP_PKG_count
+      condition_script: dags/sql/pre_sql/v_record_count_EP.sql 
+      compared_value: 0
+      operator: '>'     # '>' '<' '>=' '<=' '=' '!='
+      task_ids: {'false': SEND_EMAIL_2, 'true': EP_TRANS_DUMP_PKG_EXPORT.deploy_export_files }
+
+    - name: SEND_EMAIL_2
+      email_configurations:
+        subject: YB Events with more than 1 Main order
+        message: "No Records"
+        email_recipient_query: pre_sql/v_error_email_to.sql
+        email_recipient_query_args:
+          v_package_name: 'EP_TRANS_DUMP_PKG'
+        
+    - name: EP_TRANS_DUMP_PKG_EXPORT
+      description: drop and recreate table then extract data and load to s3
+      export_file_name:
+        v_US_data_center_replace_space: dags/sql/pre_sql/v_US_data_center_replace_space.sql
+        v_actuate_sysdate: dags/sql/pre_sql/v_actuate_sysdate.sql
+      tasks:
+      # Tasks represent the number of the subpakages.
+        - script_location: dags/sql/99_GL_TRANS_DUMP_MONTHLY_PKG/EP_TRANS_DUMP_PKG_create_tmp_2.sql
+        # Script location to create the table
+          export_files:
+          # For each script location or create tmp table, we may need to export one or mutiple files.
+            - extract_query: '99_GL_TRANS_DUMP_MONTHLY_PKG/EP_TRANS_DUMP_PKG_export.sql'
+              # The extract query is a select statement will be executed on the ec2 as intermediate storage before writing the csv file into s3
+              export_location: finance/General_Ledger_Posting/GL_TRANS_DTL_DUMP_EVENT_PAYMENT
+              # Each pkg as its own may to locate the files in s3, so this path is the path before the file name. 
+              batch_mode: true
+
+          email_configurations:
+              subject: Event_Payment_Dump Files Created
+              # The subject of the email found in the odi extraction
+              email_recipient_query: pre_sql/v_error_email_to.sql
+              email_recipient_query_args:
+                v_package_name: 'EP_TRANS_DUMP_PKG'
+              # The list of the emails will be executed as a query for the var v_error_email_to <blocked>
+      
+    - name: YB_TRANS_DUMP_SAP_PKG
+      description: ODI SQL Transformation Logic
+      tasks: 
+        - description: run create tmp table
+          type: oracle_sql
+          script_location: dags/sql/99_GL_TRANS_DUMP_MONTHLY_PKG/YB_TRANS_DUMP_SAP_PKG_create_tmp_1.sql   
+       
+    - name: YB_TRANS_DUMP_SAP_PKG_evaluate 
+      description: evaluate EP_TRANS_DUMP_PKG_count
+      condition_script: dags/sql/pre_sql/v_record_count.sql 
+      compared_value: 0
+      operator: '>'     # '>' '<' '>=' '<=' '=' '!='
+      task_ids: {'false': SEND_EMAIL_3, 'true': YB_TRANS_DUMP_SAP_PKG_EXPORT.deploy_export_files }
+
+    - name: SEND_EMAIL_3
+      email_configurations:
+        subject: YB Events with more than 1 Main order
+        message: "No Records"
+        email_recipient_query: pre_sql/v_error_email_to.sql
+        email_recipient_query_args:
+          v_package_name: 'EP_TRANS_DUMP_PKG'
+        
+    - name: YB_TRANS_DUMP_SAP_PKG_EXPORT
+      description: drop and recreate table then extract data and load to s3
+      export_file_name:
+        v_US_data_center_replace_space: dags/sql/pre_sql/v_US_data_center_replace_space.sql
+        v_actuate_sysdate: dags/sql/pre_sql/v_actuate_sysdate.sql
+      tasks:
+      # Tasks represent the number of the subpakages.
+        - script_location: dags/sql/99_GL_TRANS_DUMP_MONTHLY_PKG/YB_TRANS_DUMP_SAP_PKG_create_tmp_2.sql
+        # Script location to create the table
+          export_files:
+          # For each script location or create tmp table, we may need to export one or mutiple files.
+            - extract_query: '99_GL_TRANS_DUMP_MONTHLY_PKG/YB_TRANS_DUMP_SAP_PKG_export.sql'
+              # The extract query is a select statement will be executed on the ec2 as intermediate storage before writing the csv file into s3
+              export_location: finance/General_Ledger_Posting/GL_TRANS_DTL_DUMP_YearBook_Postings
+              # Each pkg as its own may to locate the files in s3, so this path is the path before the file name. 
+              batch_mode: true
+
+    - name: subpakages_cdc_update
+      # This task represens the normal oracle task, only need to update a table at the end of the pkg
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks: 
+        - description: run_pkg
+          type: oracle_sql
+          script_location: dags/sql/99_GL_TRANS_DUMP_MONTHLY_PKG/EP_TRANS_DUMP_PKG_cdc_update.sql
+          args:
+            v_cdc_load_table_name: EP_TRANS_DTL_DUMP
+            v_cdc_oms_overlap: 0.02083333333
+    
+        - description: run_pkg
+          type: oracle_sql
+          script_location: dags/sql/99_GL_TRANS_DUMP_MONTHLY_PKG/YB_TRANS_DUMP_SAP_PKG_cdc_update.sql
+          args:
+            v_cdc_load_table_name: YB_TRANS_DTL_DUMP
+            v_cdc_oms_overlap: 0.02083333333
+    
+    - name: 99_GL_TRANS_DUMP_MONTHLY_PKG_ODI_Transformation
+      # This task represens the normal oracle task, only need to update a table at the end of the pkg
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks: 
+        - description: run_pkg
+          type: oracle_sql
+          script_location: dags/sql/99_GL_TRANS_DUMP_MONTHLY_PKG/GL_TRANS_DTL_DUMP_CDC_update.sql
+          args:
+            v_cdc_load_table_name: GL_TRANS_DTL_DUMP
+            v_cdc_oms_overlap: 0.02083333333

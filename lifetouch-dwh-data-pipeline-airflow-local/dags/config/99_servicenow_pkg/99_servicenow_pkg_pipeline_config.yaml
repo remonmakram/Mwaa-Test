@@ -1,0 +1,30 @@
+---
+
+pipeline:
+  name: 99_servicenow_pkg_PKG_dag
+  description: 99_servicenow_pkgpackage
+  schedule: "0 3 * * *" #runs ever day at 3 AM
+  tags:
+    - lifetouch
+    - 99_servicenow_pkg
+    
+  task_groups:
+
+    - name: 99_servicenow_pkg_export
+      description: drop and recreate table then extract data and load to s3
+      export_file_name:
+        v_data_export_run_date: dags/sql/pre_sql/v_data_export_run_date.sql
+
+      tasks:
+        - script_location:  dags/sql/99_servicenow_pkg/99_sevicenow_account_create_tmp.sql
+          export_files:
+            - extract_query:  99_servicenow_pkg/99_servicenow_account_export.sql
+              export_location: finance/ServiceNow/account
+        
+        - script_location: dags/sql/99_servicenow_pkg/99_servicenow_contact_create_tmp.sql
+          export_files:
+            - extract_query: 99_servicenow_pkg/99_servicenow_contact_export.sql
+              export_location: finance/ServiceNow/contact
+
+
+        

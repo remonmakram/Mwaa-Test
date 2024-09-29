@@ -1,0 +1,1 @@
+select count(*) from RAX_APP_USER.MONTHLY_EP_AUDIT ct

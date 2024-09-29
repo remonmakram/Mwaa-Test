@@ -1,0 +1,24 @@
+---
+
+pipeline:
+  name: lt_LOAD_EVENT_DIM_dag
+  description: LOAD_EVENT_DIM pipeline
+  schedule: "8 * * * *"
+  tags:
+    - lifetouch
+    - LOAD_EVENT_DIM
+  task_groups:
+    - name: LOAD_EVENT_DIM_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql/v_cdc_load_date_ODS_DM.sql
+      default_args:
+        v_cdc_ods_overlap: 0.0104166666666666666666666666666666666667
+      tasks:
+        - description: load event dim subpackage
+          type: oracle
+          script_location: dags/sql/LOAD_EVENT_DIM/LOAD_EVENT_DIM.sql
+          args:
+            v_cdc_load_table_name: ODS_EVENT
+            
+        

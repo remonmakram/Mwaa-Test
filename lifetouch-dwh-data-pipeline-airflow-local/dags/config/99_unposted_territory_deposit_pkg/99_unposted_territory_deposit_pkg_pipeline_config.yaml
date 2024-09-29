@@ -1,0 +1,29 @@
+---
+
+pipeline:
+  name: 99_unposted_territory_deposit_pkg_PKG_dag
+  description: 99_unposted_territory_deposit_pkgpackage
+  schedule: "0 0 */33 * *"
+  tags:
+    - lifetouch
+    - 99_unposted_territory_deposit_pkg
+  
+  task_groups:
+    - name: 99_unposted_territory_deposit_pkg_wait_for_data
+      description: run ODI wait command
+      schema_name: ODS_STAGE
+      session_name: 99_UNPOSTED_TERRITORY_DEPOSIT_PKG
+      table_name: DATA_EXPORT_TRIGGER
+    
+
+    - name: 99_unposted_territory_deposit_pkg_export
+      description: drop and recreate table then extract data and load to s3
+      export_file_name:
+        v_actuate_sysdate: dags/sql/pre_sql/v_actuate_sysdate.sql
+      pre_sql:
+        v_actuate_fiscal_year: dags/sql/pre_sql/v_actuate_fiscal_year.sql
+      tasks:
+        - script_location: dags/sql/99_unposted_territory_deposit_pkg/temp_tbl_create.sql
+          export_files:
+            - extract_query: 99_unposted_territory_deposit_pkg/unposted_territory_deposit_export.sql
+              export_location: finance/unposted_territory_deposit/unposted_territory_deposit

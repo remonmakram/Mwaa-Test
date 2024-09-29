@@ -1,0 +1,108 @@
+---
+
+pipeline:
+  name: lt_06_oms2_csis_load_dag
+  description: lifetouch 06 oms2 csis load package
+  schedule: "*/20 * * * *"
+  tags:
+    - lifetouch
+    - 06_OMS2_CSIS_LOAD_PKG
+  task_groups:
+    - name: OMS2_CSIS_Ingestion
+      description: extract and load part
+      ingestion_script: ingestion_script.py
+      data_sources:
+          - type: oracle
+            name: oms2
+            default_args:
+              dest_schema: RAX_APP_USER
+              merge_required: False
+              v_cdc_overlap: 0.02083333333
+              v_env: DEV_OMS2
+            entities:
+              - dest_table: "C$_0OMS2_LT_SB_A_TIE_STG"
+                v_cdc_load_table_name: OMS2_LT_SUBJECT_APO_TIE_STG
+                tmp_create: '06_OMS2_CSIS_LOAD_PKG/tmp_create_LT_SUBJECT_APO_TIE.sql'
+                extract_query: '06_OMS2_CSIS_LOAD_PKG/extract_query_LT_SUBJECT_APO_TIE.sql'
+                src_table: LT_SUBJECT_APO_TIE
+
+              - dest_table: "C$_0OMS2_YFS_STATUS_STG"
+                v_cdc_load_table_name: OMS2_YFS_STATUS_STG
+                tmp_create: '06_OMS2_CSIS_LOAD_PKG/tmp_create_YFS_STATUS.sql'
+                extract_query: '06_OMS2_CSIS_LOAD_PKG/extract_query_YFS_STATUS.sql'
+                src_table: YFS_STATUS
+
+              - dest_table: "C$_0OMS2_LT_SUBJECT_STG"
+                v_cdc_load_table_name: OMS2_LT_SUBJECT_STG
+                tmp_create: '06_OMS2_CSIS_LOAD_PKG/tmp_create_LT_SUBJECT.sql'
+                extract_query: '06_OMS2_CSIS_LOAD_PKG/extract_query_LT_SUBJECT.sql'
+                src_table: LT_SUBJECT
+
+              - dest_table: "C$_0OMS2_LT_SB_A_SES_STG"
+                v_cdc_load_table_name: OMS2_LT_SUBJECT_APO_SESS_STG
+                tmp_create: '06_OMS2_CSIS_LOAD_PKG/tmp_create_LT_SUBJECT_APO_SESSION_TIE.sql'
+                extract_query: '06_OMS2_CSIS_LOAD_PKG/extract_query_LT_SUBJECT_APO_SESSION_TIE.sql'
+                src_table: LT_SUBJECT_APO_SESSION_TIE
+
+              - dest_table: "C$_0OMS2_LT_IMAGE_STG"
+                v_cdc_load_table_name: OMS2_LT_IMAGE_STG
+                tmp_create: '06_OMS2_CSIS_LOAD_PKG/tmp_create_LT_IMAGE.sql'
+                extract_query: '06_OMS2_CSIS_LOAD_PKG/extract_query_LT_IMAGE.sql'
+                src_table: LT_IMAGE         
+
+            
+    - name: OMS2_CSIS_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+        v_env: DEV_OMS2
+      tasks:
+        - name: LOAD_OMS2_STAGING_TABLES_PKG 
+          description: load LOAD_OMS2_STAGING_TABLES_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/06_OMS2_CSIS_LOAD_PKG/LOAD_OMS2_STAGING_TABLES_PKG.sql
+          trigger_rule: all_success
+          args:
+            v_cdc_load_table_name: OMS2_LT_SUBJECT_APO_TIE_STG
+
+        - name: LOAD_OMS2_STAGING_TABLES_PKG2 
+          description: load LOAD_OMS2_STAGING_TABLES_PKG2 subpackage
+          type: oracle_sql
+          script_location: dags/sql/06_OMS2_CSIS_LOAD_PKG/LOAD_OMS2_STAGING_TABLES_PKG2.sql
+          trigger_rule: all_success
+          args:
+            v_cdc_load_table_name: OMS2_YFS_STATUS_STG
+
+        - name: LOAD_OMS2_SUBJECT_PKG 
+          description: load LOAD_OMS2_SUBJECT_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/06_OMS2_CSIS_LOAD_PKG/LOAD_OMS2_SUBJECT_PKG.sql
+          trigger_rule: all_done
+          args:
+            v_cdc_load_table_name: OMS2_LT_SUBJECT_STG
+
+        - name: LOAD_OMS2_CAPTURE_SESSION_PKG 
+          description: load LOAD_OMS2_CAPTURE_SESSION_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/06_OMS2_CSIS_LOAD_PKG/LOAD_OMS2_CAPTURE_SESSION_PKG.sql
+          trigger_rule: all_done
+          args:
+            v_cdc_load_table_name: OMS2_LT_SUBJECT_APO_SESS_STG      
+
+        - name: LOAD_OMS2_IMAGE_PKG 
+          description: load LOAD_OMS2_IMAGE_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/06_OMS2_CSIS_LOAD_PKG/LOAD_OMS2_IMAGE_PKG.sql
+          trigger_rule: all_done
+          args:
+            v_cdc_load_table_name: OMS2_LT_IMAGE_STG
+
+        - name: OMS2_DELETE_MARKED_DUPS_PKG 
+          description: load OMS2_DELETE_MARKED_DUPS_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/06_OMS2_CSIS_LOAD_PKG/OMS2_DELETE_MARKED_DUPS_PKG.sql
+          trigger_rule: all_done 
+          args:
+            v_cdc_load_table_name: OMS2_LT_IMAGE_STG           

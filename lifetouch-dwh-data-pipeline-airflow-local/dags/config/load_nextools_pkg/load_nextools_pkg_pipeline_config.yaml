@@ -1,0 +1,219 @@
+---
+
+pipeline:
+  name: load_nextools_pkg_dag
+  description: load_nextools_pkg package
+  schedule: "@daily" 
+  tags:
+    - lifetouch
+    - load_nextools_pkg
+  task_groups:
+    - name: load_nextools_pkg_Ingestion
+      description: extract and load part
+      ingestion_script: ingestion_script.py
+      data_sources:
+          - type: mssql
+            name: nextools
+            default_args:
+              dest_schema: RAX_APP_USER
+              merge_required: False
+            entities:
+
+              - dest_table: "c$_0nxtl_jobusertype"
+                tmp_create: 'mssql_sqls/LOAD_NEXTOOLS_PKG/create_temp_jobusertype.sql'
+                extract_query: 'mssql_sqls/LOAD_NEXTOOLS_PKG/extract_jobusertype.sql'
+                src_table: jobusertype 
+                v_cdc_load_table_name: NEXTOOLS_LOAD
+                v_cdc_oms_overlap: 0.01041666666
+              
+              - dest_table: "c$_0nxtl_jobuser"
+                tmp_create: 'mssql_sqls/LOAD_NEXTOOLS_PKG/create_temp_jobuser.sql'
+                extract_query: 'mssql_sqls/LOAD_NEXTOOLS_PKG/extract_jobuser.sql'
+                src_table: jobuser 
+                v_cdc_load_table_name: NEXTOOLS_LOAD
+                v_cdc_oms_overlap: 0.01041666666
+
+              - dest_table: "c$_0nxtl_job"
+                tmp_create: 'mssql_sqls/LOAD_NEXTOOLS_PKG/create_temp_job.sql'
+                extract_query: 'mssql_sqls/LOAD_NEXTOOLS_PKG/extract_job.sql'
+                src_table: job 
+                v_cdc_load_table_name: NEXTOOLS_LOAD
+                v_cdc_oms_overlap: 0.01041666666
+
+              - dest_table: "c$_0nxtl_bookoption"
+                src_table: bookoption 
+                tmp_create: 'mssql_sqls/LOAD_NEXTOOLS_PKG/create_temp_bookoption.sql'
+                extract_query: 'mssql_sqls/LOAD_NEXTOOLS_PKG/extract_bookoption.sql'
+                v_cdc_load_table_name: NEXTOOLS_LOAD
+                v_cdc_oms_overlap: 0.01041666666
+                
+              - dest_table: "c$_0nxtl_grade"
+                src_table: grade 
+                tmp_create: 'mssql_sqls/LOAD_NEXTOOLS_PKG/create_temp_grade.sql'
+                extract_query: 'mssql_sqls/LOAD_NEXTOOLS_PKG/extract_grade.sql'
+                v_cdc_load_table_name: NEXTOOLS_LOAD
+                v_cdc_oms_overlap: 0.01041666666
+
+              - dest_table: "c$_0nxtl_jobfinal"
+                src_table: jobfinal 
+                tmp_create: 'mssql_sqls/LOAD_NEXTOOLS_PKG/create_temp_jobfinal.sql'
+                extract_query: 'mssql_sqls/LOAD_NEXTOOLS_PKG/extract_jobfinal.sql'
+                v_cdc_load_table_name: NEXTOOLS_LOAD
+                v_cdc_oms_overlap: 0.01041666666
+
+              - dest_table: "c$_0nxtl_jobgrade"
+                src_table: jobgrade 
+                tmp_create: 'mssql_sqls/LOAD_NEXTOOLS_PKG/create_temp_jobgrade.sql'
+                extract_query: 'mssql_sqls/LOAD_NEXTOOLS_PKG/extract_jobgrade.sql'
+                v_cdc_load_table_name: NEXTOOLS_LOAD
+                v_cdc_oms_overlap: 0.01041666666
+
+              - dest_table: "c$_0nxtl_orderorigin"
+                src_table: orderorigin 
+                tmp_create: 'mssql_sqls/LOAD_NEXTOOLS_PKG/create_temp_orderorigin.sql'
+                extract_query: 'mssql_sqls/LOAD_NEXTOOLS_PKG/extract_orderorigin.sql'
+                v_cdc_load_table_name: NEXTOOLS_LOAD
+                v_cdc_oms_overlap: 0.01041666666
+
+              - dest_table: "c$_0nxtl_payment"
+                src_table: payment 
+                tmp_create: 'mssql_sqls/LOAD_NEXTOOLS_PKG/create_temp_payment.sql'
+                extract_query: 'mssql_sqls/LOAD_NEXTOOLS_PKG/extract_payment.sql'
+                v_cdc_load_table_name: NEXTOOLS_LOAD
+                v_cdc_oms_overlap: 0.01041666666
+
+              - dest_table: "c$_0nxtl_personbookoption"
+                src_table: personbookoption 
+                tmp_create: 'mssql_sqls/LOAD_NEXTOOLS_PKG/create_temp_personbookoption.sql'
+                extract_query: 'mssql_sqls/LOAD_NEXTOOLS_PKG/extract_personbookoption.sql'
+                v_cdc_load_table_name: NEXTOOLS_LOAD
+                v_cdc_oms_overlap: 0.01041666666
+
+              - dest_table: "c$_0nxtl_person"
+                src_table: person 
+                tmp_create: 'mssql_sqls/LOAD_NEXTOOLS_PKG/create_temp_person.sql'
+                extract_query: 'mssql_sqls/LOAD_NEXTOOLS_PKG/extract_person.sql'
+                v_cdc_load_table_name: NEXTOOLS_LOAD
+                v_cdc_oms_overlap: 0.01041666666
+
+              - dest_table: "c$_0nxtl_jobusersurveyanswer"
+                src_table: jobusersurveyanswer 
+                tmp_create: 'mssql_sqls/LOAD_NEXTOOLS_PKG/create_temp_jobusersurveyanswer.sql'
+                extract_query: 'mssql_sqls/LOAD_NEXTOOLS_PKG/extract_jobusersurveyanswer.sql'
+                v_cdc_load_table_name: NEXTOOLS_LOAD
+                v_cdc_oms_overlap: 0.01041666666
+
+              - dest_table: "c$_0nxtl_jobusersurveyquestion"
+                src_table: jobusersurveyquestion 
+                tmp_create: 'mssql_sqls/LOAD_NEXTOOLS_PKG/create_temp_jobusersurveyquestion.sql'
+                extract_query: 'mssql_sqls/LOAD_NEXTOOLS_PKG/extract_jobusersurveyquestion.sql'
+                v_cdc_load_table_name: NEXTOOLS_LOAD
+                v_cdc_oms_overlap: 0.01041666666
+
+              - dest_table: "c$_0nxtl_book"
+                src_table: book 
+                tmp_create: 'mssql_sqls/LOAD_NEXTOOLS_PKG/create_temp_book.sql'
+                extract_query: 'mssql_sqls/LOAD_NEXTOOLS_PKG/extract_book.sql'
+                v_cdc_load_table_name: NEXTOOLS_LOAD
+                v_cdc_oms_overlap: 0.01041666666
+
+              - dest_table: "c$_0nxtl_schoolpricing"
+                src_table: schoolpricing 
+                tmp_create: 'mssql_sqls/LOAD_NEXTOOLS_PKG/create_temp_schoolpricing.sql'
+                extract_query: 'mssql_sqls/LOAD_NEXTOOLS_PKG/extract_schoolpricing.sql'
+                v_cdc_load_table_name: NEXTOOLS_LOAD
+                v_cdc_oms_overlap: 0.01041666666
+                
+              - dest_table: "nxtl_book_stg"
+                src_table: book_stg
+                tmp_create: 'mssql_sqls/LOAD_NEXTOOLS_PKG/drop_or_truncate_temp_book_stg.sql'
+                extract_query: 'mssql_sqls/LOAD_NEXTOOLS_PKG/extract_book_stg.sql'
+                v_cdc_load_table_name: NEXTOOLS_LOAD
+                v_cdc_oms_overlap: 0.01041666666
+
+              - dest_table: "nxtl_bookoption_stg"
+                src_table: bookoption_stg 
+                tmp_create: 'mssql_sqls/LOAD_NEXTOOLS_PKG/drop_or_truncate_temp_bookoption_stg.sql'
+                extract_query: 'mssql_sqls/LOAD_NEXTOOLS_PKG/extract_bookoption_stg.sql'
+                v_cdc_load_table_name: NEXTOOLS_LOAD
+                v_cdc_oms_overlap: 0.01041666666
+
+              - dest_table: "nxtl_jobfinal_stg"
+                src_table: jobfinal_stg 
+                tmp_create: 'mssql_sqls/LOAD_NEXTOOLS_PKG/drop_or_truncate_temp_jobfinal_stg.sql'
+                extract_query: 'mssql_sqls/LOAD_NEXTOOLS_PKG/extract_jobfinal_stg.sql'
+                v_cdc_load_table_name: NEXTOOLS_LOAD
+                v_cdc_oms_overlap: 0.01041666666
+
+              - dest_table: "nxtl_jobgrade_stg"
+                src_table: jobgrade_stg 
+                tmp_create: 'mssql_sqls/LOAD_NEXTOOLS_PKG/drop_or_truncate_temp_jobgrade_stg.sql'
+                extract_query: 'mssql_sqls/LOAD_NEXTOOLS_PKG/extract_jobgrade_stg.sql'
+                v_cdc_load_table_name: NEXTOOLS_LOAD
+                v_cdc_oms_overlap: 0.01041666666
+
+              - dest_table: "nxtl_jobuser_stg"
+                src_table: jobuser_stg 
+                tmp_create: 'mssql_sqls/LOAD_NEXTOOLS_PKG/drop_or_truncate_temp_jobuser_stg.sql'
+                extract_query: 'mssql_sqls/LOAD_NEXTOOLS_PKG/extract_jobuser_stg.sql'
+                v_cdc_load_table_name: NEXTOOLS_LOAD
+                v_cdc_oms_overlap: 0.01041666666
+
+              - dest_table: "nxtl_payment_stg"
+                src_table: payment_stg 
+                tmp_create: 'mssql_sqls/LOAD_NEXTOOLS_PKG/drop_or_truncate_temp_payment_stg.sql'
+                extract_query: 'mssql_sqls/LOAD_NEXTOOLS_PKG/extract_payment_stg.sql'
+                v_cdc_load_table_name: NEXTOOLS_LOAD
+                v_cdc_oms_overlap: 0.01041666666
+
+              - dest_table: "nxtl_person_stg"
+                src_table: person_stg 
+                tmp_create: 'mssql_sqls/LOAD_NEXTOOLS_PKG/drop_or_truncate_temp_person_stg.sql'
+                extract_query: 'mssql_sqls/LOAD_NEXTOOLS_PKG/extract_person_stg.sql'
+                v_cdc_load_table_name: NEXTOOLS_LOAD
+                v_cdc_oms_overlap: 0.01041666666
+
+              - dest_table: "nxtl_personbookoption_stg"
+                src_table: personbookoption_stg 
+                tmp_create: 'mssql_sqls/LOAD_NEXTOOLS_PKG/drop_or_truncate_temp_personbookoption_stg.sql'
+                extract_query: 'mssql_sqls/LOAD_NEXTOOLS_PKG/extract_personbookoption_stg.sql'
+                v_cdc_load_table_name: NEXTOOLS_LOAD
+                v_cdc_oms_overlap: 0.01041666666
+
+              - dest_table: "nxtl_schoolpricing_stg"
+                src_table: schoolpricing_stg
+                tmp_create: 'mssql_sqls/LOAD_NEXTOOLS_PKG/drop_or_truncate_temp_schoolpricing_stg.sql'
+                extract_query: 'mssql_sqls/LOAD_NEXTOOLS_PKG/extract_schoolpricing_stg.sql'
+                v_cdc_load_table_name: NEXTOOLS_LOAD
+                v_cdc_oms_overlap: 0.01041666666
+
+              - dest_table: "nxtl_job_stg"
+                src_table: job_stg 
+                tmp_create: 'mssql_sqls/LOAD_NEXTOOLS_PKG/drop_or_truncate_temp_job_stg.sql'
+                extract_query: 'mssql_sqls/LOAD_NEXTOOLS_PKG/extract_job_stg.sql'
+                v_cdc_load_table_name: NEXTOOLS_LOAD
+                v_cdc_oms_overlap: 0.01041666666
+
+              - dest_table: "nxtl_vw_student_book_option"
+                src_table: vw_student_book_option 
+                tmp_create: 'mssql_sqls/LOAD_NEXTOOLS_PKG/delete_table_vw_student_book_option.sql'
+                extract_query: 'mssql_sqls/LOAD_NEXTOOLS_PKG/extract_vw_student_book_option.sql'
+                v_cdc_load_table_name: NEXTOOLS_LOAD
+                v_cdc_oms_overlap: 0.01041666666
+
+    - name: load_nextools_pkg_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql/v_cdc_load_date_ODS_DM.sql
+      default_args:
+        v_cdc_overlap: 0.01041666666
+        v_cdc_load_table_name: NEXTOOLS_LOAD
+      tasks:
+        - description: load nextools pkg subpackage
+          type: oracle_sql
+          script_location: dags/sql/load_nextools_pkg/LOAD_NEXTOOLS_PKG.sql
+          args:
+            v_cdc_sales_ods_overlap: 0.02083333333
+            v_cdc_ods_overlap: 0.02083333333
+              
+              

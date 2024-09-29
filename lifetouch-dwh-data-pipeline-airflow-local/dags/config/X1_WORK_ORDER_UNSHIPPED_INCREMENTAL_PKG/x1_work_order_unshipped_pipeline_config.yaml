@@ -1,0 +1,52 @@
+---
+
+pipeline:
+  name: lt_x1_work_order_unshipped
+  description: lifetouch X1_WORK_ORDER_UNSHIPPED_INCREMENTAL_PKG package
+  schedule: "0 8-18/2 * * *"
+  tags:
+    - lifetouch
+    - X1_WORK_ORDER_UNSHIPPED_INCREMENTAL_PKG
+  task_groups:
+    - name: ODI_SQL_TRANFRMATINFON_TASKS
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date_ODS_DM: dags/sql/pre_sql/v_cdc_load_date_ODS_DM.sql
+        v_data_center: dags/sql/pre_sql/v_data_center.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks:
+        - name: X1_WORK_ORDER_UNSHIPPED_INCREMENTAL_PKG
+          description: load X1_WORK_ORDER_UNSHIPPED_INCREMENTAL_PKG package
+          type: oracle_sql
+          script_location: dags/sql/X1_WORK_ORDER_UNSHIPPED_INCREMENTAL_PKG/X1_WORK_ORDER_UNSHIPPED_INCREMENTAL_PKG.sql
+          args:
+            v_cdc_load_table_name: X1_WO_UNSHIPPED
+
+        - name: UPDATE_X1_WORK_ORDER_SHIPPED_PKG
+          description: load UPDATE_X1_WORK_ORDER_SHIPPED_PKG subpackage
+          type: oracle_sql
+          script_location: dags/sql/X1_WORK_ORDER_UNSHIPPED_INCREMENTAL_PKG/UPDATE_X1_WORK_ORDER_SHIPPED_PKG.sql
+          args:
+            v_cdc_load_table_name: UPDATE_X1_WO_SHIPPED_HIST
+
+        - name: Update_CDC_Load_Status
+          description: Update CDC Load Status
+          type: oracle_sql
+          script_location: dags/sql/X1_WORK_ORDER_UNSHIPPED_INCREMENTAL_PKG/Update_CDC_Load_Status.sql
+          args:
+            v_cdc_load_table_name: X1_WO_UNSHIPPED    
+
+    - name: SEND_EMAIL_1
+      description: Send email on filure
+      email_configurations:
+        subject: 'Attention : X1 Work Order Unshipped ETL Package Failed'
+        message: dags/sql/messages/X1_WORK_ORDER_UNSHIPPED_INCREMENTAL_PKG/failure_message.txt
+        message_args:
+          v_data_center:
+            path: dags/sql/pre_sql/v_data_center.sql
+        email_recipient_query: pre_sql/v_error_email_to.sql
+        email_recipient_query_args:
+          v_package_name: 'X1_WORK_ORDER_UNSHIPPED_INCREMENTAL_PKG'
+      trigger_rule: one_failed
+          

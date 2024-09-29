@@ -1,0 +1,25 @@
+
+            DECLARE create_query CLOB;  
+            BEGIN  
+                BEGIN  
+                    EXECUTE IMMEDIATE 'DROP TABLE RAX_APP_USER.c$_0ybpy_payment';  
+                EXCEPTION  
+                    WHEN OTHERS THEN NULL;  
+                END;  
+                create_query := 'create table RAX_APP_USER.C$_0YBPY_PAYMENT
+(
+	C1_ID	NUMBER NULL,
+	C2_ORDERID	NUMBER NULL,
+	C3_AMOUNT	NUMBER NULL,
+	C4_CREDITCARDTYPECODE	VARCHAR2(4) NULL,
+	C5_MASKEDCARDNUMBER	VARCHAR2(4) NULL,
+	C6_VERIFICATIONRESULTCODE	NUMBER NULL,
+	C7_VERIFICATIONRESULTMESSAGE	VARCHAR2(200) NULL,
+	C8_SALEPNREF	VARCHAR2(50) NULL,
+	C9_CREATEDATE	DATE NULL,
+	C10_LASTCHANGEDATE	DATE NULL
+)
+NOLOGGING';
+                EXECUTE IMMEDIATE create_query;
+            END;  
+            

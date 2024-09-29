@@ -1,0 +1,546 @@
+
+/*-----------------------------------------------*/
+/* TASK No. 20 */
+
+/* NONE or SET VARIABLE STATEMENT FOUND, CHECK ODI TASK NO. 20 */
+
+
+
+
+/*-----------------------------------------------*/
+/* TASK No. 21 */
+
+/* SELECT STATEMENT FOUND, CHECK ODI TASK NO. 21 */
+
+
+
+
+/*-----------------------------------------------*/
+/* TASK No. 22 */
+
+/* SELECT STATEMENT FOUND, CHECK ODI TASK NO. 22 */
+
+
+
+
+/*-----------------------------------------------*/
+/* TASK No. 23 */
+/* Drop work table */
+
+-- drop table RAX_APP_USER.C$_0OMS2_YFS_STATUS_STG purge
+
+-- &
+
+
+-- /*-----------------------------------------------*/
+-- /* TASK No. 24 */
+-- /* Create work table */
+
+-- create table RAX_APP_USER.C$_0OMS2_YFS_STATUS_STG
+-- (
+-- 	C1_STATUS_KEY	VARCHAR2(24) NULL,
+-- 	C2_STATUS	VARCHAR2(15) NULL,
+-- 	C3_DESCRIPTION	VARCHAR2(100) NULL,
+-- 	C4_PROCESS_TYPE_KEY	VARCHAR2(24) NULL,
+-- 	C5_STATUS_NAME	VARCHAR2(50) NULL,
+-- 	C6_STATUS_TYPE	VARCHAR2(15) NULL,
+-- 	C7_OWNER_KEY	VARCHAR2(24) NULL,
+-- 	C8_REQUIRES_COLLABORATION	VARCHAR2(1) NULL,
+-- 	C9_LOCKID	NUMBER NULL,
+-- 	C10_CREATETS	DATE NULL,
+-- 	C11_MODIFYTS	DATE NULL,
+-- 	C12_CREATEUSERID	VARCHAR2(40) NULL,
+-- 	C13_MODIFYUSERID	VARCHAR2(40) NULL,
+-- 	C14_CREATEPROGID	VARCHAR2(40) NULL,
+-- 	C15_MODIFYPROGID	VARCHAR2(40) NULL
+-- )
+-- NOLOGGING
+
+-- &
+
+
+-- /*-----------------------------------------------*/
+-- /* TASK No. 25 */
+-- /* Load data */
+
+-- /* SOURCE CODE */
+
+
+-- select	
+-- 	trim(YFS_STATUS.STATUS_KEY)	   C1_STATUS_KEY,
+-- 	trim(YFS_STATUS.STATUS)	   C2_STATUS,
+-- 	YFS_STATUS.DESCRIPTION	   C3_DESCRIPTION,
+-- 	trim(YFS_STATUS.PROCESS_TYPE_KEY)	   C4_PROCESS_TYPE_KEY,
+-- 	YFS_STATUS.STATUS_NAME	   C5_STATUS_NAME,
+-- 	YFS_STATUS.STATUS_TYPE	   C6_STATUS_TYPE,
+-- 	trim(YFS_STATUS.OWNER_KEY)	   C7_OWNER_KEY,
+-- 	YFS_STATUS.REQUIRES_COLLABORATION	   C8_REQUIRES_COLLABORATION,
+-- 	YFS_STATUS.LOCKID	   C9_LOCKID,
+-- 	YFS_STATUS.CREATETS	   C10_CREATETS,
+-- 	YFS_STATUS.MODIFYTS	   C11_MODIFYTS,
+-- 	YFS_STATUS.CREATEUSERID	   C12_CREATEUSERID,
+-- 	YFS_STATUS.MODIFYUSERID	   C13_MODIFYUSERID,
+-- 	YFS_STATUS.CREATEPROGID	   C14_CREATEPROGID,
+-- 	YFS_STATUS.MODIFYPROGID	   C15_MODIFYPROGID
+-- from	OMS2_OWN.YFS_STATUS   YFS_STATUS
+-- where	(1=1)
+-- And (YFS_STATUS.MODIFYTS >= TO_DATE(SUBSTR(:v_cdc_load_date, 1, 19), 'YYYY-MM-DD HH24:MI:SS')  -:v_cdc_overlap
+-- )
+
+
+
+
+
+
+
+-- &
+
+-- /* TARGET CODE */
+-- insert /*+ append */ into RAX_APP_USER.C$_0OMS2_YFS_STATUS_STG
+-- (
+-- 	C1_STATUS_KEY,
+-- 	C2_STATUS,
+-- 	C3_DESCRIPTION,
+-- 	C4_PROCESS_TYPE_KEY,
+-- 	C5_STATUS_NAME,
+-- 	C6_STATUS_TYPE,
+-- 	C7_OWNER_KEY,
+-- 	C8_REQUIRES_COLLABORATION,
+-- 	C9_LOCKID,
+-- 	C10_CREATETS,
+-- 	C11_MODIFYTS,
+-- 	C12_CREATEUSERID,
+-- 	C13_MODIFYUSERID,
+-- 	C14_CREATEPROGID,
+-- 	C15_MODIFYPROGID
+-- )
+-- values
+-- (
+-- 	:C1_STATUS_KEY,
+-- 	:C2_STATUS,
+-- 	:C3_DESCRIPTION,
+-- 	:C4_PROCESS_TYPE_KEY,
+-- 	:C5_STATUS_NAME,
+-- 	:C6_STATUS_TYPE,
+-- 	:C7_OWNER_KEY,
+-- 	:C8_REQUIRES_COLLABORATION,
+-- 	:C9_LOCKID,
+-- 	:C10_CREATETS,
+-- 	:C11_MODIFYTS,
+-- 	:C12_CREATEUSERID,
+-- 	:C13_MODIFYUSERID,
+-- 	:C14_CREATEPROGID,
+-- 	:C15_MODIFYPROGID
+-- )
+
+-- &
+
+
+/*-----------------------------------------------*/
+/* TASK No. 26 */
+/* Analyze work table */
+
+
+
+BEGIN
+DBMS_STATS.GATHER_TABLE_STATS (
+    ownname =>	'RAX_APP_USER',
+    tabname =>	'C$_0OMS2_YFS_STATUS_STG',
+    estimate_percent =>	DBMS_STATS.AUTO_SAMPLE_SIZE
+);
+END;
+
+
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 28 */
+/* Set vID */
+
+/* NONE or SET VARIABLE STATEMENT FOUND, CHECK ODI TASK NO. 28 */
+
+
+
+
+/*-----------------------------------------------*/
+/* TASK No. 29 */
+/* Drop flow table */
+
+-- drop table RAX_APP_USER.I$_OMS2_YFS_STATUS_STG2008001 
+
+BEGIN
+    EXECUTE IMMEDIATE 'drop table RAX_APP_USER.I$_OMS2_YFS_STATUS_STG2008001 ';
+    EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        END IF;
+    END;
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 30 */
+/* Create flow table I$ */
+
+create table RAX_APP_USER.I$_OMS2_YFS_STATUS_STG2008001
+(
+	STATUS_KEY	VARCHAR2(24) NULL,
+	STATUS	VARCHAR2(15) NULL,
+	DESCRIPTION	VARCHAR2(100) NULL,
+	PROCESS_TYPE_KEY	VARCHAR2(24) NULL,
+	STATUS_NAME	VARCHAR2(50) NULL,
+	STATUS_TYPE	VARCHAR2(15) NULL,
+	OWNER_KEY	VARCHAR2(24) NULL,
+	REQUIRES_COLLABORATION	VARCHAR2(1) NULL,
+	LOCKID	NUMBER NULL,
+	CREATETS	DATE NULL,
+	MODIFYTS	DATE NULL,
+	CREATEUSERID	VARCHAR2(40) NULL,
+	MODIFYUSERID	VARCHAR2(40) NULL,
+	CREATEPROGID	VARCHAR2(40) NULL,
+	MODIFYPROGID	VARCHAR2(40) NULL,
+	ODS_CREATE_DATE	DATE NULL,
+	ODS_MODIFY_DATE	DATE NULL
+	,IND_UPDATE		char(1)
+)
+NOLOGGING
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 31 */
+/* Insert flow into I$ table */
+
+/* DETECTION_STRATEGY = NOT_EXISTS */
+ 
+
+
+  
+
+
+insert into	RAX_APP_USER.I$_OMS2_YFS_STATUS_STG2008001
+(
+	STATUS_KEY,
+	STATUS,
+	DESCRIPTION,
+	PROCESS_TYPE_KEY,
+	STATUS_NAME,
+	STATUS_TYPE,
+	OWNER_KEY,
+	REQUIRES_COLLABORATION,
+	LOCKID,
+	CREATETS,
+	MODIFYTS,
+	CREATEUSERID,
+	MODIFYUSERID,
+	CREATEPROGID,
+	MODIFYPROGID,
+	IND_UPDATE
+)
+select 
+STATUS_KEY,
+	STATUS,
+	DESCRIPTION,
+	PROCESS_TYPE_KEY,
+	STATUS_NAME,
+	STATUS_TYPE,
+	OWNER_KEY,
+	REQUIRES_COLLABORATION,
+	LOCKID,
+	CREATETS,
+	MODIFYTS,
+	CREATEUSERID,
+	MODIFYUSERID,
+	CREATEPROGID,
+	MODIFYPROGID,
+	IND_UPDATE
+ from (
+
+
+select 	 
+	
+	C1_STATUS_KEY STATUS_KEY,
+	C2_STATUS STATUS,
+	C3_DESCRIPTION DESCRIPTION,
+	C4_PROCESS_TYPE_KEY PROCESS_TYPE_KEY,
+	C5_STATUS_NAME STATUS_NAME,
+	C6_STATUS_TYPE STATUS_TYPE,
+	C7_OWNER_KEY OWNER_KEY,
+	C8_REQUIRES_COLLABORATION REQUIRES_COLLABORATION,
+	C9_LOCKID LOCKID,
+	C10_CREATETS CREATETS,
+	C11_MODIFYTS MODIFYTS,
+	C12_CREATEUSERID CREATEUSERID,
+	C13_MODIFYUSERID MODIFYUSERID,
+	C14_CREATEPROGID CREATEPROGID,
+	C15_MODIFYPROGID MODIFYPROGID,
+
+	'I' IND_UPDATE
+
+from	RAX_APP_USER.C$_0OMS2_YFS_STATUS_STG
+where	(1=1)
+
+
+
+
+
+
+) S
+where NOT EXISTS 
+	( select 1 from ODS_STAGE.OMS2_YFS_STATUS_STG T
+	where	T.STATUS_KEY	= S.STATUS_KEY 
+		 and ((T.STATUS = S.STATUS) or (T.STATUS IS NULL and S.STATUS IS NULL)) and
+		((T.DESCRIPTION = S.DESCRIPTION) or (T.DESCRIPTION IS NULL and S.DESCRIPTION IS NULL)) and
+		((T.PROCESS_TYPE_KEY = S.PROCESS_TYPE_KEY) or (T.PROCESS_TYPE_KEY IS NULL and S.PROCESS_TYPE_KEY IS NULL)) and
+		((T.STATUS_NAME = S.STATUS_NAME) or (T.STATUS_NAME IS NULL and S.STATUS_NAME IS NULL)) and
+		((T.STATUS_TYPE = S.STATUS_TYPE) or (T.STATUS_TYPE IS NULL and S.STATUS_TYPE IS NULL)) and
+		((T.OWNER_KEY = S.OWNER_KEY) or (T.OWNER_KEY IS NULL and S.OWNER_KEY IS NULL)) and
+		((T.REQUIRES_COLLABORATION = S.REQUIRES_COLLABORATION) or (T.REQUIRES_COLLABORATION IS NULL and S.REQUIRES_COLLABORATION IS NULL)) and
+		((T.LOCKID = S.LOCKID) or (T.LOCKID IS NULL and S.LOCKID IS NULL)) and
+		((T.CREATETS = S.CREATETS) or (T.CREATETS IS NULL and S.CREATETS IS NULL)) and
+		((T.MODIFYTS = S.MODIFYTS) or (T.MODIFYTS IS NULL and S.MODIFYTS IS NULL)) and
+		((T.CREATEUSERID = S.CREATEUSERID) or (T.CREATEUSERID IS NULL and S.CREATEUSERID IS NULL)) and
+		((T.MODIFYUSERID = S.MODIFYUSERID) or (T.MODIFYUSERID IS NULL and S.MODIFYUSERID IS NULL)) and
+		((T.CREATEPROGID = S.CREATEPROGID) or (T.CREATEPROGID IS NULL and S.CREATEPROGID IS NULL)) and
+		((T.MODIFYPROGID = S.MODIFYPROGID) or (T.MODIFYPROGID IS NULL and S.MODIFYPROGID IS NULL))
+        )
+
+  
+  
+
+  
+
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 32 */
+/* Analyze integration table */
+
+
+
+begin
+    dbms_stats.gather_table_stats(
+	ownname => 'RAX_APP_USER',
+	tabname => 'I$_OMS2_YFS_STATUS_STG2008001',
+	estimate_percent => dbms_stats.auto_sample_size
+    );
+end;
+
+
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 33 */
+/* Create Index on flow table */
+
+-- create index	RAX_APP_USER.I$_OMS2_YFS_STATUS_STG_IDX2008001
+-- on		RAX_APP_USER.I$_OMS2_YFS_STATUS_STG2008001 (STATUS_KEY)
+-- NOLOGGING
+
+BEGIN
+    EXECUTE IMMEDIATE 'create index	RAX_APP_USER.I$_OMS2_YFS_STATUS_STG_IDX2008001
+on		RAX_APP_USER.I$_OMS2_YFS_STATUS_STG2008001 (STATUS_KEY)
+NOLOGGING';
+    EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -972 AND SQLCODE != -1418 AND SQLCODE != -1408 AND SQLCODE != -955 THEN
+            RAISE;
+        END IF;
+    END;
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 34 */
+/* Merge Rows */
+
+merge into	ODS_STAGE.OMS2_YFS_STATUS_STG T
+using	RAX_APP_USER.I$_OMS2_YFS_STATUS_STG2008001 S
+on	(
+		T.STATUS_KEY=S.STATUS_KEY
+	)
+when matched
+then update set
+	T.STATUS	= S.STATUS,
+	T.DESCRIPTION	= S.DESCRIPTION,
+	T.PROCESS_TYPE_KEY	= S.PROCESS_TYPE_KEY,
+	T.STATUS_NAME	= S.STATUS_NAME,
+	T.STATUS_TYPE	= S.STATUS_TYPE,
+	T.OWNER_KEY	= S.OWNER_KEY,
+	T.REQUIRES_COLLABORATION	= S.REQUIRES_COLLABORATION,
+	T.LOCKID	= S.LOCKID,
+	T.CREATETS	= S.CREATETS,
+	T.MODIFYTS	= S.MODIFYTS,
+	T.CREATEUSERID	= S.CREATEUSERID,
+	T.MODIFYUSERID	= S.MODIFYUSERID,
+	T.CREATEPROGID	= S.CREATEPROGID,
+	T.MODIFYPROGID	= S.MODIFYPROGID
+	,              T.ODS_MODIFY_DATE	= sysdate
+when not matched
+then insert
+	(
+	T.STATUS_KEY,
+	T.STATUS,
+	T.DESCRIPTION,
+	T.PROCESS_TYPE_KEY,
+	T.STATUS_NAME,
+	T.STATUS_TYPE,
+	T.OWNER_KEY,
+	T.REQUIRES_COLLABORATION,
+	T.LOCKID,
+	T.CREATETS,
+	T.MODIFYTS,
+	T.CREATEUSERID,
+	T.MODIFYUSERID,
+	T.CREATEPROGID,
+	T.MODIFYPROGID
+	,               T.ODS_CREATE_DATE,
+	T.ODS_MODIFY_DATE
+	)
+values
+	(
+	S.STATUS_KEY,
+	S.STATUS,
+	S.DESCRIPTION,
+	S.PROCESS_TYPE_KEY,
+	S.STATUS_NAME,
+	S.STATUS_TYPE,
+	S.OWNER_KEY,
+	S.REQUIRES_COLLABORATION,
+	S.LOCKID,
+	S.CREATETS,
+	S.MODIFYTS,
+	S.CREATEUSERID,
+	S.MODIFYUSERID,
+	S.CREATEPROGID,
+	S.MODIFYPROGID
+	,               sysdate,
+	sysdate
+	)
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 35 */
+/* Commit transaction */
+
+/*commit*/
+
+
+/*-----------------------------------------------*/
+/* TASK No. 36 */
+/* Drop flow table */
+
+drop table RAX_APP_USER.I$_OMS2_YFS_STATUS_STG2008001 
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 1000027 */
+/* Drop work table */
+
+drop table RAX_APP_USER.C$_0OMS2_YFS_STATUS_STG purge
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 37 */
+/* Update CDC Load Status */
+
+UPDATE ODS_OWN.ODS_CDC_LOAD_STATUS
+SET LAST_CDC_COMPLETION_DATE=TO_DATE(
+             SUBSTR(:v_sess_beg, 1, 19), 'RRRR-MM-DD HH24:MI:SS')
++ nvl((TIMEZONE_OFFSET/24), 0) 
+WHERE ODS_TABLE_NAME=:v_cdc_load_table_name
+AND CONTEXT_NAME = :v_env
+
+/*
+UPDATE ODS_OWN.ODS_CDC_LOAD_STATUS
+SET LAST_CDC_COMPLETION_DATE=TO_DATE(
+             SUBSTR(:v_sess_beg, 1, 19), 'RRRR-MM-DD HH24:MI:SS')
+WHERE ODS_TABLE_NAME=:v_cdc_load_table_name
+AND CONTEXT_NAME = :v_env
+*/
+
+&
+
+
+/*-----------------------------------------------*/
+/* TASK No. 38 */
+/* Insert CDC Audit Record */
+
+INSERT INTO RAX_APP_USER.ODS_CDC_LOAD_STATUS_AUDIT
+(TABLE_NAME,
+SESS_NO,                      
+SESS_NAME,                    
+SCEN_VERSION,                 
+SESS_BEG,                     
+ORIG_LAST_CDC_COMPLETION_DATE,
+OVERLAP,
+CREATE_DATE,
+CONTEXT_NAME,
+TIMEZONE_OFFSET              
+)
+select 
+:v_cdc_load_table_name
+,:v_sess_no
+,'LOAD_OMS2_STAGING_TABLES_PKG'
+,'005'
+,TO_DATE(SUBSTR(:v_sess_beg, 1, 19), 'RRRR-MM-DD HH24:MI:SS')
+,TO_DATE (SUBSTR(:v_cdc_load_date, 1, 19),'YYYY-MM-DD HH24:MI:SS')
+,:v_cdc_overlap
+,SYSDATE
+,:v_env
+,TIMEZONE_OFFSET
+from 
+ODS_OWN.ODS_CDC_LOAD_STATUS
+WHERE ODS_TABLE_NAME=:v_cdc_load_table_name
+AND CONTEXT_NAME = :v_env
+
+/*
+INSERT INTO RAX_APP_USER.ODS_CDC_LOAD_STATUS_AUDIT
+(TABLE_NAME,
+SESS_NO,                      
+SESS_NAME,                    
+SCEN_VERSION,                 
+SESS_BEG,                     
+ORIG_LAST_CDC_COMPLETION_DATE,
+OVERLAP,
+CREATE_DATE,
+CONTEXT_NAME              
+)
+values (
+:v_cdc_load_table_name,
+:v_sess_no,
+'LOAD_OMS2_STAGING_TABLES_PKG',
+'005',
+TO_DATE(
+             SUBSTR(:v_sess_beg, 1, 19), 'RRRR-MM-DD HH24:MI:SS'),
+TO_DATE (SUBSTR (:v_cdc_load_date, 1, 19),
+                           'YYYY-MM-DD HH24:MI:SS'
+                          )
+,:v_cdc_overlap,
+SYSDATE,
+ :v_env)
+*/
+
+
+&
+
+
+/*-----------------------------------------------*/

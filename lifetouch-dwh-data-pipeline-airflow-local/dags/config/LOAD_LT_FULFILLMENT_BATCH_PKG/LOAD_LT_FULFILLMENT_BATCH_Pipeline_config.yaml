@@ -1,0 +1,42 @@
+---
+
+pipeline:
+  name: lt_fulfillment_batch_dag
+  description: lifetouch fulfillment batch load package
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - fulfillment_batch
+  task_groups:
+    - name: fulfillment_batch_Ingestion
+      description: extract and load part
+      ingestion_script: ingestion_script.py
+      data_sources:
+          - type: oracle
+            name: oms3
+            default_args:
+              dest_schema: RAX_APP_USER
+              merge_required: False
+            entities:
+              - dest_table: "C$_0LT_FULFILL_BATCH_STG"
+                v_cdc_load_table_name: LT_FULFILLMENT_BATCH
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: 'LT_FULFILLMENT_BATCH_PKG/tmp_create_lt_fulfill_batch.sql'
+                extract_query: 'LT_FULFILLMENT_BATCH_PKG/extract_query_lt_fulfillment_batch.sql'
+                src_table: LT_FULFILLMENT_BATCH
+
+            
+    - name: FULFILLMENT_BATCH_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks:
+        - name: LOAD_LT_FULFILLMENT_BATCH_PKG 
+          description: load fulfillment_batch package
+          type: oracle_sql
+          script_location: dags/sql/LOAD_LT_FULFILLMENT_BATCH_PKG/LOAD_LT_FULFILLMENT_BATCH_PKG.sql
+          args:
+            v_cdc_load_table_name: LT_FULFILLMENT_BATCH
+            v_cdc_oms_overlap: 0.02083333333

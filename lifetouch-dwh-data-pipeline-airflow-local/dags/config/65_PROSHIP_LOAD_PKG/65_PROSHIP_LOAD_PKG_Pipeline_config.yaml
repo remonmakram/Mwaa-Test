@@ -1,0 +1,43 @@
+---
+
+pipeline:
+  name: lt_65_proship_load_dag
+  description: lifetouch proship load package
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - 65_PROSHIP_LOAD_PKG
+  task_groups:
+    - name: PROSHIP_LOAD_Ingestion
+      description: extract and load part
+      ingestion_script: ingestion_script.py
+      data_sources:
+          - type: mssql
+            name: proship
+            default_args:
+              dest_schema: RAX_APP_USER
+              merge_required: False
+              v_cdc_overlap: 0.02083333333
+            entities:
+              - dest_table: "proship_shipheader_tmp"
+                v_cdc_load_table_name: PROSHIP_SHIPHEADER
+                tmp_create: 'mssql_sqls/65_PROSHIP_LOAD_PKG/tmp_create_ShipHeader.sql'
+                extract_query: 'mssql_sqls/65_PROSHIP_LOAD_PKG/extract_query_ShipHeader.sql'
+                src_table: ShipHeader
+                log_cdc_table_name: ods_own.ods_cdc_load_status
+                log_cdc_col_name: ods_table_name
+
+            
+    - name: PROSHIP_LOAD_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks:
+        - name: LOAD_SHIPHEADER_PKG 
+          description: load LOAD_SHIPHEADER_PKG package
+          type: oracle_sql
+          script_location: dags/sql/65_PROSHIP_LOAD_PKG/LOAD_SHIPHEADER_PKG.sql
+          args:
+            v_cdc_load_table_name: PROSHIP_SHIPHEADER

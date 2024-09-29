@@ -1,0 +1,45 @@
+---
+
+pipeline:
+  name: PKG_NAME_dag
+  description: PKG_NAME package
+  schedule: PUT_YOUR_SCHEDULE 
+  tags:
+    - lifetouch
+    - PKG_NAME
+  task_groups:
+    - name: PKG_NAME_Ingestion
+      description: extract and load part
+      ingestion_script: ingestion_script.py
+      data_sources:
+          - type: oracle
+            name: Name_to_be_used_for_secret
+            default_args:
+              dest_schema: RAX_APP_USER
+              merge_required: False
+            entities:
+              - dest_table:
+                v_cdc_load_table_name: 
+                v_cdc_oms_overlap: 0.02083333333
+                tmp_create: 'tmp_create_{table_name}.sql'
+                extract_query: 'extract_query_{table_name}.sql'
+                src_table: 
+
+              
+
+            
+    - name: PKG_NAME_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks: 
+        - description: load PKG_NAME {sub_pkg} batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/PKG_NAME/{YOUR_SUB_PKG_file_name}.sql
+          args:
+            v_cdc_load_table_name: YOUR_TABLE_NAME
+            v_cdc_oms_overlap: 0.02083333333
+        
+        

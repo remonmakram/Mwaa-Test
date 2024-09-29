@@ -1,0 +1,26 @@
+---
+
+pipeline:
+  name: lt_36_imagestream_track_dag
+  description: Imagestream Track Package
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - image_stream_track
+  task_groups:
+
+    - name: IMAGESTREAM_TRACK_ODI_Transformation
+      description: ODI SQL Transformation Logic for IMAGESTREAM TRACK
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+        v_cdc_ld_date: dags/sql/pre_sql/pre_v_cdc_ld_date.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks: 
+        - description: load image_stream_track subpackage
+          type: oracle_sql
+          script_location: dags/sql/36_LOAD_IMAGESTREAM_TRACK_PKG/36_LOAD_IMAGESTREAM_TRACK_PKG.sql
+          args:
+            v_cdc_load_table_name: HP_IMAGESTREAM_TRACK
+            v_cdc_oms_overlap: 0.02083333333
+        

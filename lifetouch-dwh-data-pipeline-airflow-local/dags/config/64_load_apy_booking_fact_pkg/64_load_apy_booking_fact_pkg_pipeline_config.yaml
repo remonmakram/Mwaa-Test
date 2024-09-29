@@ -1,0 +1,47 @@
+---
+
+pipeline:
+  name: lt_64_load_apy_booking_fact_dag
+  description: APY BOOKING FACT Package
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - apy_booking_fact
+  task_groups:
+
+    - name: APY_BOOKING_FACT_ODI_Transformation
+      description: ODI SQL Transformation Logic for APY BOOKING FACT
+      default_args:
+        v_sy_offset: 0  
+      pre_sql:
+        v_data_center_tz: dags/sql/pre_sql/pre_v_data_center_tz.sql
+      tasks: 
+        - name: APY_BOOKING_FACT_ODI_Transformation1_1
+          description: APY_BOOKING_FACT_ODI_Transformation_variable v_sy_offset set to 0
+          type: oracle_sql
+          script_location: dags/sql/64_LOAD_APY_BOOKING_FACT_PKG/64_LOAD_APY_BOOKING_FACT_PKG1.sql
+          args:
+            v_sy_offset: 0 
+
+        
+        - name: APY_BOOKING_FACT_ODI_Transformation1_2
+          description: APY_BOOKING_FACT_ODI_Transformation_variable v_sy_offset set to 1
+          type: oracle_sql
+          script_location: dags/sql/64_LOAD_APY_BOOKING_FACT_PKG/64_LOAD_APY_BOOKING_FACT_PKG1.sql
+          args:
+            v_sy_offset: 1
+
+        
+        - name: APY_BOOKING_FACT_ODI_Transformation1_3
+          description: APY_BOOKING_FACT_ODI_Transformation_variable v_sy_offset set to 2
+          type: oracle_sql
+          script_location: dags/sql/64_LOAD_APY_BOOKING_FACT_PKG/64_LOAD_APY_BOOKING_FACT_PKG1.sql
+          args:
+            v_sy_offset: 2
+          
+        
+        - name: APY_BOOKING_FACT_ODI_Transformation2
+          description: load apy_booking_fact
+          type: oracle_sql
+          script_location: dags/sql/64_LOAD_APY_BOOKING_FACT_PKG/64_LOAD_APY_BOOKING_FACT_PKG2.sql
+          

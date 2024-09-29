@@ -1,0 +1,47 @@
+---
+
+pipeline:
+  name: 99_seniors_d42_payments_pkg_dag
+  description: 99_seniors_d42_payments_pkgpackage
+  schedule: "0 0 1 * *"
+  tags:
+    - lifetouch
+    - 99_seniors_d42_payments_pkg
+  
+  task_groups:
+    - name: 99_seniors_d42_payments_pkg_export
+      description: drop and recreate table then extract data and load to s3
+      export_file_name:
+        v_US_data_center: dags/sql/pre_sql/v_US_data_center.sql
+        v_actuate_sysdate:  dags/sql/pre_sql/v_actuate_sysdate.sql
+
+      tasks:
+        - script_location: dags/sql/99_seniors_d42_payments_pkg/create_seniors_d42_payments_tmp.sql
+          export_files:
+            - extract_query: 99_seniors_d42_payments_pkg/seniors_d42_paymens_export.sql
+              export_location: finance/seniors_d42_payments/SENIORS_D42_PAYMENTS
+
+    - name: 99_seniors_d42_payments_pkg_ODI_Update
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks: 
+        - description: run_pkg
+          type: oracle_sql
+          script_location: dags/sql/99_seniors_d42_payments_pkg/99_seniors_d42_payments_pkg.sql
+          args:
+            v_session_name: 99_seniors_d42_payments_pkg
+            v_cdc_load_table_name: 99_SENIORS_D42_PAYMENTS_PKG
+
+    - name: SEND_EMAIL_TASK
+      email_configurations:
+        subject: Seniors D42 Payments file created
+        message: dags/sql/messages/99_seniors_d42_payments_pkg/message.txt
+        message_args:
+          v_US_data_center:
+            path: dags/sql/pre_sql/v_US_data_center.sql
+        email_recipient_query: pre_sql/v_error_email_to.sql
+        email_recipient_query_args:
+          v_package_name: '99_SENIORS_D42_PAYMENTS_PKG'

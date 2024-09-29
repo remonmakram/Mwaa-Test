@@ -1,0 +1,85 @@
+---
+
+pipeline:
+  name: lt_44_aar_dag
+  description: 44 aar pipeline
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - aar
+  task_groups:
+    - name: AAR_Ingestion
+      description: extract and load part
+      ingestion_script: ingestion_script.py
+      data_sources:
+          - type: mysql
+            name: aar
+            default_args:
+                src_prefix: AAR_AF
+                dest_prefix: AAR
+                src_schema: AAR_OWN
+                dest_schema: RAX_APP_USER
+                stage_schema: ODS_STAGE
+                watermark_interval: 30
+                watermark_column: AUDIT_MODIFY_DATE
+                excluded_columns :   "'ODS_CREATE_DATE', 'ODS_MODIFY_DATE'"
+                insert_date_columns: "ODS_CREATE_DATE, ODS_MODIFY_DATE"
+                update_date_columns: "ODS_MODIFY_DATE"
+                unique_keys: "ID"
+                merge_required: True
+            entities:
+                - src_table: account_principal
+                  full_load : "True"
+                  unique_keys: "ACCOUNT_PRINCIPAL_ID"
+                - src_table: role
+                  full_load : "True"
+                  unique_keys: "ROLE_ID"
+                - src_table: invitation
+                  full_load : "True"
+                  unique_keys: "IDENTIFIER"
+                - src_table: record_change_audit
+                  full_load : "True"
+                  unique_keys: "TABLE_NAME,KEY_VALUE,EVENT_TYPE"
+                  pre_sql: "DELETE FROM
+                                (
+                                SELECT T.*
+                                FROM RAX_APP_USER.AAR_AF_RECORD_CHANGE_AUDIT_LND T
+                                INNER JOIN
+                                (
+                                    SELECT TABLE_NAME, KEY_VALUE, EVENT_TYPE, MAX(DATE_CREATED) AS MAX_DATE_CREATED
+                                    FROM RAX_APP_USER.AAR_AF_RECORD_CHANGE_AUDIT_LND
+                                    GROUP BY TABLE_NAME, KEY_VALUE, EVENT_TYPE
+                                    HAVING COUNT(*) > 1
+                                ) R ON T.TABLE_NAME = R.TABLE_NAME
+                                        AND T.KEY_VALUE = R.KEY_VALUE
+                                        AND T.EVENT_TYPE = R.EVENT_TYPE
+                                        AND T.DATE_CREATED < R.MAX_DATE_CREATED
+                            )"
+                  watermark_column: date_created
+                
+
+
+    - name: AAR_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks:
+        - description: load account principal subpackage
+          type: oracle_sql
+          script_location: dags/sql/aar/01-LOAD_ACCOUNT_PRINCIPAL_PKG.sql
+          args:
+            v_cdc_load_table_name: ACCOUNT_PRINCIPAL
+        - description: load role subpackage
+          type: oracle_sql
+          script_location: dags/sql/aar/02-LOAD_ROLE_PKG.sql
+          args:
+            v_cdc_load_table_name: AAR_ROLE
+            v_cdc_oms_overlap: 0.02083333333
+        - description: load invitation subpackage
+          type: oracle_sql
+          script_location: dags/sql/aar/03-LOAD_INVITATION_PKG.sql
+          args:
+            v_cdc_load_table_name: AAR_INVITATION
+        

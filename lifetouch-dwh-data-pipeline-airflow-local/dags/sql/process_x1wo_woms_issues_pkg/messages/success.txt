@@ -1,0 +1,8 @@
+Data Center - :v_data_center
+
+Package Name : PROCESS_X1WO_WOMS_ISSUES_PKG
+Location : FACT_Folder>Plant Operations>Packages
+
+PROCESS_X1WO_WOMS_ISSUES_PKG Completed Successfully!!
+
+Thanks!

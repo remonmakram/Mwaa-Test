@@ -1,0 +1,28 @@
+---
+
+pipeline:
+  name: lt_35_upd_image_tracking_dag
+  description: Upd_Image_Tracking package
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - upd_image_tracking
+  task_groups:
+  
+    - name: Upd_image_tracking_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        #v_cdc_load_date: dags/sql/pre_sql.sql
+        v_cdc_ld_date: dags/sql/pre_sql/pre_v_cdc_ld_date.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks: 
+        - description: load update image tracking batch package
+          type: oracle_sql
+          script_location: dags/sql/35_UPD_IMAGE_TRACKING/35_UPD_IMAGE_TRACKING.sql
+          args:
+            v_cdc_load_table_name: UPD_IMAGE_TRACKING
+            v_cdc_oms_overlap: 0.02083333333
+       
+        
+        

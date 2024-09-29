@@ -1,0 +1,122 @@
+---
+
+pipeline:
+  name: lt_61_mic_pkg
+  description: lifetouch 61 mic pipeline
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - mic
+  task_groups:
+    - name: MIC_Ingestion
+      description: extract and load part
+      ingestion_script: ingestion_script_test.py
+      data_sources:
+          - type: mysql
+            name: mic
+            default_args:
+                src_prefix: MIC_AF
+                dest_prefix: MIC
+                src_schema: MIC_OWN
+                dest_schema: RAX_APP_USER
+                stage_schema: ODS_STAGE
+                watermark_interval: 30
+                watermark_column: last_update_date
+                excluded_columns :   "'ODS_CREATE_DATE', 'ODS_MODIFY_DATE'"
+                insert_date_columns: "ODS_CREATE_DATE, ODS_MODIFY_DATE"
+                update_date_columns: "ODS_MODIFY_DATE"
+                unique_keys: "ID"
+                merge_required: True
+            entities:
+                - src_table: item
+                  excluded_columns : "'ODS_CREATE_DATE', 'ODS_MODIFY_DATE', 'IMAGES_EXTERNALLY_ACCESSIBLE', 'REVERSE_PAGE_ORDER', 'PRERENDERED_IMAGE_SIZE', 'MANUFACTURING_FAMILY_NAME'"
+                  target_mapping:
+                      SRC_CREATE_DATE: created_date as SRC_CREATE_DATE
+                      SRC_LAST_UPDATE_DATE: last_update_date as SRC_LAST_UPDATE_DATE
+
+                - src_table: item_merch_item
+                  full_load : "True"
+                  operations_to_apply: 'Insert'
+                  unique_keys: [
+                                  'ITEM_ID',
+                                  {'FieldName': 'MERCH_ITEM_ID', 'expression': "coalesce({FieldName}, ' ')"}
+                                ]
+
+                - src_table: manufacturing_family
+                  src_prefix: AF_MIC
+                  excluded_columns: "'ODS_CREATE_DATE', 'ODS_MODIFY_DATE', 'PROCESSING_STRATEGY'"
+                  lnd_table: "MANUFACT_FAMILY"
+                  target_mapping: 
+                      SRC_CREATE_DATE: created_date as SRC_CREATE_DATE 
+                      SRC_LAST_UPDATE_DATE: last_update_date as SRC_LAST_UPDATE_DATE
+                  unique_keys: "NAME"
+
+                - src_table: item_finishing_code
+                  full_load : "True"
+                  post_sql: "DELETE FROM ODS_STAGE.MIC_ITEM_FINISHING_CODE_STG T
+                               WHERE NOT EXISTS
+                                (
+                                  SELECT * FROM RAX_APP_USER.MIC_AF_ITEM_FINISHING_CODE_LND S
+                                  WHERE COALESCE(S.ITEM_ID, ' ') = COALESCE(T.ITEM_ID, ' ')
+                                    AND COALESCE(T.FINISHING_CODE, ' ') = COALESCE(S.FINISHING_CODE, ' ')
+                                )"
+                  unique_keys: [
+                                  {'FieldName': 'ITEM_ID', 'expression': "coalesce({FieldName}, ' ')"},
+                                  {'FieldName': 'FINISHING_CODE', 'expression': "coalesce({FieldName}, ' ')"}
+                                ]
+
+                - src_table: item_additional_attribute
+                  target_table : ITEM_ADDNL_ATTR
+                  src_prefix: AF_MIC
+                  unique_keys: "ITEM_ID, ATTRIBUTE"
+                  full_load : "True"
+                  
+                - src_table: item_ship_node
+                  unique_keys: "ITEM_ID, SHIP_NODE"
+                  full_load : "True"
+                
+                - src_table: manufacturing_family_workflow
+                  unique_keys: "MANUFACTURING_FAMILY_ID, WORKFLOW_STEP"
+                  full_load : "True"
+                  target_table : MFG_FAMILY_WFLW
+                  src_prefix: AF_MIC
+                  excluded_columns: "'ODS_CREATE_DATE', 'ODS_MODIFY_DATE', 'MANUFACTURING_FAMILY_NAME'"
+                  use_distinct_in_source_query: "True"
+                  
+
+    - name: MIC_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      v_env: DEV
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+        v_cdc_oms_overlap: 0.02083333333
+      tasks: 
+        - name: 01_LOAD_MFG_ITEM_PKG
+          description: load mic MFG_ITEM subpackage
+          type: oracle_sql
+          script_location: dags/sql/61_LOAD_MIC_PKG/01-LOAD_MFG_ITEM_PKG.sql
+          args:
+            v_cdc_load_table_name: MFG_ITEM
+        
+        - name: 02_LOAD_MFG_ITEM_MERCH_ITEM_PKG
+          description: load mic MFG_ITEM_MERCH_ITEM subpackage
+          type: oracle_sql
+          script_location: dags/sql/61_LOAD_MIC_PKG/02-LOAD_MFG_ITEM_MERCH_ITEM_PKG.sql
+          args:
+            v_cdc_load_table_name: MFG_ITEM_MERCH_ITEM
+
+        - name: 03_LOAD_MFG_FAMILY_PKG
+          description: load mic MFG_FAMILY subpackage
+          type: oracle_sql
+          script_location: dags/sql/61_LOAD_MIC_PKG/03-LOAD_MFG_FAMILY_PKG.sql
+          args:
+            v_cdc_load_table_name: MFG_FAMILY
+
+        - name: 04_LOAD_MFG_FINISHING_CODE_PKG
+          description: load mic MFG_FINISHING_CODE subpackage
+          type: oracle_sql
+          script_location: dags/sql/61_LOAD_MIC_PKG/04-LOAD_MFG_FINISHING_CODE_PKG.sql
+          args:
+            v_cdc_load_table_name: MFG_FINISHING_CODE

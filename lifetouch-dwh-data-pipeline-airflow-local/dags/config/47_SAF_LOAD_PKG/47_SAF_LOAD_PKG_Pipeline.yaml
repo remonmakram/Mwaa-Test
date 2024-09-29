@@ -1,0 +1,40 @@
+---
+
+pipeline:
+  name: lt_47_SAF_LOAD_PKG_dag
+  description: SAF LOAD package
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - 47_SAF_LOAD_PKG
+  task_groups:
+  
+    - name: 47_SAF_LOAD_PKG_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks: 
+        - description: load SUBJECT_APO batch package
+          type: oracle_sql
+          script_location: dags/sql/47_SAF_LOAD_PKG/LOAD_SUBJECT_APO_PKG.sql
+          args:
+            v_cdc_load_table_name: SUBJECT_APO
+            v_cdc_oms_overlap: 0.02083333333
+       
+        - description: load MART_SUBJECT batch package
+          type: oracle_sql
+          script_location: dags/sql/47_SAF_LOAD_PKG/LOAD_MART_SUBJECT_PKG.sql
+          args:
+            v_cdc_load_table_name: MART_SUBJECT
+            v_cdc_oms_overlap: 0.02083333333
+
+
+        - description: load SUBJECT_ACTIVITY_FACT batch package
+          type: oracle_sql
+          script_location: dags/sql/47_SAF_LOAD_PKG/LOAD_SUBJECT_ACTIVITY_FACT_PKG.sql
+          args:
+            v_cdc_load_table_name: SUBJECT_ACTIVITY_FACT
+            v_cdc_oms_overlap: 0.02083333333
+        

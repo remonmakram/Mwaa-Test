@@ -1,0 +1,71 @@
+---
+
+pipeline:
+  name: lt_LOAD_RECONNECT_DATA_FILES2_PKG_dag
+  description: LOAD_RECONNECT_DATA_FILES2 package
+  schedule: "@daily"
+  tags:
+    - lifetouch
+    - LOAD_RECONNECT_DATA_FILES2
+  
+  task_groups:
+    - name: LOAD_RECONNECT_DATA_FILES2_export
+      description: drop and recreate table then extract data and load to s3
+      tasks:
+        - export_files:
+            - extract_query: 'LOAD_RECONNET_DATA_FILES2_PKG/SALESODS_OID_Flat_File_export1.sql'
+              export_location: finance/Reconnet
+              extract_file_name: pre_sql/v_rnet_file_name_split4.sql
+              file_name_args:
+                v_rnet_corp_acct_ind: 'N'
+                v_rnet_load_date:  
+                  path: dags/sql/pre_sql/v_rnet_load_date.sql
+                  placeholder:
+                    v_cdc_load_table_name: RECONNET_DATA_FILE
+                v_rnet_currency_type: 
+                  path: dags/sql/pre_sql/v_rnet_currency_type.sql
+
+              file_ext: txt
+              extract_args:
+                v_rnet_corp_acct_ind: 'N'
+                v_rnet_load_date:
+                  path: dags/sql/pre_sql/v_rnet_load_date.sql
+                  placeholder:
+                    v_cdc_load_table_name: RECONNET_DATA_FILE
+                v_rnet_currency_type: 
+                  path: dags/sql/pre_sql/v_rnet_currency_type.sql
+
+            - extract_query: 'LOAD_RECONNET_DATA_FILES2_PKG/SALESODS_OID_Flat_File_export2.sql'
+              export_location: finance/Reconnet
+              extract_file_name: pre_sql/v_rnet_file_name_split4.sql
+              file_name_args:
+                v_rnet_corp_acct_ind: 'Y'
+                v_rnet_load_date:  
+                  path: dags/sql/pre_sql/v_rnet_load_date.sql
+                  placeholder:
+                    v_cdc_load_table_name: RECONNET_DATA_FILE
+                v_rnet_currency_type: 
+                  path: dags/sql/pre_sql/v_rnet_currency_type.sql
+
+              file_ext: txt
+              extract_args:
+                v_rnet_corp_acct_ind: 'Y'
+                v_rnet_load_date:
+                  path: dags/sql/pre_sql/v_rnet_load_date.sql
+                  placeholder:
+                    v_cdc_load_table_name: RECONNET_DATA_FILE
+                v_rnet_currency_type: 
+                  path: dags/sql/pre_sql/v_rnet_currency_type.sql
+
+    - name: LOAD_RECONNET_DATA_FILES2_PKG_ODI_Update
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_rnet_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks: 
+        - description: run_pkg
+          type: oracle_sql
+          script_location: dags/sql/LOAD_RECONNET_DATA_FILES2_PKG/LOAD_RECONNET_DATA_FILES2_PKG.sql
+          args:
+            v_cdc_load_table_name: RECONNET_DATA_FILE

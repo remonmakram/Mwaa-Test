@@ -1,0 +1,24 @@
+---
+
+pipeline:
+  name: lt_25_order_tracking_dag
+  description: lifetouch order_tracking package
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - order_tracking
+  task_groups:
+    - name: ORDER_TRACKING_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks: 
+        - name: ORDER_TRACKING_PKG
+          description: load order tracking package
+          type: oracle_sql
+          script_location: dags/sql/25_ORDER_TRACKING_PKG/25_ORDER_TRACKING_DATA_LOAD.sql
+          args:
+            v_cdc_load_table_name: ORDER_TRACKING
+

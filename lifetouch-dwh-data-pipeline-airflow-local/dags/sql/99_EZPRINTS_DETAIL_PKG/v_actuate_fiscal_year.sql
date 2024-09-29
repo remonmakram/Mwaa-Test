@@ -1,0 +1,1 @@
+select  fiscal_year  from mart.time where date_key = trunc(sysdate) 

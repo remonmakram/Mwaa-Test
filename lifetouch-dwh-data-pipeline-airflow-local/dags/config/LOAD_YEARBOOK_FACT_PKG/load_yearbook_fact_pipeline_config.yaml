@@ -1,0 +1,23 @@
+---
+
+pipeline:
+  name: lt_yearbook_fact_dag
+  description: YEARBOOK_FACT_PKG package
+  schedule: "@daily"
+  tags:
+    - lifetouch
+    - lt_yearbook_fact
+  task_groups:
+    - name: YEARBOOK_FACT_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+        v_cdc_oms_overlap: 0.02083333333
+      tasks: 
+        - description: load yearbook fact subpackage
+          type: oracle_sql
+          script_location: dags/sql/LOAD_YEARBOOK_FACT_PKG/LOAD_YEARBOOK_FACT_PKG.sql
+          args:
+            v_cdc_load_table_name: YEARBOOK_FACT

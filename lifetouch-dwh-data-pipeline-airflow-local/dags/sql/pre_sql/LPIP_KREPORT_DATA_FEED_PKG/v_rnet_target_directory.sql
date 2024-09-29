@@ -1,0 +1,2 @@
+select target_directory from ODS_APP_USER.ODI_INTERFACE_SERVER_INFO
+where interface_key = 'KREPORT_DATA_FEED'

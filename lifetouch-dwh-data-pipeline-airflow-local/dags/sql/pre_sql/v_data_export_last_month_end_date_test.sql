@@ -1,0 +1,1 @@
+select '20170630' from dual

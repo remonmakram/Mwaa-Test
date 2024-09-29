@@ -1,0 +1,27 @@
+---
+
+pipeline:
+  name: 99_pps_unshipped_wob_data_extract_pkg_dag
+  description: 99_pps_unshipped_wob_data_extract_pkgpackage
+  schedule: "0 */4 * * *"
+  tags:
+    - lifetouch
+    - 99_pps_unshipped_wob_data_extract_pkg
+  
+  task_groups:
+    - name: 99_pps_unshipped_wob_data_extract_pkg_evaluate
+      description: 99_pps_unshipped_wob_data_extract_pkg evaluate v_PPS_Data_Extract_Precheck
+      condition_script: dags/sql/pre_sql/v_PPS_Data_Extract_Precheck.sql
+      compared_value: 0
+      operator: '>'                         # '>' '<' '>=' '<=' '=' '!='
+      task_ids: {'true': 99_pps_unshipped_wob_data_extract_pkg_export.deploy_export_files, 'false': end}
+
+    - name: 99_pps_unshipped_wob_data_extract_pkg_export
+      description: drop and recreate table then extract data and load to s3
+      tasks:
+        - export_files:
+            - extract_query: '99_pps_unshipped_wob_data_extract_pkg/PPS_Unshipped_WOB_Detail_export.sql'
+              export_location: Lab_Reports/Chico/PPS_Unshipped_WOB_Detail
+              extract_args:
+                v_data_export_Context: 
+                  path: dags/sql/pre_sql/v_data_export_Context.sql

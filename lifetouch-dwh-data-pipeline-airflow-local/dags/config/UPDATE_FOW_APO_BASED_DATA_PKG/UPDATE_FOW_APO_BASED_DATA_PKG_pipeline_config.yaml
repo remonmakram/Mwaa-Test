@@ -1,0 +1,25 @@
+---
+
+pipeline:
+  name: lt_UPDATE_FOW_APO_BASED_DATA_PKG_dag
+  description: UPDATE_FOW_APO_BASED_DATA_PKG pipeline
+  schedule: "0 */6 * * *"
+  tags:
+    - lifetouch
+    - UPDATE_FOW_APO_BASED_DATA_PKG
+  task_groups:
+    - name: UPDATE_FOW_APO_BASED_DATA_PKG_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql/pre_v_cdc_ld_date.sql
+      default_args:
+        v_cdc_oms_overlap: 0.02083333333
+        v_cdc_overlap: 0.02083333333
+      tasks:
+        - description: UPDATE_FOW_APO_BASED_DATA subpackage
+          type: oracle
+          script_location: dags/sql/UPDATE_FOW_APO_BASED_DATA_PKG/UPDATE_FOW_APO_BASED_DATA_PKG.sql
+          args:
+            v_cdc_load_table_name: FOW_ONLY_BASED_DATA
+            
+        

@@ -1,0 +1,42 @@
+---
+
+pipeline:
+  name: lt_load_opt_in_audit_dag
+  description: lifetouch opt in audit load package
+  schedule: "48 3 * * *"
+  tags:
+    - lifetouch
+    - LOAD_OPT_IN_AUDIT_PKG
+  task_groups:
+    - name: opt_in_audit_Ingestion
+      description: extract and load part
+      ingestion_script: ingestion_script.py
+      data_sources:
+          - type: oracle
+            name: oms2
+            default_args:
+              dest_schema: RAX_APP_USER
+              merge_required: False
+            entities:
+              - dest_table: "C$_0Y0LT_SUBJECT_OPT_IN_AUDIT"
+                v_cdc_load_table_name: OPT_IN_AUDIT
+                tmp_create: 'LOAD_OPT_IN_AUDIT_PKG/tmp_create_LT_SUBJECT_OPT_IN_AUDIT.sql'
+                extract_query: 'LOAD_OPT_IN_AUDIT_PKG/extract_query_LT_SUBJECT_OPT_IN_AUDIT.sql'
+                src_table: LT_SUBJECT_OPT_IN_AUDIT
+                log_cdc_table_name: ODS.DW_CDC_LOAD_STATUS
+                log_cdc_col_name: DW_TABLE_NAME
+
+            
+    - name: OPT_IN_AUDIT_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql/v_cdc_load_date_ODS_DM.sql
+      default_args:
+        v_cdc_ods_overlap: 0.02083333333
+      tasks:
+        - name: LOAD_OPT_IN_AUDIT_PKG
+          description: load opt_in_audit package
+          type: oracle_sql
+          script_location: dags/sql/LOAD_OPT_IN_AUDIT_PKG/LOAD_OPT_IN_AUDIT_PKG.sql
+          args:
+            v_cdc_load_table_name: OPT_IN_AUDIT

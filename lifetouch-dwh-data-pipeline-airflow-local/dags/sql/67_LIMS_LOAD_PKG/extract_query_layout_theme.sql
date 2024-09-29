@@ -1,0 +1,10 @@
+select
+LAYOUT_THEME_ID
+,AUDIT_CREATE_DATE 
+,AUDIT_CREATED_BY
+,AUDIT_MODIFIED_BY
+,AUDIT_MODIFY_DATE 
+,EXTERNAL_KEY
+,NAME
+FROM <schema_name>.LAYOUT_THEME
+WHERE AUDIT_MODIFY_DATE >= to_date(substr(:v_cdc_load_date, 1, 19), 'yyyy-mm-dd hh24:mi:ss')  - 1

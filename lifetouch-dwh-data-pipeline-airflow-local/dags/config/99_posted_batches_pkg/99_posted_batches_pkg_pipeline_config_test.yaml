@@ -1,0 +1,34 @@
+---
+
+pipeline:
+  name: lt_99_posted_batches_pkg_dag
+  description: 99_posted_batches_pkgpackage
+  schedule: "@monthly"
+  tags:
+    - lifetouch
+    - 99_posted_batches_pkg
+  
+  task_groups:
+
+    - name: 99_posted_batches_pkg_export
+      description: drop and recreate table then extract data and load to s3
+      export_file_name:
+        v_data_export_run_date: dags/sql/pre_sql/v_data_export_run_date.sql
+      pre_sql:
+        v_data_export_last_month_end_date:  dags/sql/pre_sql/v_data_export_last_month_end_date_test.sql
+        v_data_export_last_month_begin_date:  dags/sql/pre_sql/v_data_export_last_month_begin_date_test.sql
+
+      tasks:
+        - script_location: dags/sql/99_posted_batches_pkg/posted_unposted_batches_create_temp.sql
+          export_files:
+            - extract_query: 99_posted_batches_pkg/posted_unposted_batches_extract.sql
+              export_location: finance/posted_batches/CSS_CSP_PostedUnpostedBatches
+
+
+        - script_location: dags/sql/99_posted_batches_pkg/posted_batches_create_temp.sql
+          export_files:
+            - extract_query: 99_posted_batches_pkg/posted_batches_extract.sql
+              export_location: finance/posted_batches/CSS_CSP_PostedBatches
+
+        
+        

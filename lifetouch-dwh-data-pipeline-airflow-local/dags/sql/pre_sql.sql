@@ -1,0 +1,1 @@
+SELECT last_cdc_completion_date, 'date' as type FROM ods_own.ods_cdc_load_status WHERE ods_table_name= :v_cdc_load_table_name and context_name = :v_env

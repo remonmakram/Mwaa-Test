@@ -1,0 +1,1 @@
+select count(*) ct from all_act_child_rec_idf_pos_ids

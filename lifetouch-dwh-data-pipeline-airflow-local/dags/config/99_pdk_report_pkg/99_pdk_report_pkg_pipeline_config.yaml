@@ -1,0 +1,25 @@
+---
+
+pipeline:
+  name: 99_pdk_report_pkg_PKG_dag
+  description: 99_pdk_report_pkgpackage
+  schedule: "@monthly"
+  tags:
+    - lifetouch
+    - 99_pdk_report_pkg
+  
+  task_groups:
+    - name: 99_pdk_report_pkg_export
+      description: drop and recreate table then extract data and load to s3
+      tasks:
+        - script_location: dags/sql/99_pdk_report_pkg/99_PDK_REPORT_PKG.sql
+          export_files:
+            - extract_query: 99_pdk_report_pkg/export_pdk_report.sql
+              export_location: PDK/pdk_report
+              file_ext: "csv"
+
+
+
+
+        
+        

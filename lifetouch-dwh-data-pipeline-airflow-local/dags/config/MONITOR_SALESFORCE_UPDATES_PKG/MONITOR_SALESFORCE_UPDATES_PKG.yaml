@@ -1,0 +1,76 @@
+---
+
+pipeline:
+  name: lt_monitor_salesforce_updates_dag
+  description: lifetouch monitor salesforce updates load package
+  schedule: "0 0 * * *"
+  
+  tags:
+    - lifetouch
+    - monitor_salesforce_updates
+  
+  
+  task_groups:
+
+      - name: monitor_salesforce_updates_create_temp
+        description: ODI SQL Logic
+        pre_sql:
+          v_cdc_load_date: dags/sql/pre_sql/v_cdc_load_date.sql
+          v_error_email_to: dags/sql/pre_sql/v_error_email_to.sql
+          v_noerror_email_to: dags/sql/pre_sql/v_noerror_email_to.sql
+          v_US_data_center: dags/sql/pre_sql/v_US_data_center.sql
+        tasks: 
+          - name: monitor_salesforce_updates_create_temp
+            description: drop and recreate table
+            type: oracle_sql
+            script_location: dags/sql/MONITOR_SALESFORCE_UPDATES_PKG/monitor_salesforce_updates_create_temp.sql
+            args:
+              v_cdc_load_table_name: MONITOR_SALESFORCE_UPDATES
+              v_package_name: 'MONITOR_SALESFORCE_UPDATES_PKG'
+
+
+      - name: monitor_salesforce_updates_pkg_evaluate 
+        description: evaluate v_monitor_salesforce_updates_count
+        condition_script: dags/sql/pre_sql/v_monitor_salesforce_updates_count.sql 
+        compared_value: 0
+        operator: '>'     # '>' '<' '>=' '<=' '=' '!='
+        task_ids: {'true': send_email, 'false': end }
+
+
+      - name: send_email
+        email_configurations:
+          subject: ODS Salesforce Data Not Updated
+          message: dags/sql/messages/MONITOR_SALESFORCE_UPDATES_PKG/send_email_1_message.txt
+          message_args:
+            v_US_data_center:
+              path: dags/sql/pre_sql/v_US_data_center.sql
+            v_monitor_salesforce_updates:
+              path: dags/sql/pre_sql/v_monitor_salesforce_updates.sql 
+          email_recipient_query: pre_sql/v_error_email_to.sql
+        
+          email_recipient_query_args:
+            v_package_name: 'MONITOR_SALESFORCE_UPDATES_PKG'  
+
+
+      - name: Monitor_Salesforce_Updates_ODI_Transformation
+        description: ODI SQL Transformation Logic
+        pre_sql:
+          v_cdc_load_date: dags/sql/pre_sql.sql
+        default_args:
+          v_cdc_overlap: 0.02083333333 
+      
+        tasks:
+          - description: load monitor_salesforce_updates subpackage 
+            type: oracle_sql
+            script_location: dags/sql/MONITOR_SALESFORCE_UPDATES_PKG/MONITOR_SALESFORCE_UPDATES_PKG.sql
+            args:
+              v_cdc_load_table_name: MONITOR_SALESFORCE_UPDATES
+  
+
+            
+
+
+
+
+    
+      

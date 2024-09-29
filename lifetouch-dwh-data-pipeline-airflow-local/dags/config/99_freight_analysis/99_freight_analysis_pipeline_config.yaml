@@ -1,0 +1,43 @@
+---
+
+pipeline:
+  name: lt_99_freight_analysis_PKG_dag
+  description: 99_freight_analysispackage
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - 99_freight_analysis
+  
+  task_groups:
+
+    
+    - name: Transformation_task_group
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql/pre_v_cdc_ld_date.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+        
+      tasks: 
+        - description: sub_pkg 99_FREIGHT_UC_ANALYSIS_PKG.sql
+          type: oracle_sql
+          script_location: dags/sql/99_freight_analysis/99_FREIGHT_UC_ANALYSIS_PKG.sql
+          args:
+            v_cdc_load_table_name: FREIGHT_ANALYSIS_UC
+          trigger_rule: all_done
+
+
+
+        - description: sub_pkg 99_FREIGHT_SR_ANALYSIS_PKG.sql
+          type: oracle_sql
+          script_location: dags/sql/99_freight_analysis/99_FREIGHT_SR_ANALYSIS_PKG.sql
+          args:
+            v_cdc_load_table_name: FREIGHT_ANALYSIS_SR
+          trigger_rule: all_done
+
+        - description: sub_pkg 99_FREIGHT_YB_ANALYSIS_PKG
+          type: oracle_sql
+          script_location: dags/sql/99_freight_analysis/99_FREIGHT_YB_ANALYSIS_PKG.sql
+          args:
+            v_cdc_load_table_name: FREIGHT_ANALYSIS_YB
+          trigger_rule: all_done

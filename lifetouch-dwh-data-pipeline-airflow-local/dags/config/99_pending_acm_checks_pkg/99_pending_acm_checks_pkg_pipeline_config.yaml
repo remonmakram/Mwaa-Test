@@ -1,0 +1,22 @@
+---
+pipeline:
+  name: 99_pending_acm_checks_pkg_dag
+  description: 99_pending_acm_checks_pkg
+  schedule: "0 23 * * *"
+  tags:
+    - lifetouch
+    - 99_pending_acm_checks_pkg
+  task_groups:
+    - name: 99_pending_acm_checks_pkg_export
+      description: drop and recreate table then extract data and load to s3
+      export_file_name:
+        v_data_export_run_date: dags/sql/pre_sql/v_data_export_run_date.sql
+      tasks:
+        - script_location: dags/sql/99_pending_acm_checks_pkg/99_pending_acm_checks_create_tmp.sql
+          export_files:
+            - extract_query: '99_pending_acm_checks_pkg/99_pending_acm_checks_export.sql'
+              export_location: finance/pending_acm_checks/pending_acm_checks
+
+
+
+              

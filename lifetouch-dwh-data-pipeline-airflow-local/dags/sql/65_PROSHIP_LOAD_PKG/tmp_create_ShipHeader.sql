@@ -1,0 +1,1 @@
+delete from rax_app_user.proship_shipheader_tmp

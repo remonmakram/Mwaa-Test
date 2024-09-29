@@ -1,0 +1,534 @@
+---
+
+pipeline:
+  name: lt_monitor_plps_data_issues_dag
+  description: lifetouch monitor_plps_data_issues package
+  schedule: "30 6 * * *" 
+  tags:
+    - lifetouch
+    - MONITOR_PLPS_DATA_ISSUES_PKG
+  
+  task_groups:
+    - name: TASK_GROUP_1
+      default_args:
+        connection_id: lps_conn_id
+      tasks:
+        - name: MONITOR_PLPS_DETAIL_POST_ADDS_UP_PRC
+          description: drop and recreate table
+          type: oracle_sql
+          script_location: dags/sql/MONITOR_PLPS_DATA_ISSUES_PKG/tmp_create_detail_post_adds_up.sql
+
+    - name: TASK_GROUP_2
+      default_args:
+        connection_id: lps_conn_id
+      tasks:
+        - name: MONITOR_PLPS_DETAIL_POST_HEADER_CHILD_DIFF_PRC
+          description: drop and recreate table
+          type: oracle_sql
+          trigger_rule: none_failed_or_skipped
+          script_location: dags/sql/MONITOR_PLPS_DATA_ISSUES_PKG/tmp_create_detail_post_header_child_diff.sql 
+
+    - name: TASK_GROUP_3
+      default_args:
+        connection_id: lps_conn_id
+      tasks:
+        - name: MONITOR_PLPS_DETAIL_ACT_POS_NOT_X_ORDERS_PRC
+          description: drop and recreate table
+          type: oracle_sql
+          trigger_rule: none_failed_or_skipped
+          script_location: dags/sql/MONITOR_PLPS_DATA_ISSUES_PKG/tmp_create_detail_act_pos_not_x_orders.sql
+
+    - name: TASK_GROUP_4
+      default_args:
+        connection_id: lps_conn_id
+      tasks:  
+        - name: MONITOR_PLPS_DETAIL_MERCH_POS_NOT_X_ORDERS_PRC
+          description: drop and recreate table
+          type: oracle_sql
+          trigger_rule: none_failed_or_skipped
+          script_location: dags/sql/MONITOR_PLPS_DATA_ISSUES_PKG/tmp_create_detail_merch_pos_not_x_orders.sql 
+
+    - name: TASK_GROUP_5
+      default_args:
+        connection_id: lps_conn_id 
+      tasks: 
+        - name: MONITOR_PLPS_ACT_POS_NOT_IN_DETAIL_POST_PRC
+          description: drop and recreate table
+          type: oracle_sql
+          trigger_rule: none_failed_or_skipped
+          script_location: dags/sql/MONITOR_PLPS_DATA_ISSUES_PKG/tmp_create_act_pos_not_in_detail_post.sql
+
+    - name: TASK_GROUP_6
+      default_args:
+        connection_id: lps_conn_id
+      tasks:
+        - name: MONITOR_PLPS_MERCH_POS_NOT_IN_DETAIL_POST_PRC
+          description: drop and recreate table
+          type: oracle_sql
+          trigger_rule: none_failed_or_skipped
+          script_location: dags/sql/MONITOR_PLPS_DATA_ISSUES_PKG/tmp_create_merch_pos_not_in_detail_post.sql
+
+    - name: TASK_GROUP_7
+      default_args:
+        connection_id: lps_conn_id
+      tasks:
+        - name: MONITOR_PLPS_ORDER_GUID_IN_CLI_NOT_IN_CLH_PRC
+          description: drop and recreate table
+          type: oracle_sql
+          trigger_rule: none_failed_or_skipped
+          script_location: dags/sql/MONITOR_PLPS_DATA_ISSUES_PKG/tmp_create_order_guid_in_cli_not_in_clh.sql
+
+    - name: TASK_GROUP_8
+      default_args:
+        connection_id: lps_conn_id
+      tasks:
+        - name: MONITOR_PLPS_ORDER_GUID_IN_COH_NOT_IN_CLI_PRC
+          description: drop and recreate table
+          type: oracle_sql
+          trigger_rule: none_failed_or_skipped
+          script_location: dags/sql/MONITOR_PLPS_DATA_ISSUES_PKG/tmp_create_order_guid_in_coh_not_in_cli.sql
+
+    - name: TASK_GROUP_9
+      default_args:
+        connection_id: lps_conn_id
+      tasks: 
+        - name: MONITOR_PLPS_DIFF_IN_COH_AND_CLI_PRC
+          description: drop and recreate table
+          type: oracle_sql
+          trigger_rule: none_failed_or_skipped
+          script_location: dags/sql/MONITOR_PLPS_DATA_ISSUES_PKG/tmp_create_diff_in_coh_and_cli.sql
+
+    - name: TASK_GROUP_10
+      default_args:
+        connection_id: lps_conn_id
+      tasks:  
+        - name: MONITOR_PLPS_PROMO_CODE_MISSING_REVENUE_SHARE_PRC
+          description: drop and recreate table
+          type: oracle_sql
+          trigger_rule: none_failed_or_skipped
+          script_location: dags/sql/MONITOR_PLPS_DATA_ISSUES_PKG/tmp_create_promo_code_miss_rev_share.sql  
+
+    - name: TASK_GROUP_11
+      default_args:
+        connection_id: lps_conn_id
+      tasks:  
+        - name: MONITOR_PLPS_STD_ORG_LOAD_INCORRECT_PRC
+          description: drop and recreate table
+          type: oracle_sql
+          trigger_rule: none_failed_or_skipped
+          script_location: dags/sql/MONITOR_PLPS_DATA_ISSUES_PKG/tmp_create_std_org_load_incorrect.sql
+
+    - name: TASK_GROUP_12
+      default_args:
+        connection_id: lps_conn_id  
+      tasks:
+        - name: MONITOR_PLPS_ORDER_CODE_NEW_PROD_CCPRICING_PRC
+          description: drop and recreate table
+          type: oracle_sql
+          trigger_rule: none_failed_or_skipped
+          script_location: dags/sql/MONITOR_PLPS_DATA_ISSUES_PKG/tmp_create_order_code_new_prod_ccpricing.sql  
+      
+    - name: TASK_GROUP_13
+      default_args:
+        connection_id: lps_conn_id
+      tasks: 
+        - name: MONITOR_PLPS_DIFF_IN_CCP_ND_DP_NOT_IN_CCP_PRC
+          description: drop and recreate table
+          type: oracle_sql
+          trigger_rule: none_failed_or_skipped
+          script_location: dags/sql/MONITOR_PLPS_DATA_ISSUES_PKG/temp_create_diff_in_ccp_nd_dP_not_in_CCP.sql  
+
+    - name: TASK_GROUP_14
+      default_args:
+        connection_id: lps_conn_id
+      tasks: 
+        - name: MONITOR_PLPS_DIFF_IN_CCP_NOT_IN_DETAIL_POS_PRC
+          description: drop and recreate table
+          type: oracle_sql
+          trigger_rule: none_failed_or_skipped
+          script_location: dags/sql/MONITOR_PLPS_DATA_ISSUES_PKG/tmp_create_diff_in_ccp_not_in_detail_pos.sql  
+        
+    - name: TASK_GROUP_15
+      default_args:
+        connection_id: lps_conn_id
+      tasks:  
+        - name: MONITOR_PLPS_DIFF_IN_CCPRICING_DETAIL_POST_PRC
+          description: drop and recreate table
+          type: oracle_sql
+          trigger_rule: none_failed_or_skipped
+          script_location: dags/sql/MONITOR_PLPS_DATA_ISSUES_PKG/tmp_create_diff_in_ccpricing_detail_post.sql
+
+    - name: TASK_GROUP_16
+      default_args:
+        connection_id: lps_conn_id 
+      tasks: 
+        - name: MONITOR_PLPS_ALL_ACT_CHILD_REC_IDF_POS_IDS_PRC
+          description: drop and recreate table
+          type: oracle_sql
+          trigger_rule: none_failed_or_skipped
+          script_location: dags/sql/MONITOR_PLPS_DATA_ISSUES_PKG/tmp_create_all_act_child_rec_idf_pos_ids.sql 
+
+    - name: TASK_GROUP_17
+      default_args:
+        connection_id: lps_conn_id
+      tasks: 
+        - name: MONITOR_PLPS_ALL_MER_CHILD_REC_IDF_POS_IDS_PRC
+          description: drop and recreate table
+          type: oracle_sql
+          trigger_rule: none_failed_or_skipped
+          script_location: dags/sql/MONITOR_PLPS_DATA_ISSUES_PKG/tmp_create_all_mer_child_rec_idf_pos_ids.sql    
+
+    - name: TASK_GROUP_18
+      default_args:
+        connection_id: lps_conn_id
+      tasks:  
+        - name:  MONITOR_PLPS_CCPLI_IS_NULL_1_PRC
+          description: drop and recreate table
+          type: oracle_sql
+          trigger_rule: none_failed_or_skipped
+          script_location: dags/sql/MONITOR_PLPS_DATA_ISSUES_PKG/tmp_create_CCPricingLineItem_is_nul.sql             
+      
+    - name: check_v_detail_post_adds_up_updates_count
+      description: go down a certain branch based on the condition
+      connection_id: lps_conn_id
+      condition_script: dags/sql/pre_sql/v_detail_post_adds_up_updates_count.sql
+      compared_value: 0
+      operator: '>'                         # '>' '<' '>=' '<=' '=' '!='
+      task_ids: {'true': SEND_EMAIL_1, 'false': TASK_GROUP_2.MONITOR_PLPS_DETAIL_POST_HEADER_CHILD_DIFF_PRC}
+
+    - name: check_v_detail_post_header_child_diff_updates_count
+      description: go down a certain branch based on the condition
+      connection_id: lps_conn_id
+      condition_script: dags/sql/pre_sql/v_detail_post_header_child_diff_updates_count.sql
+      compared_value: 0
+      operator: '>'                         # '>' '<' '>=' '<=' '=' '!='
+      task_ids: {'true': SEND_EMAIL_2, 'false': TASK_GROUP_3.MONITOR_PLPS_DETAIL_ACT_POS_NOT_X_ORDERS_PRC}
+
+    - name: check_v_detail_act_pos_not_x_orders
+      description: go down a certain branch based on the condition
+      connection_id: lps_conn_id
+      condition_script: dags/sql/pre_sql/v_detail_act_pos_not_x_orders.sql
+      compared_value: 0
+      operator: '>'                         # '>' '<' '>=' '<=' '=' '!='
+      task_ids: {'true': SEND_EMAIL_3, 'false': TASK_GROUP_4.MONITOR_PLPS_DETAIL_MERCH_POS_NOT_X_ORDERS_PRC}
+
+    - name: check_v_detail_merch_pos_not_x_orders_updates_count
+      description: go down a certain branch based on the condition
+      connection_id: lps_conn_id
+      condition_script: dags/sql/pre_sql/v_detail_merch_pos_not_x_orders_updates_count.sql
+      compared_value: 0
+      operator: '>'                         # '>' '<' '>=' '<=' '=' '!='
+      task_ids: {'true': SEND_EMAIL_4, 'false': TASK_GROUP_5.MONITOR_PLPS_ACT_POS_NOT_IN_DETAIL_POST_PRC}
+
+    - name: check_v_act_pos_not_in_detail_post_count
+      description: go down a certain branch based on the condition
+      connection_id: lps_conn_id
+      condition_script: dags/sql/pre_sql/v_act_pos_not_in_detail_post_count.sql
+      compared_value: 0
+      operator: '>'                         # '>' '<' '>=' '<=' '=' '!='
+      task_ids: {'true': SEND_EMAIL_5, 'false': TASK_GROUP_6.MONITOR_PLPS_MERCH_POS_NOT_IN_DETAIL_POST_PRC}
+
+    - name: check_v_merch_pos_not_in_detail_post_count
+      description: go down a certain branch based on the condition
+      connection_id: lps_conn_id
+      condition_script: dags/sql/pre_sql/v_merch_pos_not_in_detail_post_count.sql
+      compared_value: 0
+      operator: '>'                         # '>' '<' '>=' '<=' '=' '!='
+      task_ids: {'true': SEND_EMAIL_6, 'false': TASK_GROUP_7.MONITOR_PLPS_ORDER_GUID_IN_CLI_NOT_IN_CLH_PRC}
+
+    - name: check_v_order_guid_in_cli_not_in_clh_count
+      description: go down a certain branch based on the condition
+      connection_id: lps_conn_id
+      condition_script: dags/sql/pre_sql/v_order_guid_in_cli_not_in_clh_count.sql
+      compared_value: 0
+      operator: '>'                         # '>' '<' '>=' '<=' '=' '!='
+      task_ids: {'true': SEND_EMAIL_7, 'false': TASK_GROUP_8.MONITOR_PLPS_ORDER_GUID_IN_COH_NOT_IN_CLI_PRC} 
+
+    - name: check_v_order_guid_in_coh_not_in_cli_count
+      description: go down a certain branch based on the condition
+      connection_id: lps_conn_id
+      condition_script: dags/sql/pre_sql/v_order_guid_in_coh_not_in_cli_count.sql
+      compared_value: 0
+      operator: '>'                         # '>' '<' '>=' '<=' '=' '!='
+      task_ids: {'true': SEND_EMAIL_8, 'false': TASK_GROUP_9.MONITOR_PLPS_DIFF_IN_COH_AND_CLI_PRC} 
+
+    - name: check_v_diff_in_coh_and_cli_count
+      description: go down a certain branch based on the condition
+      connection_id: lps_conn_id
+      condition_script: dags/sql/pre_sql/v_diff_in_coh_and_cli_count.sql
+      compared_value: 0
+      operator: '>'                         # '>' '<' '>=' '<=' '=' '!='
+      task_ids: {'true': SEND_EMAIL_9, 'false': TASK_GROUP_10.MONITOR_PLPS_PROMO_CODE_MISSING_REVENUE_SHARE_PRC}
+
+    - name: check_v_promo_code_missing_revenue_share_count  
+      description: go down a certain branch based on the condition
+      connection_id: lps_conn_id
+      condition_script: dags/sql/pre_sql/v_promo_code_missing_revenue_share_count.sql
+      compared_value: 0
+      operator: '>'                         # '>' '<' '>=' '<=' '=' '!='
+      task_ids: {'true': SEND_EMAIL_10, 'false': TASK_GROUP_11.MONITOR_PLPS_STD_ORG_LOAD_INCORRECT_PRC}
+
+    - name: check_v_std_org_load_incorrect_count
+      description: go down a certain branch based on the condition
+      connection_id: lps_conn_id
+      condition_script: dags/sql/pre_sql/v_std_org_load_incorrect_count.sql
+      compared_value: 0
+      operator: '>'                         # '>' '<' '>=' '<=' '=' '!='
+      task_ids: {'true': SEND_EMAIL_11, 'false': TASK_GROUP_12.MONITOR_PLPS_ORDER_CODE_NEW_PROD_CCPRICING_PRC}
+
+    - name: check_v_order_code_new_prod_ccpricing_count
+      description: go down a certain branch based on the condition
+      connection_id: lps_conn_id
+      condition_script: dags/sql/pre_sql/v_order_code_new_prod_ccpricing_count.sql
+      compared_value: 0
+      operator: '>'                         # '>' '<' '>=' '<=' '=' '!='
+      task_ids: {'true': SEND_EMAIL_12, 'false': TASK_GROUP_13.MONITOR_PLPS_DIFF_IN_CCP_ND_DP_NOT_IN_CCP_PRC}
+
+    - name: check_v_diff_in_ccp_nd_dP_not_in_CCP_count
+      description: go down a certain branch based on the condition
+      connection_id: lps_conn_id
+      condition_script: dags/sql/pre_sql/v_diff_in_ccp_nd_dP_not_in_CCP_count.sql
+      compared_value: 0
+      operator: '>'                         # '>' '<' '>=' '<=' '=' '!='
+      task_ids: {'true': SEND_EMAIL_13, 'false': TASK_GROUP_14.MONITOR_PLPS_DIFF_IN_CCP_NOT_IN_DETAIL_POS_PRC}
+
+    - name: check_v_diff_in_ccp_not_in_detail_pos_count
+      description: go down a certain branch based on the condition
+      connection_id: lps_conn_id
+      condition_script: dags/sql/pre_sql/v_diff_in_ccp_not_in_detail_pos_count.sql
+      compared_value: 0
+      operator: '>'                         # '>' '<' '>=' '<=' '=' '!='
+      task_ids: {'true': SEND_EMAIL_14, 'false': TASK_GROUP_15.MONITOR_PLPS_DIFF_IN_CCPRICING_DETAIL_POST_PRC}  
+
+    - name: check_v_diff_in_ccpricing_detail_post_count
+      description: go down a certain branch based on the condition
+      connection_id: lps_conn_id
+      condition_script: dags/sql/pre_sql/v_diff_in_ccpricing_detail_post_count.sql
+      compared_value: 0
+      operator: '>'                         # '>' '<' '>=' '<=' '=' '!='
+      task_ids: {'true': SEND_EMAIL_15, 'false': TASK_GROUP_16.MONITOR_PLPS_ALL_ACT_CHILD_REC_IDF_POS_IDS_PRC}
+
+    - name: check_v_all_act_child_rec_idf_pos_ids_count
+      description: go down a certain branch based on the condition
+      connection_id: lps_conn_id
+      condition_script: dags/sql/pre_sql/v_all_act_child_rec_idf_pos_ids_count.sql
+      compared_value: 0
+      operator: '>'                         # '>' '<' '>=' '<=' '=' '!='
+      task_ids: {'true': SEND_EMAIL_16, 'false': TASK_GROUP_17.MONITOR_PLPS_ALL_MER_CHILD_REC_IDF_POS_IDS_PRC}
+
+    - name: check_v_all_mer_child_rec_idf_pos_ids_count
+      description: go down a certain branch based on the condition
+      connection_id: lps_conn_id
+      condition_script: dags/sql/pre_sql/v_all_mer_child_rec_idf_pos_ids_count.sql
+      compared_value: 0
+      operator: '>'                         # '>' '<' '>=' '<=' '=' '!='
+      task_ids: {'true': SEND_EMAIL_17, 'false':  TASK_GROUP_18.MONITOR_PLPS_CCPLI_IS_NULL_1_PRC}  
+    
+    - name: check_v_sbase_code_is_null_in_ccpli_1_count
+      description: go down a certain branch based on the condition
+      connection_id: lps_conn_id
+      condition_script: dags/sql/pre_sql/v_sbase_code_is_null_in_ccpli_1_count.sql
+      compared_value: 0
+      operator: '>'                         # '>' '<' '>=' '<=' '=' '!='
+      task_ids: {'true': SEND_EMAIL_19, 'false': end} 
+
+
+    - name: SEND_EMAIL_1
+      email_configurations:
+        subject: PLPS Data Error - Make sure Detail_post adds up
+        message: dags/sql/messages/MONITOR_PLPS_DATA_ISSUES_PKG/send_email_message_1.txt
+        message_args:
+          v_US_data_center:
+            path: dags/sql/pre_sql/v_US_data_center.sql
+        email_recipient_query: pre_sql/v_error_email_to.sql
+        email_recipient_query_args:
+          v_package_name: 'MONITOR_PLPS_DATA_ISSUES_PKG'
+
+    - name: SEND_EMAIL_2
+      email_configurations:
+        subject: PLPS Data Error - Diffs between header and child pos tables
+        message: dags/sql/messages/MONITOR_PLPS_DATA_ISSUES_PKG/send_email_message_2.txt
+        message_args:
+          v_US_data_center:
+            path: dags/sql/pre_sql/v_US_data_center.sql
+          v_detail_post_header_child_diff_updates:
+            path: dags/sql/pre_sql/v_detail_post_header_child_diff_updates_count.sql
+        email_recipient_query: pre_sql/v_error_email_to.sql
+        email_recipient_query_args:
+          v_package_name: 'MONITOR_PLPS_DATA_ISSUES_PKG'
+
+    - name: SEND_EMAIL_3
+      email_configurations:
+        subject: PLPS Data Error - Diff in act_pos_post and detail post tables not X orders
+        message: dags/sql/messages/MONITOR_PLPS_DATA_ISSUES_PKG/send_email_message_3.txt
+        message_args:
+          v_US_data_center:
+            path: dags/sql/pre_sql/v_US_data_center.sql
+        email_recipient_query: pre_sql/v_error_email_to.sql
+        email_recipient_query_args:
+          v_package_name: 'MONITOR_PLPS_DATA_ISSUES_PKG'
+
+    - name: SEND_EMAIL_4
+      email_configurations:
+        subject: PLPS Data Error - Diff in merch_post and detail post tables not X orders
+        message: dags/sql/messages/MONITOR_PLPS_DATA_ISSUES_PKG/send_email_message_4.txt
+        message_args:
+          v_US_data_center:
+            path: dags/sql/pre_sql/v_US_data_center.sql
+        email_recipient_query: pre_sql/v_error_email_to.sql
+        email_recipient_query_args:
+          v_package_name: 'MONITOR_PLPS_DATA_ISSUES_PKG'
+
+    - name: SEND_EMAIL_5
+      email_configurations:
+        subject: PLPS Data Error - Orders in Act pos post which are not in Detail post
+        message: dags/sql/messages/MONITOR_PLPS_DATA_ISSUES_PKG/send_email_message_5.txt
+        message_args:
+          v_US_data_center:
+            path: dags/sql/pre_sql/v_US_data_center.sql
+        email_recipient_query: pre_sql/v_error_email_to.sql
+        email_recipient_query_args:
+          v_package_name: 'MONITOR_PLPS_DATA_ISSUES_PKG'
+          
+    - name: SEND_EMAIL_6
+      email_configurations:
+        subject: PLPS Data Error - Orders in Merch_post which are not in Detail_post
+        message: dags/sql/messages/MONITOR_PLPS_DATA_ISSUES_PKG/send_email_message_6.txt
+        message_args:
+          v_US_data_center:
+            path: dags/sql/pre_sql/v_US_data_center.sql
+        email_recipient_query: pre_sql/v_error_email_to.sql
+        email_recipient_query_args:
+          v_package_name: 'MONITOR_PLPS_DATA_ISSUES_PKG'
+
+    - name: SEND_EMAIL_7
+      email_configurations:
+        subject: PLPS Data Error - Order_guid in ccpricinglineitem and not in ccpricingorderheader
+        message: dags/sql/messages/MONITOR_PLPS_DATA_ISSUES_PKG/send_email_message_7.txt
+        message_args:
+          v_US_data_center:
+            path: dags/sql/pre_sql/v_US_data_center.sql
+        email_recipient_query: pre_sql/v_error_email_to.sql
+        email_recipient_query_args:
+          v_package_name: 'MONITOR_PLPS_DATA_ISSUES_PKG'
+
+    - name: SEND_EMAIL_8
+      email_configurations:
+        subject: PLPS Data Error - Order_guid in ccpricingorderheader and not in ccpricinglineitem
+        message: dags/sql/messages/MONITOR_PLPS_DATA_ISSUES_PKG/send_email_message_8.txt
+        message_args:
+          v_US_data_center:
+            path: dags/sql/pre_sql/v_US_data_center.sql
+        email_recipient_query: pre_sql/v_error_email_to.sql
+        email_recipient_query_args:
+          v_package_name: 'MONITOR_PLPS_DATA_ISSUES_PKG'
+
+    - name: SEND_EMAIL_9
+      email_configurations:
+        subject: PLPS Data Error - Diff in ccpricingorderheader and ccpricinglineitem
+        message: dags/sql/messages/MONITOR_PLPS_DATA_ISSUES_PKG/send_email_message_9.txt
+        message_args:
+          v_US_data_center:
+            path: dags/sql/pre_sql/v_US_data_center.sql
+        email_recipient_query: pre_sql/v_error_email_to.sql
+        email_recipient_query_args:
+          v_package_name: 'MONITOR_PLPS_DATA_ISSUES_PKG'
+        
+    - name: SEND_EMAIL_10
+      email_configurations:
+        subject: PLPS Data Error -  Promo_code is missing from REVENUE_SHARE - rerun studioOrderPricing
+        message: dags/sql/messages/MONITOR_PLPS_DATA_ISSUES_PKG/send_email_message_10.txt
+        message_args:
+          v_US_data_center:
+            path: dags/sql/pre_sql/v_US_data_center.sql
+        email_recipient_query: pre_sql/v_error_email_to.sql
+        email_recipient_query_args:
+          v_package_name: 'MONITOR_PLPS_DATA_ISSUES_PKG'
+
+    - name: SEND_EMAIL_11
+      email_configurations:
+        subject: PLPS Data Error - Std_Organization loaded incorrectly
+        message: dags/sql/messages/MONITOR_PLPS_DATA_ISSUES_PKG/send_email_message_11.txt
+        message_args:
+          v_US_data_center:
+            path: dags/sql/pre_sql/v_US_data_center.sql
+        email_recipient_query: pre_sql/v_error_email_to.sql
+        email_recipient_query_args:
+          v_package_name: 'MONITOR_PLPS_DATA_ISSUES_PKG'
+
+    - name: SEND_EMAIL_12
+      email_configurations:
+        subject: PLPS Data Error - order_code  New Products in ccpricing tables
+        message: dags/sql/messages/MONITOR_PLPS_DATA_ISSUES_PKG/send_email_message_12.txt
+        message_args:
+          v_US_data_center:
+            path: dags/sql/pre_sql/v_US_data_center.sql
+        email_recipient_query: pre_sql/v_error_email_to.sql
+        email_recipient_query_args:
+          v_package_name: 'MONITOR_PLPS_DATA_ISSUES_PKG'
+
+    - name: SEND_EMAIL_13
+      email_configurations:
+        subject: PLPS Data Error -  Diff in ccpricing and detail post tables -- not in ccpricing
+        message: dags/sql/messages/MONITOR_PLPS_DATA_ISSUES_PKG/send_email_message_13.txt
+        message_args:
+          v_US_data_center:
+            path: dags/sql/pre_sql/v_US_data_center.sql
+        email_recipient_query: pre_sql/v_error_email_to.sql
+        email_recipient_query_args:
+          v_package_name: 'MONITOR_PLPS_DATA_ISSUES_PKG'
+
+    - name: SEND_EMAIL_14
+      email_configurations:
+        subject: PLPS Data Error - Diff in ccpricing and detail post tables -- In CCpricing but not in detail_post
+        message: dags/sql/messages/MONITOR_PLPS_DATA_ISSUES_PKG/send_email_message_14.txt
+        message_args:
+          v_US_data_center:
+            path: dags/sql/pre_sql/v_US_data_center.sql
+        email_recipient_query: pre_sql/v_error_email_to.sql
+        email_recipient_query_args:
+          v_package_name: 'MONITOR_PLPS_DATA_ISSUES_PKG'
+
+    - name: SEND_EMAIL_15
+      email_configurations:
+        subject: PLPS Data Error - Diff in ccpricing and detail post tables
+        message: dags/sql/messages/MONITOR_PLPS_DATA_ISSUES_PKG/send_email_message_15.txt
+        message_args:
+          v_US_data_center:
+            path: dags/sql/pre_sql/v_US_data_center.sql
+        email_recipient_query: pre_sql/v_error_email_to.sql
+        email_recipient_query_args:
+          v_package_name: 'MONITOR_PLPS_DATA_ISSUES_PKG'
+
+    - name: SEND_EMAIL_16
+      email_configurations:
+        subject: PLPS Data Error -  All active child records for identified pos_ids
+        message: dags/sql/messages/MONITOR_PLPS_DATA_ISSUES_PKG/send_email_message_16.txt
+        message_args:
+          v_US_data_center:
+            path: dags/sql/pre_sql/v_US_data_center.sql
+        email_recipient_query: pre_sql/v_error_email_to.sql
+        email_recipient_query_args:
+          v_package_name: 'MONITOR_PLPS_DATA_ISSUES_PKG'
+
+    - name: SEND_EMAIL_17
+      email_configurations:
+        subject: PLPS Data Error - All Merch child records for identified pos_ids 
+        message: dags/sql/messages/MONITOR_PLPS_DATA_ISSUES_PKG/send_email_message_17.txt
+        message_args:
+          v_US_data_center:
+            path: dags/sql/pre_sql/v_US_data_center.sql
+        email_recipient_query: pre_sql/v_error_email_to.sql
+        email_recipient_query_args:
+          v_package_name: 'MONITOR_PLPS_DATA_ISSUES_PKG'
+
+    - name: SEND_EMAIL_19
+      email_configurations:
+        subject: PLPS Data Error - Null Records In SBASE_CODE Column In CCPRICINGLINEITEM Table_v_actuate_sysdate
+        message: dags/sql/messages/MONITOR_PLPS_DATA_ISSUES_PKG/send_email_message_19.txt
+        message_args:
+          v_US_data_center:
+            path: dags/sql/pre_sql/v_US_data_center.sql
+        email_recipient_query: pre_sql/v_error_email_to.sql
+        email_recipient_query_args:
+          v_package_name: 'MONITOR_PLPS_DATA_ISSUES_PKG'

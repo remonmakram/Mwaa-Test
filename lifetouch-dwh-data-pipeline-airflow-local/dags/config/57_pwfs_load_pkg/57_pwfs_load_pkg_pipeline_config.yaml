@@ -1,0 +1,118 @@
+---
+
+pipeline:
+  name: lt_57_pwfs_dag
+  description: lifetouch 57 pwfs pipeline
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - pwfs
+  task_groups:
+    - name: PWFS_Ingestion
+      description: extract and load stage
+      ingestion_script: ingestion_script_test.py
+      data_sources:
+          - type: mysql
+            name: pwfs
+            default_args:
+                src_prefix: PWFS_AF
+                dest_prefix: PWFS
+                src_schema: PWFS_OWN
+                dest_schema: RAX_APP_USER
+                stage_schema: ODS_STAGE
+                watermark_interval: 30
+                watermark_column: modified_date
+                excluded_columns :   "'ODS_CREATE_DATE', 'ODS_MODIFY_DATE'"
+                insert_date_columns: "ODS_CREATE_DATE, ODS_MODIFY_DATE"
+                update_date_columns: "ODS_MODIFY_DATE"
+                unique_keys: "ID"
+                merge_required: True
+            entities:
+                - src_table: task
+                  insert_date_columns: "ODS_MODIFY_DATE"
+                  excluded_columns: "'ODS_MODIFY_DATE'"
+                  
+                - src_table: work_flow
+                  insert_date_columns: "ODS_MODIFY_DATE"
+                  excluded_columns: "'ODS_MODIFY_DATE'"
+
+                - src_table: work_flow_history
+                  insert_date_columns: "ODS_MODIFY_DATE"
+                  excluded_columns: "'ODS_MODIFY_DATE'"
+
+                - src_table: hold
+
+                - src_table: hold_reason
+
+                - src_table: record_change_audit
+                  watermark_column: DATE_CREATED 
+                  lnd_table: REC_CHANGE_AUDIT
+                  src_prefix: AF_PWFS
+                  unique_keys: "TABLE_NAME, KEY_VALUE"
+                  
+
+    - name: PWFS_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      v_env: DEV
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+        v_data_center_tz: dags/sql/pre_sql/pre_v_data_center_tz.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+        v_cdc_oms_overlap: 0.02083333333
+      tasks: 
+        - name: 01-LOAD_PWFS_WORK_FLOW
+          description: load PWFS_WORK_FLOW subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/57_PWFS_LOAD_PKG/01-LOAD_PWFS_WORK_FLOW.sql
+          args:
+            v_cdc_load_table_name: PWFS_WORK_FLOW_STG
+        
+        - name: 02-LOAD_PWFS_TASK
+          description: load PWFS_TASK subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/57_PWFS_LOAD_PKG/02-LOAD_PWFS_TASK.sql
+          args:
+            v_cdc_load_table_name: PWFS_TASK_STG
+
+        - name: 03-UPDATE_EVENT_PLANT_RECEIPT_DATE_FROM_PWFS_PKG
+          description: update EVENT_PLANT_RECEIPT_DATE from PWFS subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/57_PWFS_LOAD_PKG/03-UPDATE_EVENT_PLANT_RECEIPT_DATE_FROM_PWFS_PKG.sql
+          args:
+            v_cdc_load_table_name: PWFS_PLANT_RECEIPT_DATE_PRC
+
+        - name: 04-LOAD_PWFS_HOLD_PKG
+          description: load PWFS_HOLD subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/57_PWFS_LOAD_PKG/04-LOAD_PWFS_HOLD_PKG.sql
+          args:
+            v_cdc_load_table_name: PWFS_HOLD
+
+        - name: 05-LOAD_PWFS_HOLD_REASON_PKG
+          description: load PWFS_HOLD_REASON subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/57_PWFS_LOAD_PKG/05-LOAD_PWFS_HOLD_REASON_PKG.sql
+          args:
+            v_cdc_load_table_name: PWFS_HOLD_REASON
+
+        - name: 06-LOAD_PWFS_RECORD_CHANGE_AUDIT
+          description: load PWFS_RECORD_CHANGE_AUDIT subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/57_PWFS_LOAD_PKG/06-LOAD_PWFS_RECORD_CHANGE_AUDIT.sql
+          args:
+            v_cdc_load_table_name: PWFS_RECORD_CHANGE_AUDIT_STG
+
+        - name: 07-UPDATE_PRELAB_EVENT_TRACKING_PKG
+          description: update PRELAB_EVENT_TRACKING subpackage
+          type: oracle_sql
+          trigger_rule: all_done
+          script_location: dags/sql/57_PWFS_LOAD_PKG/07-UPDATE_PRELAB_EVENT_TRACKING_PKG.sql
+          args:
+            v_cdc_load_table_name: UPDATE_PRELAB_EVENT_TRACKING_PRC

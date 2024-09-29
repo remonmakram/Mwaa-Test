@@ -1,0 +1,56 @@
+---
+
+pipeline:
+  name: lt_30B_mdp_dag
+  description: lifetouch MDP load package
+  # schedule: "0 * * * *"
+  schedule: "0 2 * * *"
+  tags:
+    - lifetouch
+    - mdp
+  task_groups:
+    # - name: MDP_Ingestion
+    #   description: extract and load part
+    #   ingestion_script: ingestion_script.py
+    #   data_sources:
+    #       - type: oracle
+    #         name: mdp
+    #         default_args:
+    #             src_prefix: MDP_AF
+    #             dest_prefix: MDP
+    #             src_schema: MDP_OWN
+    #             dest_schema: RAX_APP_USER
+    #             stage_schema: ODS_STAGE
+    #             watermark_interval: 30
+    #             watermark_column: audit_modified_date 
+    #             excluded_columns :   "'ODS_CREATE_DATE','ODS_MODIFY_DATE'"
+    #             insert_date_columns: "ODS_CREATE_DATE, ODS_MODIFY_DATE"
+    #             update_date_columns: "ODS_MODIFY_DATE"
+    #             unique_keys: "item_id"
+    #             merge_required: True
+    #         entities:
+    #             - src_table: item_eligibility
+    #               excluded_columns :   "'ODS_MODIFY_DATE'"
+    #               insert_date_columns: "ODS_MODIFY_DATE"
+    #               dest_table: ??????  -- has no temp tables created
+    #               tmp_create: '30_mdp/tmp_create_order.sql' -- has no temp tables created
+    #               extract_query: '30_mdp/extract_query_order.sql' -- has no temp tables created
+    #               v_cdc_load_table_name: 'UPDATE_MDP_ITEM_SFLY_ELIGIBLE_PRC'
+    #               v_cdc_oms_overlap: ?? -- no value
+              
+                  
+
+
+    - name: MDP_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks:
+        - description: load mdp sfly eligible subpackage
+          type: oracle
+          script_location: dags/sql/30B_MDP_ITEM_SFLY_ELIGIBLE_PKG/30B_MDP_ITEM_SFLY_ELIGIBLE_PKG.sql
+          args:
+            v_cdc_load_table_name: UPDATE_MDP_ITEM_SFLY_ELIGIBLE_PRC
+        

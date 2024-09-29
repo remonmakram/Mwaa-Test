@@ -1,0 +1,238 @@
+---
+
+pipeline:
+  name: lt_03_apocs_load_pkg_dag
+  description: 03_apocs_load_pkg package
+  schedule: "0 * * * *"  
+  tags:
+    - lifetouch
+    - 03_apocs_load_pkg
+  task_groups:
+    - name: 03_apocs_load_pkg_Ingestion
+      description: extract and load part
+      ingestion_script: ingestion_script.py
+      data_sources:
+          - type: oracle
+            name: oms3
+            default_args:
+              dest_schema: RAX_APP_USER
+              v_cdc_oms_overlap: 0.02083333333
+              v_cdc_overlap: 0.02083333333
+              merge_required: False
+            pre_sql:
+              v_cdc_load_date: dags/sql/pre_sql/v_cdc_load_date.sql
+            entities:
+              - dest_table: C$_0STG_VISUAL_MERCH
+                v_cdc_load_table_name: VISUAL_MERCH
+                tmp_create: '03_apocs_load_pkg/create_tmp_STG_VISUAL_MERCH.sql'
+                extract_query: '03_apocs_load_pkg/extract_query_STG_VISUAL_MERCH.sql'
+                src_table: OMS3_OWN.LT_VISUAL_MERCH
+              
+              - dest_table: C$_0STG_VM_BUSINESS_CONTEXT
+                v_cdc_load_table_name: VM_BUSINESS_CONTEXT
+                tmp_create: '03_apocs_load_pkg/create_temp_stg_vm_business_context.sql'
+                extract_query: '03_apocs_load_pkg/extract_stg_vm_business_context.sql'
+                src_table: OMS3_OWN.LT_VM_BUSINESS_CONTEXT
+              
+              - dest_table: C$_0STG_VM_PRICING_CONTEXT
+                v_cdc_load_table_name: LT_VM_PRICING_CONTEXT
+                tmp_create: '03_apocs_load_pkg/create_temp_stg_vm_pricing_context.sql'
+                extract_query: '03_apocs_load_pkg/extract_stg_vm_pricing_context.sql'
+                src_table: OMS3_OWN.LT_VM_PRICING_CONTEXT
+              
+          - type: oracle
+            name: apocs
+            default_args:
+              dest_schema: RAX_APP_USER
+              v_cdc_oms_overlap: 0.02083333333
+              v_cdc_overlap: 0.02083333333
+              merge_required: False
+            pre_sql:
+              v_cdc_load_date: dags/sql/pre_sql/v_cdc_load_date.sql
+
+            entities:
+              - dest_table: C$_0STG_APO
+                v_cdc_load_table_name: APOCS_APO
+                tmp_create: '03_apocs_load_pkg/create_temp_stg_apo.sql'
+                extract_query: '03_apocs_load_pkg/extract_stg_apo.sql'
+                src_table: APOCS_OWN.APO
+              
+              - dest_table: C$_0STG_APOCS_EVENT
+                v_cdc_load_table_name: APOCS_EVENT
+                tmp_create: '03_apocs_load_pkg/create_temp_stg_apocs_event.sql'
+                extract_query: '03_apocs_load_pkg/extract_stg_apocs_event.sql'
+                src_table: APOCS_OWN.APOCS_EVENT
+
+              - dest_table: C$_0APOCS_OLS_DEFAULT_STG
+                v_cdc_load_table_name: OLS_DEFAULT
+                tmp_create: '03_apocs_load_pkg/create_temp_apocs_ols_default_stg.sql'
+                extract_query: '03_apocs_load_pkg/extract_apocs_ols_default_stg.sql'
+                src_table: APOCS_OWN.OLS_DEFAULT
+
+              - dest_table: C$_0APOCS_OLS_DEFATT_STG
+                v_cdc_load_table_name: OLS_DEFAULT_ATTRIBUTE
+                tmp_create: '03_apocs_load_pkg/create_temp_apocs_ols_defatt_stg.sql'
+                extract_query: '03_apocs_load_pkg/extract_apocs_ols_defatt_stg.sql'
+                src_table: APOCS_OWN.OLS_DEFAULT_ATTRIBUTE
+              
+              - dest_table: C$_0APOCS_RECORD_CHANGE_AUDIT
+                v_cdc_load_table_name: APOCS_RECORD_CHANGE_AUDIT
+                tmp_create: '03_apocs_load_pkg/create_temp_apocs_record_change_audit.sql'
+                extract_query: '03_apocs_load_pkg/extract_apocs_record_change_audit.sql'
+                src_table: APOCS_OWN.RECORD_CHANGE_AUDIT
+              
+              - dest_table: APOCS_EXTENDED_EVENT_STG
+                v_cdc_load_table_name: EXTENDED_EVENT_STG
+                tmp_create: '03_apocs_load_pkg/create_temp_apocs_extended_event_stg.sql'
+                extract_query: '03_apocs_load_pkg/extract_apocs_extended_event_stg.sql'
+                src_table: APOCS_OWN.EXTENDED_EVENT
+              
+              - dest_table: APOCS_AUTO_ADD_STG
+                v_cdc_load_table_name: APOCS_AUTO_ADD_STG
+                tmp_create: '03_apocs_load_pkg/create_temp_apocs_auto_add_stg.sql'
+                extract_query: '03_apocs_load_pkg/extract_apocs_auto_add_stg.sql'
+                src_table: APOCS_OWN.AUTO_ADD
+                
+              - dest_table: APOCS_LAYOUT_GROUP_STG
+                v_cdc_load_table_name: APOCS_LAYOUT_GROUP_STG
+                tmp_create: '03_apocs_load_pkg/create_temp_apocs_layout_group_stg.sql'
+                extract_query: '03_apocs_load_pkg/extract_apocs_layout_group_stg.sql'
+                src_table: APOCS_OWN.LAYOUT_GROUP
+              
+              - dest_table: APOCS_LOOK_STG
+                v_cdc_load_table_name: APOCS_LOOK_STG
+                tmp_create: '03_apocs_load_pkg/create_temp_apocs_look_stg.sql'
+                extract_query: '03_apocs_load_pkg/extract_apocs_look_stg.sql'
+                src_table: APOCS_OWN.LOOK
+              
+              - dest_table: APOCS_VISUAL_MERCHANDISE_STG
+                v_cdc_load_table_name: APOCS_VISUAL_MERCHANDISE_STG
+                tmp_create: '03_apocs_load_pkg/create_temp_apocs_visual_merchandise_stg.sql'
+                extract_query: '03_apocs_load_pkg/extract_apocs_visual_merchandise_stg.sql'
+                src_table: APOCS_OWN.visual_merchandise
+              
+              - dest_table: look_layout_theme_assoc
+                v_cdc_load_table_name: APOCS_LL_THEME_ASSOC_STG
+                tmp_create: '03_apocs_load_pkg/create_temp_look_layout_theme_assoc.sql'
+                extract_query: '03_apocs_load_pkg/extract_look_layout_theme_assoc.sql'
+                src_table: APOCS_OWN.LOOK_LAYOUT_THEME_ASSOC
+              
+
+    - name: 03_apocs_load_pkg_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      
+      default_args:
+        v_cdc_overlap: 0.02083333333
+        v_cdc_oms_overlap: 0.02083333333
+    
+
+      tasks: 
+        - description: load 03_apocs_load_pkg VISUAL_MERCH batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/03_apocs_load_pkg/LOAD_VISUAL_MERCH_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+          args:
+            v_cdc_load_table_name: VISUAL_MERCH
+       
+        - description: load 03_apocs_load_pkg LOAD_VM_BUSINESS_CONTEXT batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/03_apocs_load_pkg/LOAD_VM_BUSINESS_CONTEXT_PKG_V2.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+          args:
+            v_cdc_load_table_name: VM_BUSINESS_CONTEXT
+        
+        - description: load 03_apocs_load_pkg VM_PRICING_CONTEXT batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/03_apocs_load_pkg/LOAD_VM_PRICING_CONTEXT_PKG_V2.sql
+          args:
+            v_cdc_load_table_name: LT_VM_PRICING_CONTEXT
+        
+        - description: load 03_apocs_load_pkg LOAD_APO_PKG batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/03_apocs_load_pkg/LOAD_APO_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+          args:
+            v_cdc_load_table_name: APOCS_APO
+        
+        - description: load 03_apocs_load_pkg LOAD_APOCS_EVENT_PKG batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/03_apocs_load_pkg/LOAD_APOCS_EVENT_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+          args:
+            v_cdc_load_table_name: APOCS_EVENT
+        
+        - description: load 03_apocs_load_pkg LOAD_APOCS_OLS_DEFAULT_PKG batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/03_apocs_load_pkg/LOAD_APOCS_OLS_DEFAULT_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+          args:
+            v_cdc_load_table_name: OLS_DEFAULT
+        
+        - description: load 03_apocs_load_pkg LOAD_APOCS_OLS_DEFAULT_ATTRIBUTE_PKG batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/03_apocs_load_pkg/LOAD_APOCS_OLS_DEFAULT_ATTRIBUTE_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+          args:
+            v_cdc_load_table_name: OLS_DEFAULT_ATTRIBUTE
+        
+        - description: load 03_apocs_load_pkg PROCESS_APOCS_DELETES_PKG batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/03_apocs_load_pkg/PROCESS_APOCS_DELETES_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+          args:
+            v_cdc_load_table_name: APOCS_RECORD_CHANGE_AUDIT
+
+        - description: load 03_apocs_load_pkg LOAD_EXTENDED_EVENT_STG_PKG batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/03_apocs_load_pkg/LOAD_EXTENDED_EVENT_STG_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+          args:
+            v_cdc_load_table_name: EXTENDED_EVENT_STG
+
+        - description: load 03_apocs_load_pkg LOAD_APOCS_AUTO_ADD_STG_PKG batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/03_apocs_load_pkg/LOAD_APOCS_AUTO_ADD_STG_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+          args:
+            v_cdc_load_table_name: APOCS_AUTO_ADD_STG
+
+        - description: load 03_apocs_load_pkg LOAD_APOCS_LAYOUT_GROUP_STG_PKG batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/03_apocs_load_pkg/LOAD_APOCS_LAYOUT_GROUP_STG_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+          args:
+            v_cdc_load_table_name: APOCS_LAYOUT_GROUP_STG
+
+        - description: load 03_apocs_load_pkg LOAD_APOCS_LOOK_STG_PKG batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/03_apocs_load_pkg/LOAD_APOCS_LOOK_STG_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+          args:
+            v_cdc_load_table_name: APOCS_LOOK_STG
+
+        - description: load 03_apocs_load_pkg LOAD_APOCS_VISUAL_MERCHANDISE_STG_PKG batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/03_apocs_load_pkg/LOAD_APOCS_VISUAL_MERCHANDISE_STG_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+          args:
+            v_cdc_load_table_name: APOCS_VISUAL_MERCHANDISE_STG    
+
+        - description: load 03_apocs_load_pkg LOAD_APOCS_LOOK_LAYOUT_THEME_ASSOC_PKG batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/03_apocs_load_pkg/LOAD_APOCS_LOOK_LAYOUT_THEME_ASSOC_PKG.sql
+          pre_sql:
+            v_cdc_load_date: dags/sql/pre_sql.sql
+          args:
+            v_cdc_load_table_name: APOCS_LL_THEME_ASSOC_STG

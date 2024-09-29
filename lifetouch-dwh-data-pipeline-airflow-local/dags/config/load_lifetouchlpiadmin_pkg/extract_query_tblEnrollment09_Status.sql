@@ -1,0 +1,7 @@
+select	
+	TBLENROLLMENT09_STATUS.EnrollmentStatusID	 as  C1_ENROLLMENTSTATUSID,
+	TBLENROLLMENT09_STATUS.EnrollmentStatusDescription	 as  C2_ENROLLMENTSTATUSDESCRIPTION
+from	dbo.tblEnrollment09_Status as TBLENROLLMENT09_STATUS
+where	(1=1)
+
+

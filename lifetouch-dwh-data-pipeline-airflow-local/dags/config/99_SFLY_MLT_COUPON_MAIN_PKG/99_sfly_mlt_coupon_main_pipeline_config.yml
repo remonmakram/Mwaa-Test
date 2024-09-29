@@ -1,0 +1,79 @@
+---
+
+pipeline:
+  name: lt_99_sfly_mlt_coupon_main_dag
+  description: lifetouch 99_SFLY_MLT_COUPON_MAIN package
+  schedule: "0 2 * * *"
+  tags:
+    - lifetouch
+    - 99_SFLY_MLT_COUPON_MAIN_PKG
+  task_groups:
+    - name: 99_sfly_mlt_coupon_main_Ingestion
+      description: extract and load part
+      ingestion_script: ingestion_script.py
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      data_sources:
+          - type: oracle
+            name: mlt 
+            default_args:
+              dest_schema: RAX_APP_USER
+              merge_required: False
+            entities:
+              - dest_table: "sfly_coupon_mlt_v2_tmp"
+                v_cdc_load_table_name: SFLY_COUPON_MLT_V2_TMP
+                tmp_create: '99_SFLY_MLT_COUPON_MAIN_PKG/tmp_create_sfly_coupon_mlt_v2_tmp.sql'
+                extract_query: '99_SFLY_MLT_COUPON_MAIN_PKG/extract_query_sfly_coupon_mlt_v2_tmp.sql'
+                src_table: mlt_ingestion
+
+    - name: 99_SFLY_MLT_COUPON_export
+      description: drop and recreate table then extract data and load to s3
+      export_file_name:
+        v_data_center_name_short: dags/sql/pre_sql/v_data_center_name_short.sql
+        v_data_export_run_date: dags/sql/pre_sql/v_data_export_run_date.sql
+      pre_sql:
+        v_data_center_name_short: dags/sql/pre_sql/v_data_center_name_short.sql
+        v_data_export_run_date: dags/sql/pre_sql/v_data_export_run_date.sql
+      tasks:
+        - script_location: dags/sql/99_SFLY_MLT_COUPON_MAIN_PKG/create_temp_sfly_coupon_v2_tmp.sql
+          export_files:
+            - extract_query: '99_SFLY_MLT_COUPON_MAIN_PKG/export_SFLY_COUPON_V2_TMP.sql'
+              export_location: SFLY/SENT/sfly_mlt_coupon
+
+    - name: 99_SFLY_MLT_COUPON_MAIN_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks:
+        - name: 99_SFLY_MLT_COUPON_MAIN_PKG 
+          description: load 99_sfly_mlt_coupon_main package
+          type: oracle_sql
+          script_location: dags/sql/99_SFLY_MLT_COUPON_MAIN_PKG/99_SFLY_MLT_COUPON_PKG.sql
+          args:
+            v_cdc_load_table_name: SFLY_COUPON_MLT_V2_TMP
+
+    - name: SEND_EMAIL_OK
+      email_configurations:
+        subject: 99_SFLY_MLT_COUPON_MAIN_PKG Completed Successfully
+        message: Data Center - :v_US_data_center 99_SFLY_MLT_COUPON_MAIN_PKG Completed Successfully!!
+        message_args:
+          v_US_data_center:
+            path: dags/sql/pre_sql/v_US_data_center.sql
+        email_recipient_query: pre_sql/v_noerror_email_to.sql
+        email_recipient_query_args:
+          v_package_name: '99_SFLY_MLT_COUPON_MAIN_PKG'  
+      trigger_rule: all_success      
+
+    - name: SEND_EMAIL_NOT_OK
+      email_configurations:
+        subject: 99_SFLY_MLT_COUPON_PKG FAILED
+        message: Data Center - :v_US_data_center 99_SFLY_MLT_COUPON_PKG FAILED!!
+        message_args:
+          v_US_data_center:
+            path: dags/sql/pre_sql/v_US_data_center.sql
+        email_recipient_query: pre_sql/v_error_email_to.sql
+        email_recipient_query_args:
+          v_package_name: '99_SFLY_MLT_COUPON_MAIN_PKG'
+      trigger_rule: all_failed

@@ -1,0 +1,101 @@
+---
+
+pipeline:
+  name: lt_30_mdp_dag
+  description: 30 mdp pipeline
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - mdp
+  task_groups:
+    - name: MDP_Ingestion
+      description: extract and load part
+      ingestion_script: ingestion_script.py
+      data_sources:
+          - type: oracle
+            name: mdp
+            default_args:
+                # src_prefix: MDP_AF
+                # dest_prefix: MDP
+                # src_schema: MDP_OWN
+                dest_schema: RAX_APP_USER
+                # stage_schema: ODS_STAGE
+                # watermark_interval: 30
+                # watermark_column: audit_modified_date
+                # excluded_columns :   "'ODS_CREATE_DATE', 'ODS_MODIFY_DATE'"
+                # insert_date_columns: "ODS_CREATE_DATE, ODS_MODIFY_DATE"
+                # update_date_columns: "ODS_MODIFY_DATE"
+                # unique_keys: "ID"
+                merge_required: False
+            entities:
+              
+                - src_table: MDP_ORDER
+                  unique_keys: "ORDER_ID"
+                  dest_table: "C$_0MDP_ORDER_STG"
+                  tmp_create: '30_mdp/tmp_create_order.sql'
+                  extract_query: '30_mdp/extract_query_order.sql'
+                  v_cdc_load_table_name: 'MDP_ORDER'
+                  v_cdc_oms_overlap: 0.02083333333
+
+                # - src_table: SHIPMENT 
+                #   unique_keys: "SHIPMENT_ID"
+                  
+
+                - src_table: ITEM_ELIGIBILITY_HISTORY
+                  unique_keys: "ITEM_ID"
+                  excluded_columns :   "'ODS_MODIFY_DATE'"
+                  insert_date_columns: "ODS_MODIFY_DATE"
+                  dest_table: "C$_0MDP_ITEM_ELIGIBILITY_HIST_"
+                  tmp_create: '30_mdp/tmp_create_item_eligibility_history.sql'
+                  extract_query: '30_mdp/extract_query_item_eligibility_history.sql'
+                  v_cdc_load_table_name: 'MDP_ITEM_ELIGIBILITY_HIST'
+                  v_cdc_oms_overlap: 0.02083333333
+                  
+
+                - src_table: ITEM_ELIGIBILITY
+                  unique_keys: "ITEM_ID"
+                  excluded_columns :   "'ODS_MODIFY_DATE'"
+                  insert_date_columns: "ODS_MODIFY_DATE"
+                  dest_table: "C$_0MDP_ITEM_ELIGIBILITY_STG"
+                  tmp_create: '30_mdp/tmp_create_item_eligibility.sql'
+                  extract_query: '30_mdp/extract_query_item_eligibility.sql'
+                  v_cdc_load_table_name: 'MDP_ITEM_ELIGIBILITY'
+                  v_cdc_oms_overlap: 0.02083333333
+                  
+
+                
+
+
+    - name: MDP_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks:
+        - description: load mdp item eligibility history subpackage
+          type: oracle_sql
+          script_location: dags/sql/30_MDP_LOAD_PKG/LOAD_MDP_ITEM_ELIGIBILITY_HIST_PKG.sql
+          args:
+            v_cdc_load_table_name: MDP_ITEM_ELIGIBILITY_HIST
+        - description: load mdp item eligibility subpackage
+          type: oracle_sql
+          script_location: dags/sql/30_MDP_LOAD_PKG/LOAD_MDP_ITEM_ELIGIBILITY_PKG.sql
+          args:
+            v_cdc_load_table_name: MDP_ITEM_ELIGIBILITY
+        - description: load mdp order subpackage
+          type: oracle_sql
+          script_location: dags/sql/30_MDP_LOAD_PKG/LOAD_MDP_ORDER_PKG.sql
+          args:
+            v_cdc_load_table_name: MDP_ORDER
+        - description: update mem int bl bd track subpackage
+          type: oracle_sql
+          script_location: dags/sql/30_MDP_LOAD_PKG/UPDATE_MEM_INT_BL_CB_TRACK_PKG.sql
+          args:
+            v_cdc_load_table_name: MEM_INT_SHIP_TRACK
+        - description: update mem int ship track subpackage
+          type: oracle_sql
+          script_location: dags/sql/30_MDP_LOAD_PKG/UPDATE_MEM_INT_SHIP_TRACK_PKG.sql
+          args:
+            v_cdc_load_table_name: MEM_INT_BL_CB_TRACK
+        

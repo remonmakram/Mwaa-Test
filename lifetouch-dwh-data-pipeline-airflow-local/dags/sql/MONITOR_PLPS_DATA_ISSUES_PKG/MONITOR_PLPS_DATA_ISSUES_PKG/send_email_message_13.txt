@@ -1,0 +1,12 @@
+Data Center - :v_US_data_center
+
+PLPS Data Error in the last 24 hours:
+
+STD_ID                   TRAN_NO                    TRAN_DATE                    TOT_SALES              QUERY_SOURCE
+
+--#v_diff_in_ccp_nd_dP_not_in_CCP_updates
+
+The source for this package is in:
+ODS_Project -> LPS_Folder -> MONITOR_PLPS_DATA_ISSUES_PKG
+
+Please feel free to enhance, improve, or refine as you see fit.

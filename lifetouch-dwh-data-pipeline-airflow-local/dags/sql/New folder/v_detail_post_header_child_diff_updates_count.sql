@@ -1,0 +1,1 @@
+select count(*) ct from detail_post_header_child_diff

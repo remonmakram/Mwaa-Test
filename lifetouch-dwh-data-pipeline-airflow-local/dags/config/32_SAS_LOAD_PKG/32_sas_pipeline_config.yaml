@@ -1,0 +1,329 @@
+---
+
+pipeline:
+  name: lt_32_sas_dag
+  description: 32_sas package
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - sas
+  task_groups:
+    - name: SAS_Ingestion
+      description: extract and load part
+      ingestion_script: ingestion_script.py
+      data_sources:
+        - type: oracle
+          name: sas
+          default_args:
+            src_prefix: SAS
+            dest_prefix: SAS
+            src_schema: SAS_SIT_OWN
+            dest_schema: RAX_APP_USER
+            stage_schema: ODS_STAGE
+            watermark_interval: 30
+            watermark_column: AUDIT_MODIFY_DATE
+            excluded_columns: "'ODS_CREATE_DATE', 'ODS_MODIFY_DATE'"
+            insert_date_columns: "ODS_CREATE_DATE, ODS_MODIFY_DATE"
+            update_date_columns: "ODS_MODIFY_DATE"
+            unique_keys: "ID"
+            merge_required: False
+
+          entities:
+            - src_table: RECORD_CHANGE_AUDIT
+              dest_table: "C$_0SAS_RCA"
+              watermark_column: "DATE_CREATED"
+              tmp_create: '32_sas/tmp_create_delete_sas.sql'
+              extract_query: '32_sas/extract_query_delete_sas.sql'
+              unique_keys: "TABLE_NAME"
+              full_load: "False"
+              v_cdc_load_table_name: SAS_RECORD_CHANGE_AUDIT
+              v_cdc_load_date: dags/sql/pre_sql.sql
+              v_cdc_overlap: 0.02083333333
+              v_cdc_oms_overlap: 0.02083333333
+            - src_table: SUBJECT
+              dest_table: "C$_0SAS_SUBJECT_STG"
+              tmp_create: '32_sas/tmp_create_subject.sql'
+              extract_query: '32_sas/extract_query_subject.sql'
+              unique_keys: "SUBJECT_ID"
+              full_load: "False"
+              v_cdc_load_table_name: SAS_SUBJECT
+              v_cdc_load_date: dags/sql/pre_sql.sql
+              v_cdc_overlap: 0.02083333333
+              v_cdc_oms_overlap: 0.02083333333
+            - src_table: APPOINTMENT_SLOT
+              dest_table: "C$_0SAS_APPT_SLOT_STG"
+              tmp_create: '32_sas/tmp_create_appointment_slot.sql'
+              extract_query: '32_sas/extract_query_appointment_slot.sql'
+              unique_keys: "APPOINTMENT_SLOT_ID"
+              full_load: "False"
+              v_cdc_load_table_name: SAS_APPOINTMENT_SLOT
+              v_cdc_load_date: dags/sql/pre_sql.sql
+              v_cdc_overlap: 0.02083333333
+              v_cdc_oms_overlap: 0.02083333333
+            - src_table: APPOINTMENT
+              dest_table: "C$_0SAS_APPOINTMENT_STG"
+              tmp_create: '32_sas/tmp_create_appointment.sql'
+              extract_query: '32_sas/extract_query_appointment.sql'
+              unique_keys: "APPOINTMENT_ID"
+              full_load: "False"
+              v_cdc_load_table_name: SAS_APPOINTMENT
+              v_cdc_load_date: dags/sql/pre_sql.sql
+              v_cdc_overlap: 0.02083333333
+              v_cdc_oms_overlap: 0.02083333333
+            - src_table: CUSTOMER_ORDER_LINE
+              dest_table: "C$_0SAS_CUST_ORD_LN_STG"
+              tmp_create: '32_sas/tmp_create_customer_order_line.sql'
+              extract_query: '32_sas/extract_query_customer_order_line.sql'
+              unique_keys: "CUSTOMER_ORDER_LINE_ID"
+              full_load: "False"
+              v_cdc_load_table_name: SAS_CUSTOMER_ORDER_LINE
+              v_cdc_load_date: dags/sql/pre_sql.sql
+              v_cdc_overlap: 0.02083333333
+              v_cdc_oms_overlap: 0.02083333333
+            - src_table: CUSTOMER_ORDER
+              dest_table: "C$_0SAS_CUST_ORDER_STG"
+              tmp_create: '32_sas/tmp_create_customer_order.sql'
+              extract_query: '32_sas/extract_query_customer_order.sql'
+              unique_keys: "CUSTOMER_ORDER_ID"
+              full_load: "False"
+              v_cdc_load_table_name: SAS_CUSTOMER_ORDER
+              v_cdc_load_date: dags/sql/pre_sql.sql
+              v_cdc_overlap: 0.02083333333
+              v_cdc_oms_overlap: 0.02083333333
+            - src_table: CUST_ORD_LINE_DTL
+              dest_table: "C$_0SAS_CU_OL_DTL_STG"
+              tmp_create: '32_sas/tmp_create_cust_ord_line_dtl.sql'
+              extract_query: '32_sas/extract_query_cust_ord_line_dtl.sql'
+              unique_keys: "CUSTOMER_ORDER_LINE_DETAIL_ID"
+              full_load: "False"
+              v_cdc_load_table_name: SAS_CUST_ORD_LINE_DTL
+              v_cdc_load_date: dags/sql/pre_sql.sql
+              v_cdc_overlap: 0.02083333333
+              v_cdc_oms_overlap: 0.02083333333
+            - src_table: CUST_ORD_LINE_PROMO
+              dest_table: "C$_0SAS_COL_PROMO_STG"
+              tmp_create: '32_sas/tmp_create_cust_ord_line_promo.sql'
+              extract_query: '32_sas/extract_query_cust_ord_line_promo.sql'
+              unique_keys: "CUSTOMER_ORDER_LINE_ID"
+              full_load: "False"
+              v_cdc_load_table_name: SAS_CUST_ORD_LINE_PROMO
+              v_cdc_load_date: dags/sql/pre_sql.sql
+              v_cdc_overlap: 0.02083333333
+              v_cdc_oms_overlap: 0.02083333333
+            - src_table: CUST_ORD_PROMO
+              dest_table: "C$_0SAS_ORD_PROMO_STG"
+              tmp_create: '32_sas/tmp_create_cust_ord_promo.sql'
+              extract_query: '32_sas/extract_query_cust_ord_promo.sql'
+              unique_keys: "CUSTOMER_ORDER_ID"
+              full_load: "False"
+              v_cdc_load_table_name: SAS_CUST_ORD_PROMO
+              v_cdc_load_date: dags/sql/pre_sql.sql
+              v_cdc_overlap: 0.02083333333
+              v_cdc_oms_overlap: 0.02083333333
+            - src_table: ORDER_STATUS
+              dest_table: "C$_0SAS_ORD_STATUS_STG"
+              tmp_create: '32_sas/tmp_create_order_status.sql'
+              extract_query: '32_sas/extract_query_order_status.sql'
+              unique_keys: "ORDER_STATUS_ID"
+              full_load: "False"
+              v_cdc_load_table_name: SAS_ORDER_STATUS
+              v_cdc_load_date: dags/sql/pre_sql.sql
+              v_cdc_overlap: 0.02083333333
+              v_cdc_oms_overlap: 0.02083333333
+            - src_table: PARENT_GUARDIAN
+              dest_table: "C$_0SAS_PAR_GUAR_STG"
+              tmp_create: '32_sas/tmp_create_parent_guardian.sql'
+              extract_query: '32_sas/extract_query_parent_guardian.sql'
+              unique_keys: "PARENT_GUARDIAN_ID"
+              full_load: "False"
+              v_cdc_load_table_name: SAS_PARENT_GUARDIAN
+              v_cdc_load_date: dags/sql/pre_sql.sql
+              v_cdc_overlap: 0.02083333333
+              v_cdc_oms_overlap: 0.02083333333
+            - src_table: PAYMENT
+              dest_table: "C$_0SAS_PAYMENT_STG"
+              tmp_create: '32_sas/tmp_create_payment.sql'
+              extract_query: '32_sas/extract_query_payment.sql'
+              unique_keys: "PAYMENT_ID"
+              full_load: "False"
+              v_cdc_load_table_name: SAS_PAYMENT
+              v_cdc_load_date: dags/sql/pre_sql.sql
+              v_cdc_overlap: 0.02083333333
+              v_cdc_oms_overlap: 0.02083333333
+            - src_table: SUBJECT_ALIAS
+              dest_table: "C$_0SAS_SUB_ALIAS_STG"
+              tmp_create: '32_sas/tmp_create_subject_alias.sql'
+              extract_query: '32_sas/extract_query_subject_alias.sql'
+              unique_keys: "SUBJECT_ALIAS_ID"
+              full_load: "False"
+              v_cdc_load_table_name: SAS_SUBJECT_ALIAS
+              v_cdc_load_date: dags/sql/pre_sql.sql
+              v_cdc_overlap: 0.02083333333
+              v_cdc_oms_overlap: 0.02083333333
+            - src_table: SUBJECT_ALIAS_TYPE
+              dest_table: "C$_0SAS_SUB_ALI_TYP_STG"
+              tmp_create: '32_sas/tmp_create_subject_alias_type.sql'
+              extract_query: '32_sas/extract_query_subject_alias_type.sql'
+              unique_keys: "SUBJECT_ALIAS_TYPE_ID"
+              full_load: "False"
+              v_cdc_load_table_name: SAS_SUBJECT_ALIAS_TYPE
+              v_cdc_load_date: dags/sql/pre_sql.sql
+              v_cdc_overlap: 0.02083333333
+              v_cdc_oms_overlap: 0.02083333333
+            - src_table: SUBJECT_EVENT_INFO
+              dest_table: "C$_0SAS_SUB_EVT_INF_STG"
+              tmp_create: '32_sas/tmp_create_subject_event_info.sql'
+              extract_query: '32_sas/extract_query_subject_event_info.sql'
+              unique_keys: "SUBJECT_ID"
+              full_load: "False"
+              v_cdc_load_table_name: SAS_SUBJECT_EVENT_INFO
+              v_cdc_load_date: dags/sql/pre_sql.sql
+              v_cdc_overlap: 0.02083333333
+              v_cdc_oms_overlap: 0.02083333333
+            - src_table: SUBSCRIPTION_TYPE
+              dest_table: "C$_0SAS_SUBSCR_TYP_STG"
+              tmp_create: '32_sas/tmp_create_subscription_type.sql'
+              extract_query: '32_sas/extract_query_subscription_type.sql'
+              unique_keys: "SUBSCRIPTION_TYPE_ID"
+              full_load: "False"
+              v_cdc_load_table_name: SAS_SUBSCRIPTION_TYPE
+              v_cdc_load_date: dags/sql/pre_sql.sql
+              v_cdc_overlap: 0.02083333333
+              v_cdc_oms_overlap: 0.02083333333
+            - src_table: SUBSCRIPTION_RELATIONSHIP
+              dest_table: "C$_0SAS_SUB_RELATN_STG"
+              tmp_create: '32_sas/tmp_create_subscription_relationship.sql'
+              extract_query: '32_sas/extract_query_subscription_relationship.sql'
+              unique_keys: "RELATIONSHIP_ID"
+              full_load: "False"
+              v_cdc_load_table_name: SAS_SUBSCRIPTION_RELATIONSHIP
+              v_cdc_load_date: dags/sql/pre_sql.sql
+              v_cdc_overlap: 0.02083333333
+              v_cdc_oms_overlap: 0.02083333333
+            - src_table: SUBJECT_SUBSCRIPTION
+              dest_table: "C$_0SAS_SUB_SUBSCR_STG"
+              tmp_create: '32_sas/tmp_create_subject_subscription.sql'
+              extract_query: '32_sas/extract_query_subject_subscription.sql'
+              unique_keys: "SUBJECT_SUBSCRIPTION_ID"
+              full_load: "False"
+              v_cdc_load_table_name: SAS_SUBJECT_SUBSCRIPTION
+              v_cdc_load_date: dags/sql/pre_sql.sql
+              v_cdc_overlap: 0.02083333333
+              v_cdc_oms_overlap: 0.02083333333
+
+    - name: SAS_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks:
+        - description: DELETE_SAS_PKG
+          type: oracle_sql
+          script_location: dags/sql/32_SAS_LOAD_PKG/DELETE_SAS_PKG.sql
+          args:
+            v_cdc_load_table_name: SAS_RECORD_CHANGE_AUDIT
+            v_cdc_oms_overlap: 0.02083333333
+        - description: LOAD_SAS_SUBJECT_PKG
+          type: oracle_sql
+          script_location: dags/sql/32_SAS_LOAD_PKG/LOAD_SAS_SUBJECT_PKG.sql
+          args:
+            v_cdc_load_table_name: SAS_SUBJECT
+            v_cdc_oms_overlap: 0.02083333333
+        - description: LOAD_SAS_APPOINTMENT_SLOT_PKG
+          type: oracle_sql
+          script_location: dags/sql/32_SAS_LOAD_PKG/LOAD_SAS_APPOINTMENT_SLOT_PKG.sql
+          args:
+            v_cdc_load_table_name: SAS_APPOINTMENT_SLOT
+            v_cdc_oms_overlap: 0.02083333333
+        - description: LOAD_SAS_APPOINTMENT_PKG
+          type: oracle_sql
+          script_location: dags/sql/32_SAS_LOAD_PKG/LOAD_SAS_APPOINTMENT_PKG.sql
+          args:
+            v_cdc_load_table_name: SAS_APPOINTMENT
+            v_cdc_oms_overlap: 0.02083333333
+        - description: LOAD_SAS_CUSTOMER_ORDER_LINE_PKG
+          type: oracle_sql
+          script_location: dags/sql/32_SAS_LOAD_PKG/LOAD_SAS_CUSTOMER_ORDER_LINE_PKG.sql
+          args:
+            v_cdc_load_table_name: SAS_CUSTOMER_ORDER_LINE
+            v_cdc_oms_overlap: 0.02083333333
+        - description: LOAD_SAS_CUSTOMER_ORDER_PKG
+          type: oracle_sql
+          script_location: dags/sql/32_SAS_LOAD_PKG/LOAD_SAS_CUSTOMER_ORDER_PKG.sql
+          args:
+            v_cdc_load_table_name: SAS_CUSTOMER_ORDER
+            v_cdc_oms_overlap: 0.02083333333
+        - description: LOAD_SAS_CUST_ORD_LINE_DTL_PKG
+          type: oracle_sql
+          script_location: dags/sql/32_SAS_LOAD_PKG/LOAD_SAS_CUST_ORD_LINE_DTL_PKG.sql
+          args:
+            v_cdc_load_table_name: SAS_CUST_ORD_LINE_DTL
+            v_cdc_oms_overlap: 0.02083333333
+        - description: LOAD_SAS_CUST_ORD_LINE_PROMO_PKG
+          type: oracle_sql
+          script_location: dags/sql/32_SAS_LOAD_PKG/LOAD_SAS_CUST_ORD_LINE_PROMO_PKG.sql
+          args:
+            v_cdc_load_table_name: SAS_CUST_ORD_LINE_PROMO
+            v_cdc_oms_overlap: 0.02083333333
+        - description: LOAD_SAS_CUST_ORD_PROMO_PKG
+          type: oracle_sql
+          script_location: dags/sql/32_SAS_LOAD_PKG/LOAD_SAS_CUST_ORD_PROMO_PKG.sql
+          args:
+            v_cdc_load_table_name: SAS_CUST_ORD_PROMO
+            v_cdc_oms_overlap: 0.02083333333
+        - description: LOAD_SAS_ORDER_STATUS_PKG
+          type: oracle_sql
+          script_location: dags/sql/32_SAS_LOAD_PKG/LOAD_SAS_ORDER_STATUS_PKG.sql
+          args:
+            v_cdc_load_table_name: SAS_ORDER_STATUS
+            v_cdc_oms_overlap: 0.02083333333
+        - description: LOAD_SAS_PARENT_GUARDIAN_PKG
+          type: oracle_sql
+          script_location: dags/sql/32_SAS_LOAD_PKG/LOAD_SAS_PARENT_GUARDIAN_PKG.sql
+          args:
+            v_cdc_load_table_name: SAS_PARENT_GUARDIAN
+            v_cdc_oms_overlap: 0.02083333333
+        - description: LOAD_SAS_PAYMENT_PKG
+          type: oracle_sql
+          script_location: dags/sql/32_SAS_LOAD_PKG/LOAD_SAS_PAYMENT_PKG.sql
+          args:
+            v_cdc_load_table_name: SAS_PAYMENT
+            v_cdc_oms_overlap: 0.02083333333
+        - description: LOAD_SAS_SUBJECT_ALIAS_PKG
+          type: oracle_sql
+          script_location: dags/sql/32_SAS_LOAD_PKG/LOAD_SAS_SUBJECT_ALIAS_PKG.sql
+          args:
+            v_cdc_load_table_name: SAS_SUBJECT_ALIAS
+            v_cdc_oms_overlap: 0.02083333333
+        - description: LOAD_SAS_SUBJECT_ALIAS_TYPE_PKG
+          type: oracle_sql
+          script_location: dags/sql/32_SAS_LOAD_PKG/LOAD_SAS_SUBJECT_ALIAS_TYPE_PKG.sql
+          args:
+            v_cdc_load_table_name: SAS_SUBJECT_ALIAS_TYPE
+            v_cdc_oms_overlap: 0.02083333333
+        - description: LOAD_SAS_SUBJECT_EVENT_INFO_PKG
+          type: oracle_sql
+          script_location: dags/sql/32_SAS_LOAD_PKG/LOAD_SAS_SUBJECT_EVENT_INFO_PKG.sql
+          args:
+            v_cdc_load_table_name: SAS_SUBJECT_EVENT_INFO
+            v_cdc_oms_overlap: 0.02083333333
+        - description: LOAD_SAS_SUBSCRIPTION_TYPE_PKG
+          type: oracle_sql
+          script_location: dags/sql/32_SAS_LOAD_PKG/LOAD_SAS_SUBSCRIPTION_TYPE_PKG.sql
+          args:
+            v_cdc_load_table_name: SAS_SUBSCRIPTION_TYPE
+            v_cdc_oms_overlap: 0.02083333333
+        - description: LOAD_SAS_SUBSCRIPTION_RELATIONSHIP_PKG
+          type: oracle_sql
+          script_location: dags/sql/32_SAS_LOAD_PKG/LOAD_SAS_SUBSCRIPTION_RELATIONSHIP_PKG.sql
+          args:
+            v_cdc_load_table_name: SAS_SUBSCRIPTION_RELATIONSHIP
+            v_cdc_oms_overlap: 0.02083333333
+        - description: LOAD_SAS_SUBJECT_SUBSCRIPTION_PKG
+          type: oracle_sql
+          script_location: dags/sql/32_SAS_LOAD_PKG/LOAD_SAS_SUBJECT_SUBSCRIPTION_PKG.sql
+          args:
+            v_cdc_load_table_name: SAS_SUBJECT_SUBSCRIPTION
+            v_cdc_oms_overlap: 0.02083333333
+

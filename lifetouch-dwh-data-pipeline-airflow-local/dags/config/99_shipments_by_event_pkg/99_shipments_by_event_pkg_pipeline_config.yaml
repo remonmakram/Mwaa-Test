@@ -1,0 +1,47 @@
+---
+
+pipeline:
+  name: lt_99_shipments_by_event_pkg_dag
+  description: 99_shipments_by_event_pkg package
+  schedule: "0 5 * * *"
+  tags:
+    - lifetouch
+    - 99_shipments_by_event_pkg
+  task_groups:
+
+    - name: 99_shipments_by_event_pkg_ODI_Table_preps
+      tasks:
+        - description: load 99_shipments_by_event_pkg batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/99_shipments_by_event_pkg/99_shipments_by_event_pkg_create_temp_tables.sql
+          args:
+            v_cdc_load_table_name: SHIPMENTS_BY_EVENT_STG
+
+
+    - name: 99_shipments_by_event_pkg_check
+      description: go down a certain branch based on the condition
+      condition_script: dags/sql/99_shipments_by_event_pkg/evaluate_counts.sql
+      compared_value: 1
+      operator: '>'
+      task_ids: { 'true': 'export_files.deploy_export_files', 'false': 'end.drop_tables' }
+
+    - name: export_files
+      export_file_name:
+        v_data_export_run_date: dags/sql/pre_sql/v_data_export_run_date.sql
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      tasks:
+        - export_files:
+          - extract_query: 99_shipments_by_event_pkg/99_shipments_by_event_pkg_extract_query.sql
+            export_location: finance/Shipments_By_Event/shipments
+
+    - name: end
+      tasks:
+        - description: drop tables
+          name: drop_tables
+          trigger_rule: all_done
+          type: oracle_sql
+          script_location: dags/sql/99_shipments_by_event_pkg/99_shipments_by_event_pkg_drop_tables.sql
+          args:
+            v_cdc_load_table_name: SHIPMENTS_BY_EVENT_STG

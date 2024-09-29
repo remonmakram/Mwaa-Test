@@ -1,0 +1,12 @@
+Data Center - :v_US_data_center
+
+PLPS Data Error in the last 24 hours:
+
+ORDER_GUID                                                        PROMO_CODE                                     ISSUE_WITH
+
+--#v_promo_code_missing_revenue_share_updates
+
+The source for this package is in:
+ODS_Project -> LPS_Folder -> MONITOR_PLPS_DATA_ISSUES_PKG
+
+Please feel free to enhance, improve, or refine as you see fit.

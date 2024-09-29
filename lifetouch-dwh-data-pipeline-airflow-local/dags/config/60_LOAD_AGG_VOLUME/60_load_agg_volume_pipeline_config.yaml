@@ -1,0 +1,40 @@
+---
+
+pipeline:
+  name: lt_60_load_agg_volume_dag
+  description: 60 load agg volume pipeline
+  schedule: "0 6 * * *"
+  tags:
+    - lifetouch
+    - load_agg_volume
+  task_groups:
+    - name: LOAD_AGG_VOLUME_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks:
+        - description: agg senior volume subpackage
+          type: oracle_sql
+          script_location: dags/sql/60_LOAD_AGG_VOLUME_PKG/AGG_SENIOR_VOLUME_PKG.sql
+          args:
+            v_cdc_load_table_name: AGG_SENIOR_VOLUME_FACT
+        - description: agg pr prod volumetrics subpackage
+          type: oracle_sql
+          script_location: dags/sql/60_LOAD_AGG_VOLUME_PKG/AGG_PR_PROD_VOLUMETRICS_PKG.sql
+          args:
+            v_cdc_load_table_name: AGG_PR_PROD_VOLUMETRICS_FACT
+        - description: agg pr flash card subpackage
+          type: oracle_sql
+          script_location: dags/sql/60_LOAD_AGG_VOLUME_PKG/AGG_PR_FLASH_CARD_PKG.sql
+          args:
+            v_cdc_load_table_name: AGG_PR_FLASH_CARD_FACT
+        - description: agg plant service days subpackage
+          type: oracle_sql
+          script_location: dags/sql/60_LOAD_AGG_VOLUME_PKG/AGG_PLANT_SERVICE_DAYS_PKG.sql
+          args:
+            v_cdc_load_table_name: AGG_PLANT_SERVICE_DAYS
+        - description: agg one of orders shipped subpackage
+          type: oracle_sql
+          script_location: dags/sql/60_LOAD_AGG_VOLUME_PKG/AGG_ONE_OF_ORDERS_SHIPPED_PKG.sql
+          args:
+            v_cdc_load_table_name: AGG_ONE_OF_ORDERS_SHIPPED

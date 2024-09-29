@@ -1,0 +1,62 @@
+---
+
+pipeline:
+  name: lt_42_irs_dag
+  description: 42 irs pipeline
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - irs
+  task_groups:
+    - name: IRS_Ingestion
+      description: extract and load part
+      ingestion_script: ingestion_script.py
+      data_sources:
+          - type: mysql
+            name: irs
+            default_args:
+                src_prefix: IRS_AF
+                dest_prefix: IRS
+                src_schema: IRS_OWN
+                dest_schema: RAX_APP_USER
+                stage_schema: ODS_STAGE
+                watermark_interval: 30
+                watermark_column: modified_date
+                excluded_columns :   "'ODS_CREATE_DATE', 'ODS_MODIFY_DATE'"
+                insert_date_columns: "ODS_CREATE_DATE, ODS_MODIFY_DATE"
+                update_date_columns: "ODS_MODIFY_DATE"
+                unique_keys: "ID"
+                merge_required: True
+            entities:
+                - src_table: issue_reference_type
+                  unique_keys: REFERENCE_TYPE_ID
+                  watermark_column: last_update_date
+                  lnd_table: ISSUE_REF_TYPE
+                  src_prefix: AF_IRS
+                - src_table: issue_reference
+                  unique_keys: ISSUE_REFERENCE_ID
+                  watermark_column: last_update_date
+                - src_table: issue
+                  unique_keys: ISSUE_ID
+                  watermark_column: last_update_date
+                  excluded_columns: "'ODS_CREATE_DATE', 'ODS_MODIFY_DATE', 'REFERENCE_TYPE', 'REFERENCE_VALUE'"
+                - src_table: source_system
+                  unique_keys: SOURCE_SYSTEM_ID
+                  full_load: "True"
+
+
+    - name: IRS_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+        v_cdc_oms_overlap: 0.02083333333
+      tasks:
+        - description: load irs issue reference subpackage
+          type: mysql
+          script_location: dags/sql/42_LOAD_IRS_PKG/LOAD_IRS_ISSUE_REFERENCE_PKG.sql
+          args:
+            v_cdc_load_table_name: IRS_ISSUE_REFERENCE
+            
+        

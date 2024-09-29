@@ -1,0 +1,52 @@
+---
+
+pipeline:
+  name: lt_tags_load_dag
+  description: tags load pipeline
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - tags
+  task_groups:
+    - name: TAG_Ingestion
+      description: extract and load part
+      ingestion_script: ingestion_script.py
+      data_sources:
+          - type: oracle
+            name: tags
+            default_args:
+                dest_schema: RAX_APP_USER
+                merge_required: False
+            entities:
+              
+                - src_table: TAG_GROUP 
+                  dest_table: "C$_0TAG_GROUP_STG"
+                  tmp_create: '28_TAGS_LOAD_PKG/tmp_create_tag_group_stg.sql'
+                  extract_query: '28_TAGS_LOAD_PKG/extract_query_tag_group.sql'
+                  v_cdc_load_table_name: 'TAGS_TABLES'
+                  v_cdc_oms_overlap: 0.0208333333
+
+
+                - src_table: TAG
+                  dest_table: "C$_0TAG_TAG_STG"
+                  tmp_create: '28_TAGS_LOAD_PKG/tmp_create_tag_tag_stg.sql'
+                  extract_query: '28_TAGS_LOAD_PKG/extract_query_tag.sql'
+                  v_cdc_load_table_name: 'TAGS_TABLES'
+                  v_cdc_oms_overlap: 0.0208333333
+                  
+
+
+    - name: TAGS_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+        # v_cdc_ld_date: dags/sql/pre_sql/pre_v_cdc_ld_date.sql
+      default_args:
+        v_cdc_oms_overlap: 0.0208333333
+      tasks:
+        - description: load tags load subpackage
+          type: oracle_sql
+          script_location: dags/sql/28_TAGS_LOAD_PKG/28_TAGS_LOAD_PKG.sql
+          args:
+            v_cdc_load_table_name: TAGS_TABLES
+        

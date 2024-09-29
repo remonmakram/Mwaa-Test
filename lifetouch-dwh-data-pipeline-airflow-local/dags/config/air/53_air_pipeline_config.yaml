@@ -1,0 +1,98 @@
+---
+
+pipeline:
+  name: lt_53_air_dag
+  description: 53 air pipeline
+  schedule: "0 * * * *"
+  tags:
+    - lifetouch
+    - air
+  task_groups:
+    - name: AIR_Ingestion
+      description: extract and load part
+      ingestion_script: ingestion_script.py
+      data_sources:
+          - type: mysql
+            name: air
+            default_args:
+                src_prefix: AIR_AF
+                dest_prefix: AIR
+                src_schema: AIR_OWN
+                dest_schema: RAX_APP_USER
+                stage_schema: ODS_STAGE
+                watermark_interval: 30
+                watermark_column: modified_date
+                excluded_columns :   "'ODS_CREATE_DATE', 'ODS_MODIFY_DATE'"
+                insert_date_columns: "ODS_CREATE_DATE, ODS_MODIFY_DATE"
+                update_date_columns: "ODS_MODIFY_DATE"
+                allow_master_process: True
+                unique_keys: "ID"
+                merge_required: True
+            entities:
+                - src_table: check_me
+                  lnd_table:  'RAX_APP_USER.AF_IRS_ISSUE_REF_TYPE_LND'
+                - src_table: issue_reference
+                  unique_keys: ISSUE_REFERENCE_ID
+
+                - src_table: issue
+                  excluded_columns: "'ODS_CREATE_DATE', 'ODS_MODIFY_DATE', 'REFERENCE_TYPE', 'REFERENCE_VALUE'"
+                - src_table: retouch_request
+                - src_table: image_group
+                - src_table: asset
+                - src_table: photo_import_batch
+                - src_table: recipe
+                - src_table: image
+                - src_table: record_change_audit
+                  unique_keys: "TABLE_NAME,KEY_VALUE,EVENT_TYPE"
+                  watermark_column: date_created
+                  
+
+
+    - name: AIR_ODI_Transformation
+      description: ODI SQL Transformation Logic
+      pre_sql:
+        v_cdc_load_date: dags/sql/pre_sql.sql
+      default_args:
+        v_cdc_overlap: 0.02083333333
+      tasks:
+        - description: load air photo import batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/53_LOAD_AIR_PKG/LOAD_AIR_PHOTO_IMPORT_BATCH_PKG.sql
+          args:
+            v_cdc_load_table_name: AIR_PHOTO_IMPORT_BATCH
+        - description: load air asset subpackage
+          type: oracle_sql
+          script_location: dags/sql/53_LOAD_AIR_PKG/LOAD_AIR_ASSET_PKG.sql
+          args:
+            v_cdc_load_table_name: AIR_ASSET
+        - description: load air photo import batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/53_LOAD_AIR_PKG/LOAD_AIR_IMAGE_GROUP_PKG.sql
+          args:
+            v_cdc_load_table_name: AIR_IMAGE_GROUP
+        - description: load air asset subpackage
+          type: oracle_sql
+          script_location: dags/sql/53_LOAD_AIR_PKG/LOAD_AIR_RETOUCH_REQUEST_PKG.sql
+          args:
+            v_cdc_load_table_name: AIR_RETOUCH_REQUEST
+        - description: load air photo import batch subpackage
+          type: oracle_sql
+          script_location: dags/sql/53_LOAD_AIR_PKG/LOAD_AIR_ASSET_REQUEST_PKG.sql
+          args:
+            v_cdc_load_table_name: AIR_ASSET_REQUEST
+        - description: load air asset subpackage
+          type: oracle_sql
+          script_location: dags/sql/53_LOAD_AIR_PKG/LOAD_AIR_CHECK_ME_PKG.sql
+          args:
+            v_cdc_load_table_name: AIR_CHECK_ME
+        - description: load air asset subpackage
+          type: oracle_sql
+          script_location: dags/sql/53_LOAD_AIR_PKG/UPDATE_IMAGE_MODIFY_DATE_AIR_PKG.sql
+          args:
+            v_cdc_load_table_name: AIR_IMAGE_MODIFY_DATE
+            v_cdc_oms_overlap: 0.02083333333
+        - description: load air asset subpackage
+          type: oracle_sql
+          script_location: dags/sql/53_LOAD_AIR_PKG/LOAD_AIR_RECORD_CHANGE_AUDIT_PKG.sql
+          args:
+            v_cdc_load_table_name: AIR_RECORD_CHANGE_AUDIT
